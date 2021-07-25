@@ -1,0 +1,245 @@
+#include "main.hpp"
+#include "UI/NativeServerBrowser.hpp"
+#include "UnityEngine/Resources.hpp"
+#include "UnityEngine/Object.hpp"
+#include "UnityEngine/GameObject.hpp"
+#include "UnityEngine/Events/UnityAction.hpp"
+#include "UnityEngine/Vector3.hpp"
+
+#include "System/Text/StringBuilder.hpp"
+#include "System/Action.hpp"
+#include "System/Action_1.hpp"
+
+#include "HMUI/UIKeyboard.hpp"
+#include "HMUI/ImageView.hpp"
+#include "HMUI/Interactable.hpp"
+
+#include "GlobalNamespace/UIKeyboardManager.hpp"
+using namespace GlobalNamespace;
+
+DEFINE_TYPE(ServerBrowser::UI, NativeServerBrowser);
+
+namespace ServerBrowser::UI {
+//#pragma region Components
+//	UnityEngine::UI::Button* _createServerButton;
+//	UnityEngine::UI::Button* _filterButton;
+//	HMUI::CurvedTextMeshPro* _filterButtonLabel;
+//	UnityEngine::UI::Button* _refreshButton;
+//	GlobalNamespace::LoadingControl* _mainLoadingControl;
+//	GlobalNamespace::GameServersListTableView* _tableView;
+//#pragma endregion
+
+#pragma region Creation / Instance
+	//Il2CppString* NativeServerBrowser::GameObjectName = il2cpp_utils::newcsstr("NativeServerBrowserButItsTheMod");
+
+	NativeServerBrowser* Instance = nullptr;
+	GameServerBrowserViewController*  ViewController = nullptr;
+
+	NativeServerBrowser* NativeServerBrowser::SetUp() {
+		if (ViewController == nullptr) {
+			ViewController = UnityEngine::GameObject::FindObjectOfType<GameServerBrowserViewController*>();
+		}
+
+		if (Instance == nullptr)
+		{
+			Instance = ViewController->AddComponent<NativeServerBrowser*>();
+		}
+
+		return Instance;
+	}
+#pragma endregion
+
+#pragma region Core / Data
+	void NativeServerBrowser::OnEnable() {
+		//MpModeSelection->SetTitle(il2cpp_utils::newcsstr("Server Browser"));
+
+		//HostedGameBrowser->OnUpdate += OnBrowserUpdate;
+		auto actionOnJoinPressed = il2cpp_utils::MakeDelegate<System::Action_1<GlobalNamespace::INetworkPlayer*>*>(classof(System::Action_1<GlobalNamespace::INetworkPlayer*>*), OnJoinPressed);
+		_tableView->joinButtonPressedEvent += actionOnJoinPressed;
+
+		DoFullRefresh();
+	}
+
+	void NativeServerBrowser::OnDisable() {
+		//HostedGameBrowser->OnUpdate -= OnBrowserUpdate;
+		auto actionOnJoinPressed = il2cpp_utils::MakeDelegate<System::Action_1<GlobalNamespace::INetworkPlayer*>*>(classof(System::Action_1<GlobalNamespace::INetworkPlayer*>*), OnJoinPressed);
+		_tableView->joinButtonPressedEvent -= actionOnJoinPressed;
+	}
+
+	void NativeServerBrowser::DoFullRefresh() {
+		_refreshButton->set_interactable(false);
+		_filterButton->set_interactable(false);
+
+		_mainLoadingControl->ShowLoading(il2cpp_utils::newcsstr("Loading server list"));
+
+		//HostedGameBrowser.FullRefresh(_searchQuery);
+	}
+
+	void NativeServerBrowser::OnBrowserUpdate() {
+		_refreshButton->set_interactable(true);
+		_filterButton->set_interactable(true);
+
+		// void SetData(System::Collections::Generic::IEnumerable_1<GlobalNamespace::INetworkPlayer*>* servers, bool clearSelection);
+		//_tableView->SetData(HostedFameBrowser->LobbiesOnPage, true);
+
+		UpdateLoadingControl();
+		UpdateFilterButton();
+	}
+
+	void NativeServerBrowser::UpdateLoadingControl() {
+		if (/*!HostedGameBrowser->ConnectionOk*/ false) {
+			_mainLoadingControl->ShowText(il2cpp_utils::newcsstr("Failed to get server list"), true);
+		}
+		else  if (/*!HostedGameBrowser->AnyResultsOnPage*/ false) {
+			bool isSearching = !_searchQuery || !to_utf8(csstrtostr(_searchQuery)).empty();
+			if (isSearching) {
+				_mainLoadingControl->ShowText(il2cpp_utils::newcsstr("No servers found matching your search"), false);
+			}
+			else {
+				_mainLoadingControl->ShowText(il2cpp_utils::newcsstr("No servers found"), true);
+			}
+		}
+		else {
+			_mainLoadingControl->Hide();
+		}
+	}
+
+	void NativeServerBrowser::UpdateFilterButton() {
+		System::Text::StringBuilder* nextLabel = il2cpp_utils::New<System::Text::StringBuilder*>();
+
+		// Current constraints list
+		if (!_searchQuery || !to_utf8(csstrtostr(_searchQuery)).empty()) {
+			std::string search = "Search: \"" + to_utf8(csstrtostr(_searchQuery)) + "\"";
+			nextLabel->Append(il2cpp_utils::newcsstr(search));
+		}
+		else {
+			nextLabel->Append(il2cpp_utils::newcsstr("All Servers"));
+		}
+
+		// No MpEx?
+		if (/*!MpSeession->GetLocalPlayerHasMultiplayerExtensions()*/false) {
+			nextLabel->Append(il2cpp_utils::newcsstr(", no modded games"));
+		}
+
+		// (X results)
+		int resultCount = HostedGameBrowser->TotalResultCount;
+		Il2CppString* resultUnit = resultCount == 1 ? il2cpp_utils::newcsstr("result") : il2cpp_utils::newcsstr("results");
+		nextLabel->Append(il2cpp_utils::newcsstr(std::to_string(resultCount)) + resultUnit);
+
+		// Apply
+		_filterButtonLabel->SetText(nextLabel->ToString());
+	}
+
+	void NativeServerBrowser::OnJoinPressed(GlobalNamespace::INetworkPlayer* game) {
+		//((HostedGameData*)game)->Join();
+	}
+
+	void NativeServerBrowser::OnRefreshPressed() {
+		DoFullRefresh();
+	}
+#pragma endregion
+
+#pragma region Awake (UI Setup)
+	//ModalKeyboard* _modalBeyboard;
+
+	void NativeServerBrowser::Awake() {
+		// Create ModalKeyboard (BSML)
+		//auto modalKeyboardTag = new ModalKeyboardTag();
+		//auto modalKeyboardObj = modalKeyboardTag->CreateObject(transform);
+
+		//_modalKeyboard = modalKeyboardObj->GetComponent<ModalKeyboard>();
+		//_modalKeyboard->clearOnOpen = false;
+		//_modalKeyboard->keyboard->EnterPressed += OnModalKeyboardSubmit;
+
+		// Create server button
+		UnityEngine::Transform* createServerButtonTransform = get_gameObject()->get_transform()->Find(il2cpp_utils::newcsstr("CreateServerButton"));
+		createServerButtonTransform->set_localPosition(UnityEngine::Vector3(-76.50f, 40.0f, 0.0f));
+
+		_createServerButton = createServerButtonTransform->GetComponent<UnityEngine::UI::Button*>();
+		_createServerButton->set_onClick(UnityEngine::UI::Button::ButtonClickedEvent::New_ctor());
+		_createServerButton->get_onClick()->AddListener(il2cpp_utils::MakeDelegate(UnityEngine::Events::UnityAction*,
+			[&]() {
+				//MpModeSelection.OpenCreateServerMenu()
+			}));
+
+		// Move the top-right loading control up, so the refresh button aligns properly
+		(UnityEngine::RectTransform*)(get_gameObject()->get_transform()->Find(il2cpp_utils::newcsstr("Filters/SmallLoadingControl")))->set_localPosition(UnityEngine::Vector3(62.0f, 3.5f, 0.0f));
+
+		// Resize the filters bar so it doesn't overlap the refresh button
+		UnityEngine::Transform* filterButtonTransform = (UnityEngine::RectTransform*)(get_gameObject()->get_transform()->Find(il2cpp_utils::newcsstr("Filters/FilterButton")));
+		filterButtonTransform->set_sizeDelta(UnityEngine::Vector2(-11.0f, 10.0f));
+		filterButtonTransform->set_offsetMax(UnityEngine::Vector2(-11.0f, 5.0f));
+
+		_filterButton = filterButtonTransform->GetComponent<UnityEngine::UI::Button>();
+		_filterButton->set_onClick(UnityEngine::UI::Button::ButtonClickedEvent::New_ctor());
+		_filterButton->get_onClick()->AddListener(il2cpp_utils::MakeDelegate(UnityEngine::Events::UnityAction*,
+			[&]() {
+				//_modalKeyboard.keyboard.KeyboardText.text = !String.IsNullOrEmpty(_searchQuery) ? _searchQuery : "";
+
+				//_modalKeyboard.modalView.Show(true, true, null);
+			}));
+
+		// Filters lable
+		_filterButtonLabel = get_transform()->Find(il2cpp_utils::newcsstr("Filters/FilterButton/Content/Text"))->GetComponent<HMUI::CurvedTextMeshPro*>();
+		_filterButtonLabel->set_text(il2cpp_utils::newcsstr("Hello world!"));
+
+		// Hide top-right loading spinners
+		UnityEngine::Object::Destroy(get_transform()
+			->Find(il2cpp_utils::newcsstr("Filters/SmallLoadingControl/LoadingContainer"))->get_gameObject());
+		UnityEngine::Object::Destroy(get_transform()
+			->Find(il2cpp_utils::newcsstr("Filters/SmallLoadingControl/DownloadingContainer"))->get_gameObject());
+
+		// Refresh button (add listener, make visible)
+		LoadingControl* smallLoadingControl = get_transform()->Find(il2cpp_utils::newcsstr("Filters/SmallLoadingControl"))
+			->GetComponent<LoadingControl*>();
+		auto actionOnRefreshPressed = il2cpp_utils::MakeDelegate(System::Action*, OnRefreshPressed);
+		smallLoadingControl->didPressRefreshButtonEvent += actionOnRefreshPressed;
+
+		auto refreshContainer = smallLoadingControl->get_transform()->Find(il2cpp_utils::newcsstr("RefreshContainer"));
+		refreshContainer->get_gameObject->SetActive(true);
+
+		_refreshButton = refreshContainer->Find(il2cpp_utils::newcsstr("RefreshButton"))
+			->GetComponent<UnityEngine::UI::Button*>();
+
+		// Change "Music Packs" table header to "Type"
+		get_transform()->Find(il2cpp_utils::newcsstr("GameServersListTableView/GameServerListTableHeader/LabelsContainer/MusicPack"))
+			->GetComponent<HMUI::CurvedTextMeshPro*>()
+			->SetText(il2cpp_utils::newcsstr("Type"));
+
+		// Main loading control
+		_mainLoadingControl = get_transform()
+			->Find(il2cpp_utils::newcsstr("GameServersListTableView/TableView/Viewport/MainLoadingControl"))
+			->GetComponent<LoadingControl*>();
+		_mainLoadingControl->didPressRefreshButtonEvent += actionOnRefreshPressed;
+
+		_mainLoadingControl->ShowLoading("Initializing");
+
+		// Table view
+		_tableView = get_transform()->Find(il2cpp_utils::newcsstr("GameServersListTableView"))->GetComponent<GameServersListTableView*>();
+
+		// Modify content cell prefab (add a background)
+		//var contentCellPrefab = _tableView->GetField<GameServerListTableCell, GameServersListTableView>("_gameServerListCellPrefab");
+
+		GameServerListTableCell* contentCellPrefab = _tableView->gameServerListCellPrefab;
+
+		//auto backgroundBase = UnityEngine::Resources::FindObjectOfType<HMUI::ImageView>()(x = > x.gameObject ? .name == "Background"
+		//	&& x.sprite != null && x.sprite.name.StartsWith("RoundRect10"));
+
+		//var backgroundClone = UnityEngine.Object.Instantiate(backgroundBase);
+		//backgroundClone.transform.SetParent(contentCellPrefab.transform, false);
+		//backgroundClone.transform.SetAsFirstSibling();
+		//backgroundClone.name = "Background";
+
+		//var backgroundTransform = backgroundClone.transform as RectTransform;
+		//backgroundTransform.anchorMin = new Vector2(0.0f, 0.0f);
+		//backgroundTransform.anchorMax = new Vector2(0.95f, 1.0f);
+		//backgroundTransform.offsetMin = new Vector2(0.5f, 0.0f);
+		//backgroundTransform.offsetMax = new Vector2(5.0f, 0.0f);
+		//backgroundTransform.sizeDelta = new Vector2(4.50f, 0.0f);
+
+		//var cellBackgroundHelper = contentCellPrefab.gameObject.AddComponent<CellBackgroundHelper>();
+		//cellBackgroundHelper.Cell = contentCellPrefab;
+		//cellBackgroundHelper.Background = backgroundClone;
+	}
+#pragma endregion
+}

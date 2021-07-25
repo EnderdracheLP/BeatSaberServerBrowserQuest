@@ -1,0 +1,15 @@
+{
+  "host_identifier": "local",
+  "predefines": {
+    "cpp_compiler": "clang++",
+    "cpp_compiler_defines": {},
+    "cpp_user_defines": {},
+    "cpp_user_undefines": [],
+    "c_compiler": "g++",
+    "c_compiler_defines": {},
+    "c_user_defines": {},
+    "c_user_undefines": []
+  },
+  "target_sizes": {},
+  "supports_x86_64": true
+}

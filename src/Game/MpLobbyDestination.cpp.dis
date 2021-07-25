@@ -1,0 +1,10 @@
+#include "main.hpp"
+#include "Game/MpLobbyDestination.hpp"
+using namespace GlobalNamespace;
+
+DEFINE_TYPE(ServerBrowser::Game, MpLobbyDestination);
+
+namespace ServerBrowser::Game {
+	MpLobbyDestination::MpLobbyDestionation(std::string serverCode, Il2CppString* hostSecret) {
+	}
+}

@@ -1,0 +1,32 @@
+#include "UI/ServerBrowserFlowCoordinator.hpp"
+#include "UI/ServerBrowserViewController.hpp"
+#include "HMUI/ViewController_AnimationType.hpp"
+#include "HMUI/ViewController_AnimationDirection.hpp"
+#include "questui/shared/BeatSaberUI.hpp"
+
+#ifndef REGISTER_FUNCTION
+DEFINE_TYPE(ServerBrowser::UI, ServerBrowserFlowCoordinator);
+#elif defined(DEFINE_TYPE)
+DEFINE_TYPE(ServerBrowser::UI::ServerBrowserFlowCoordinator);
+#elif defined(DEFINE_CLASS)
+DEFINE_CLASS(ServerBrowser::UI::ServerBrowserFlowCoordinator);
+#else
+#error Unsupported Custom-Types version!
+#endif
+
+namespace ServerBrowser::UI {
+	void ServerBrowserFlowCoordinator::DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+		if (firstActivation) {
+			this->SetTitle(il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("ServerBrowser::UI::FlowCoordinator"), HMUI::ViewController::AnimationDirection::Vertical);
+			this->showBackButton = true;
+
+			if (!this->ServerBrowserView) this->ServerBrowserView = QuestUI::BeatSaberUI::CreateViewController<ViewControllers::ServerBrowserViewController*>();
+
+			this->ProvideInitialViewControllers(ServerBrowserView, nullptr, nullptr, nullptr, nullptr);
+		}
+	}
+
+	void ServerBrowserFlowCoordinator::BackButtonWasPressed(HMUI::ViewController* topViewController) {
+		this->parentFlowCoordinator->DismissFlowCoordinator(this, HMUI::ViewController::AnimationDirection::Horizontal, nullptr, false);
+	}
+}

@@ -1,0 +1,9 @@
+#include "main.hpp"
+#include "GlobalNamespace/SelectMultiplayerLobbyDestination.hpp"
+#include "custom-types/shared/macros.hpp"
+
+DECLARE_CLASS_CODEGEN(ServerBrowser::Game, MpLobbyDestination, GlobalNamespace::SelectMultiplayerLobbyDestination
+
+DECLARE_CTOR(MpLobbyDestination, std::string, Il2CppString*);
+
+)

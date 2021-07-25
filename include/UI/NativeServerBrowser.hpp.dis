@@ -1,0 +1,49 @@
+#include "main.hpp"
+#include "custom-types/shared/macros.hpp"
+#include "UnityEngine/MonoBehaviour.hpp"
+#include "UnityEngine/UI/Button.hpp"
+#include "HMUI/CurvedTextMeshPro.hpp"
+#include "GlobalNamespace/GameServerBrowserViewController.hpp"
+#include "GlobalNamespace/INetworkPlayer.hpp"
+#include "GlobalNamespace/LoadingControl.hpp"
+#include "GlobalNamespace/GameServersListTableView.hpp"
+
+/*
+TODO: https://github.com/roydejong/BeatSaberServerBrowser/blob/3fb775cafe03bca9cd253704fd721c0322937e0f/UI/NativeServerBrowser.cs
+*/
+
+DECLARE_CLASS_CODEGEN(ServerBrowser::UI, NativeServerBrowser, UnityEngine::MonoBehaviour, 
+
+	DECLARE_STATIC_FIELD(Il2CppString*, GameObjectName);
+
+	public:
+		static ServerBrowser::UI::NativeServerBrowser* Instance;
+
+	DECLARE_STATIC_FIELD(GlobalNamespace::GameServerBrowserViewController*, ViewController);
+
+	DECLARE_STATIC_METHOD(ServerBrowser::UI::NativeServerBrowser*, SetUp);
+
+	DECLARE_INSTANCE_FIELD_DEFAULT(Il2CppString*, _searchQuery, nullptr);
+
+	DECLARE_INSTANCE_METHOD(void, OnEnable);
+	DECLARE_INSTANCE_METHOD(void, OnDisable);
+	DECLARE_INSTANCE_METHOD(void, DoFullRefresh);
+	DECLARE_INSTANCE_METHOD(void, OnBrowserUpdate);
+	DECLARE_INSTANCE_METHOD(void, UpdateLoadingControl);
+	DECLARE_INSTANCE_METHOD(void, UpdateFilterButton);
+	DECLARE_INSTANCE_METHOD(void, OnJoinPressed, GlobalNamespace::INetworkPlayer* game);
+	DECLARE_INSTANCE_METHOD(void, OnModalKeyboardSubmit, Il2CppString* searchValue);
+	DECLARE_INSTANCE_METHOD(void, OnRefreshPressed);
+
+	DECLARE_INSTANCE_FIELD(UnityEngine::UI::Button*, _createServerButton);
+	DECLARE_INSTANCE_FIELD(UnityEngine::UI::Button*, _filterButton);
+	DECLARE_INSTANCE_FIELD(HMUI::CurvedTextMeshPro*, _filterButtonLabel);
+	DECLARE_INSTANCE_FIELD(UnityEngine::UI::Button*, _refreshButton);
+	DECLARE_INSTANCE_FIELD(GlobalNamespace::LoadingControl*, _mainLoadingControl);
+	DECLARE_INSTANCE_FIELD(GlobalNamespace::GameServersListTableView*, _tableView);
+
+	/* TODO: BSML Keyboard stuff would be here
+		DECLARE_INSTANCE_FIELD(ModalKeyboard*, _modalKeyboard),
+	*/ 
+	DECLARE_INSTANCE_METHOD(void, Awake);
+)

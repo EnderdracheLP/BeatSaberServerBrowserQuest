@@ -1,0 +1,15 @@
+#include "main.hpp"
+
+namespace ServerBrowser::UI::Components {
+	class HostedGameCellData : CustomListTableData::CustomCellInfo {
+	public:
+		HostedGameData Game;
+		HostedGameData get_HostedGameData();
+
+	private:
+		void set_HostedGameData(HostedGameData Game);
+
+		static CancellationTokenSource* _cancellationTokenSource;
+		staitc System::Action<HostedGameCellData>* _onContentChange;
+	};
+}

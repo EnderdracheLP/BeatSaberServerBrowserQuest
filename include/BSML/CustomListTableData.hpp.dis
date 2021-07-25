@@ -1,0 +1,16 @@
+#include "main.hpp"
+#include "custom-types/shared/macros.hpp"
+#include "UnityEngine/MonoBehaviour.hpp"
+#include "HMUI/TableView.hpp"
+
+// TODO: Do I need to implement this BSML class?
+DECLARE_CLASS_CODEGEN_INTERFACES(BeatSaberMarkubLanguage::Components, CustomListTableData, UnityEngine::MonoBehaviour*, HMUI::TableView::IDataSource*,
+
+public:
+	enum ListStyle {
+		List, Box, Simple
+	};
+
+	DECLARE_INSTANCE_FIELD_DEFAULT(ListStyle, listStyle, ListStyle::List;)
+	DECLARE_INSTANCE_FIELD(GlobalNamespace::LevelListTableCell, )
+)

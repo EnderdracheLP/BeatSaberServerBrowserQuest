@@ -1,0 +1,56 @@
+#include "main.hpp"
+#include "questui/shared/BeatSaberUI.hpp"
+#include "GlobalNamespace/MultiplayerSessionManager.hpp"
+
+namespace ServerBrowser::UI::Components {
+	class LobbyConfigPanel : NotifiableSingleTon<LobbyConfigPanel> {
+	public:
+#pragma region LobbyAnnounceToggle
+		UnityEngine::UI::Toggle* LobbyAnnounceToggle;
+		bool LobbyAnnounceToggleValue;
+		bool get_LobbyAnnounceToggleValue();
+		void set_LobbyAnnounceToggleValue(bool value);
+
+		void SetLobbyAnnounceToggle(bool value);
+
+#pragma endregion
+
+#pragma region StatusText
+		TMPro::TextMeshProUGUI* StatusText;
+#pragma endregion
+
+#pragma region Set Game Name
+		// No BSML
+
+		UnityEngine::UI::VerticalLayoutGroup* MainContentRoot;
+
+		Il2CppString* NameValue;
+		Il2CppString* get_NameValue();
+		void set_NameValue(Il2CppString* value);
+
+		void NameKeyboardSubmit(Il2CppString* text);
+
+		UnityEngine::UI::Button* NameButton;
+		void NameButtonClick();
+#pragma endregion
+
+#pragma region JoinNotificationsEnabled
+		// Not Implemented
+#pragma endregion
+
+#pragma region UI Update
+	private:
+		GlobalNamespace::MultiplayerSessionManager* sessionManager;
+
+	public:
+		static void UpdatePanelInstance();
+
+		void UpdatePanel();
+#pragma endregion
+
+#pragma region BSML Modifier Tab
+		// Not Implemented
+#pragma endregion
+
+	};
+}
