@@ -17,6 +17,11 @@ namespace ServerBrowser::Game {
 		static bool WeAbortedJoin;
 		static ServerBrowser::Core::HostedGameData LastConnectToHostedGame;
 
+		// Remove the below for next update
+		static Il2CppString* InjectQuickPlaySecret;
+		static Il2CppString* InjectServerCode;
+
+
 #pragma region Init
 	private:
 		static GlobalNamespace::MultiplayerModeSelectionFlowCoordinator* _flowCoordinator;

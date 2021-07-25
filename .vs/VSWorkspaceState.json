@@ -2,11 +2,15 @@
   "ExpandedNodes": [
     "",
     "\\include",
-    "\\include\\BSML",
-    "\\include\\Core",
+    "\\include\\Game",
+    "\\include\\UI",
+    "\\include\\UI\\Components",
     "\\src",
-    "\\src\\Core"
+    "\\src\\Core",
+    "\\src\\Game",
+    "\\src\\UI",
+    "\\src\\UI\\Components"
   ],
-  "SelectedNode": "\\BeatSaberServerBrowserQuest.sln",
+  "SelectedNode": "\\src\\main.cpp",
   "PreviewInSolutionExplorer": false
 }

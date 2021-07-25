@@ -51,8 +51,8 @@ Logger& getLogger() {
 //ServerBrowser::UI::ServerBrowserFlowCoordinator* SBFlowCd;
 
 MAKE_HOOK_MATCH(MultiplayerModeSelectionViewController_DidActivate, &MultiplayerModeSelectionViewController::DidActivate, void, MultiplayerModeSelectionViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
-    MultiplayerModeSelectionViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
     getLogger().debug("MultiplayerModeSelectionViewController_DidActivate");
+    MultiplayerModeSelectionViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 
     UnityEngine::UI::Button* btnGameBrowser = self->gameBrowserButton;
     btnGameBrowser->set_enabled(true);
@@ -119,18 +119,18 @@ MAKE_HOOK_MATCH(CreateServerViewController_DidActivate, &CreateServerViewControl
     CreateServerViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 }
 
-MAKE_HOOK_MATCH(GameServerBrowserFlowCoordinator_DidActivate, &GameServerBrowserFlowCoordinator::DidActivate, void, GameServerBrowserFlowCoordinator* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
-    getLogger().debug("GameServerBrowserFlowCoordinator_DidActivate");
-    //GameServerBrowserFlowCoordinator_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
-    self->set_showBackButton(true);
-    self->SetTitle(il2cpp_utils::newcsstr("Server Browser"), HMUI::ViewController::AnimationDirection::Vertical);
-    //self->parentFlowCoordinator->ReplaceChildFlowCoordinator(SBFlowCd, nullptr, HMUI::ViewController::AnimationDirection::Horizontal, false);
-    //self->parentFlowCoordinator->DismissFlowCoordinator(self, HMUI::ViewController::AnimationDirection::Horizontal, nullptr, false);
-
-    //GameServerBrowserViewController* GBVC = GameServerBrowserViewController::New_ctor();
-    //
-    //self->ProvideInitialViewControllers(GBVC, nullptr, nullptr, nullptr, nullptr);
-}
+//MAKE_HOOK_MATCH(GameServerBrowserFlowCoordinator_DidActivate, &GameServerBrowserFlowCoordinator::DidActivate, void, GameServerBrowserFlowCoordinator* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+//    getLogger().debug("GameServerBrowserFlowCoordinator_DidActivate");
+//    //GameServerBrowserFlowCoordinator_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
+//    self->set_showBackButton(true);
+//    self->SetTitle(il2cpp_utils::newcsstr("Server Browser"), HMUI::ViewController::AnimationDirection::Vertical);
+//    //self->parentFlowCoordinator->ReplaceChildFlowCoordinator(SBFlowCd, nullptr, HMUI::ViewController::AnimationDirection::Horizontal, false);
+//    //self->parentFlowCoordinator->DismissFlowCoordinator(self, HMUI::ViewController::AnimationDirection::Horizontal, nullptr, false);
+//
+//    //GameServerBrowserViewController* GBVC = GameServerBrowserViewController::New_ctor();
+//    //
+//    //self->ProvideInitialViewControllers(GBVC, nullptr, nullptr, nullptr, nullptr);
+//}
 
 //MAKE_HOOK_FIND_CLASS_UNSAFE_INSTANCE(GameServerBrowserFlowCoordinator_BackButtonWasPressed, "", "GameServerBrowserFlowCoordinator", "BackButtonWasPressed", void, GameServerBrowserFlowCoordinator* self, HMUI::ViewController* topViewController) {
 //    getLogger().debug("GameServerBrowserFlowCoordinator_BackButtonWasPressed");
@@ -163,7 +163,7 @@ extern "C" void load() {
     getLogger().info("Installing hooks...");
     INSTALL_HOOK(getLogger(), MultiplayerModeSelectionViewController_DidActivate);
     INSTALL_HOOK(getLogger(), CreateServerViewController_DidActivate);
-    INSTALL_HOOK(getLogger(), GameServerBrowserFlowCoordinator_DidActivate);
+    //INSTALL_HOOK(getLogger(), GameServerBrowserFlowCoordinator_DidActivate);
     INSTALL_HOOK(getLogger(), MultiplayerModeSelectionFlowCoordinator_HandleMultiplayerLobbyControllerDidFinish);
     //INSTALL_HOOK(getLogger(), GameServerBrowserFlowCoordinator_BackButtonWasPressed);
     //INSTALL_HOOK(getLogger(), GameServerBrowserViewController_DidActivate);
