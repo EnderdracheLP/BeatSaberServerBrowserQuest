@@ -18,7 +18,7 @@ TARGET_ARCH_ABI := $(APP_ABI)
 
 rwildcard=$(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
 
-# Creating prebuilt for dependency: modloader - version: 1.2.3
+# Creating prebuilt for dependency: modloader - version: 1.1.0
 include $(CLEAR_VARS)
 LOCAL_MODULE := modloader
 LOCAL_EXPORT_C_INCLUDES := extern/modloader

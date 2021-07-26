@@ -1,0 +1,32 @@
+--------- beginning of main
+--------- beginning of system
+--------- beginning of tracking
+[38;5;196m07-26 18:58:04.257 21781 21781 E main-modloader: Failed to dlopen: /data/data/com.beatgames.beatsaber/libbs-utils.so, dlerror: dlopen failed: library "libbeatsaber-hook_1_3_3.so" not found[0m
+[38;5;166m07-26 18:58:04.426 21781 21781 W main-modloader: Failed List:[0m
+[38;5;196m07-26 18:58:04.426 21781 21781 E main-modloader: Failed to dlopen: /data/data/com.beatgames.beatsaber/libbs-utils.so, dlerror: dlopen failed: library "libbeatsaber-hook_1_3_3.so" not found[0m
+[38;5;196m07-26 18:58:04.426 21781 21781 E main-modloader: STILL Failed to dlopen: /data/data/com.beatgames.beatsaber/libbs-utils.so[0m
+[38;5;166m07-26 18:58:04.426 21781 21781 W main-modloader: One or more libs failed to load! Continuing anyways...[0m
+[38;5;196m07-26 18:58:04.620 21781 21781 E QuestHook[UtilsLogger|v2.0.3]: Only found 0 instructions matching this predicate![0m
+[38;5;196m07-26 18:58:04.630 21781 21781 E QuestHook[UtilsLogger|v2.0.3]: (il2cpp_functions::find_GC_SetWriteBarrier) gc_wbarrier_start.findNthDirectBranchWithoutLink(1) (in bool find_GC_SetWriteBarrier(const int32_t *) at /home/runner/work/beatsaber-hook/beatsaber-hook/src/utils/il2cpp-functions.cpp:406) returned false![0m
+[38;5;40m07-26 18:58:04.642 21781 21781 I QuestHook[ServerBrowser|v0.1.0]: Completed setup![0m
+[38;5;166m07-26 18:58:04.646 21781 21781 W main-modloader: dlerror when dlopening: /data/data/com.beatgames.beatsaber/libplaylistmanager.so: dlopen failed: library "libsongloader.so" not found[0m
+[38;5;166m07-26 18:58:04.656 21781 21781 W main-modloader: Failed List:[0m
+[38;5;40m07-26 18:58:05.356 21781 21824 I QuestHook[ServerBrowser|v0.1.0]: Installing hooks...[0m
+[38;5;40m07-26 18:58:05.356 21781 21824 I QuestHook[ServerBrowser|v0.1.0]: Installing hook: MultiplayerModeSelectionViewController_DidActivate to offset: 0x7cc9ba8a20[0m
+[38;5;40m07-26 18:58:05.356 21781 21824 I QuestHook[ServerBrowser|v0.1.0]: Installing hook: CreateServerViewController_DidActivate to offset: 0x7cc9d39dac[0m
+[38;5;40m07-26 18:58:05.356 21781 21824 I QuestHook[ServerBrowser|v0.1.0]: Installing hook: MultiplayerModeSelectionFlowCoordinator_HandleMultiplayerLobbyControllerDidFinish to offset: 0x7cc9bd4928[0m
+[38;5;40m07-26 18:58:05.356 21781 21824 I QuestHook[ServerBrowser|v0.1.0]: Installed all hooks![0m
+[38;5;75m07-26 18:58:16.673 21781 21824 D QuestHook[ServerBrowser|v0.1.0]: MultiplayerModeSelectionViewController_DidActivate[0m
+[38;5;75m07-26 18:58:16.673 21781 21824 D QuestHook[ServerBrowser|v0.1.0]: MultiplayerModeSelectionViewController get gameBrowserButtom[0m
+[38;5;75m07-26 18:58:16.673 21781 21824 D QuestHook[ServerBrowser|v0.1.0]: Components values[0] name: DEV_GameServerBrowser (UnityEngine.RectTransform)[0m
+[38;5;75m07-26 18:58:16.673 21781 21824 D QuestHook[ServerBrowser|v0.1.0]: Components values[1] name: DEV_GameServerBrowser (UnityEngine.CanvasRenderer)[0m
+[38;5;75m07-26 18:58:16.673 21781 21824 D QuestHook[ServerBrowser|v0.1.0]: Components values[2] name: DEV_GameServerBrowser (SignalOnUIButtonClick)[0m
+[38;5;75m07-26 18:58:16.673 21781 21824 D QuestHook[ServerBrowser|v0.1.0]: Components values[3] name: DEV_GameServerBrowser (HMUI.NoTransitionsButton)[0m
+[38;5;75m07-26 18:58:16.673 21781 21824 D QuestHook[ServerBrowser|v0.1.0]: Components values[4] name: DEV_GameServerBrowser (HMUI.ButtonStaticAnimations)[0m
+[38;5;75m07-26 18:58:16.673 21781 21824 D QuestHook[ServerBrowser|v0.1.0]: Components values[5] name: DEV_GameServerBrowser (HMUI.StackLayoutGroup)[0m
+[38;5;75m07-26 18:58:16.673 21781 21824 D QuestHook[ServerBrowser|v0.1.0]: Components values[6] name: DEV_GameServerBrowser (UnityEngine.Animation)[0m
+[38;5;75m07-26 18:58:16.673 21781 21824 D QuestHook[ServerBrowser|v0.1.0]: MultiplayerModeSelectionViewController firstActivation[0m
+[38;5;75m07-26 18:58:16.673 21781 21824 D QuestHook[ServerBrowser|v0.1.0]: MpModeSelection::SetUp get MultiplayerModeSelectionFlowCoordinator[0m
+[38;5;75m07-26 18:58:16.676 21781 21824 D QuestHook[ServerBrowser|v0.1.0]: MpModeSelection::SetUp get multiplayerLobbyConnectionController[0m
+[38;5;75m07-26 18:58:16.676 21781 21824 D QuestHook[ServerBrowser|v0.1.0]: MpModeSelection::SetUp get joiningLobbyViewController[0m
+[38;5;75m07-26 18:58:16.676 21781 21824 D QuestHook[ServerBrowser|v0.1.0]: MpModeSelection::SetUp get simpleDialogPromptViewController[0m

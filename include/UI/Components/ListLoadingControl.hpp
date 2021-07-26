@@ -1,3 +1,4 @@
+#pragma once
 #include "main.hpp"
 #include "UnityEngine/Transform.hpp"
 #include "GlobalNamespace/LoadingControl.hpp"

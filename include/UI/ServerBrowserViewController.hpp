@@ -17,6 +17,7 @@ DECLARE_CLASS_CODEGEN(ServerBrowser::UI::ViewControllers, ServerBrowserViewContr
         //HostedGameData _selectedGame;
     DECLARE_INSTANCE_FIELD_DEFAULT(GlobalNamespace::LoadingControl*, _loadingControl, nullptr);
 
+    DECLARE_INSTANCE_METHOD(void, RefreshButtonClick);
     DECLARE_INSTANCE_METHOD(void, SetInitialUiState);
     DECLARE_INSTANCE_METHOD(void, CancelImageLoading, bool reset = true);
 

@@ -7,16 +7,21 @@
 #include "Game/MpModeSelection.hpp"
 #include "UI/PluginUi.hpp"
 
-#include "UnityEngine/UI/Button.hpp"
-#include "UnityEngine/GameObject.hpp"
-#include "UnityEngine/Transform.hpp"
-#include "UnityEngine/Vector3.hpp"
-
 #include "HMUI/ViewController.hpp"
 #include "HMUI/FlowCoordinator.hpp"
 #include "HMUI/ViewController_AnimationType.hpp"
 #include "HMUI/ViewController_AnimationDirection.hpp"
 #include "HMUI/CurvedTextMeshPro.hpp"
+#include "HMUI/CurvedCanvasSettingsHelper.hpp"
+
+#include "TMPro/TextMeshProUGUI.hpp"
+
+#include "UnityEngine/UI/Button.hpp"
+#include "UnityEngine/GameObject.hpp"
+#include "UnityEngine/Transform.hpp"
+#include "UnityEngine/Vector3.hpp"
+#include "UnityEngine/RectTransform.hpp"
+#include "UnityEngine/Component.hpp"
 
 #include "custom-types/shared/register.hpp"
 
@@ -29,6 +34,7 @@
 #include "GlobalNamespace/GameServerBrowserFlowCoordinator.hpp"
 #include "GlobalNamespace/GameServerBrowserViewController.hpp"
 using namespace GlobalNamespace;
+using namespace UnityEngine;
 using namespace ServerBrowser::UI;
 using namespace ServerBrowser::Game;
 
@@ -53,18 +59,19 @@ Logger& getLogger() {
 MAKE_HOOK_MATCH(MultiplayerModeSelectionViewController_DidActivate, &MultiplayerModeSelectionViewController::DidActivate, void, MultiplayerModeSelectionViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     getLogger().debug("MultiplayerModeSelectionViewController_DidActivate");
     MultiplayerModeSelectionViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
-
+    getLogger().debug("MultiplayerModeSelectionViewController get gameBrowserButtom");
     UnityEngine::UI::Button* btnGameBrowser = self->gameBrowserButton;
     btnGameBrowser->set_enabled(true);
     btnGameBrowser->get_gameObject()->SetActive(true);
 
-    Array<UnityEngine::Component*>* comp = btnGameBrowser->GetComponents<UnityEngine::Component*>();
-    //getLogger().debug("Amount of Components %d", comp->get_Length());
+    Array<Component*>* comp = btnGameBrowser->GetComponents<Component*>();
     for (int i = 0; i < comp->get_Length(); i++) {
         comp->values[i]->get_gameObject()->SetActive(true);
-        //getLogger().debug("Components values[%d]", i);
+        getLogger().debug("Components values[%d] name: %s", i, to_utf8(csstrtostr(comp->values[i]->ToString())).c_str());
     }
 
+
+    getLogger().debug("MultiplayerModeSelectionViewController firstActivation");
     if (firstActivation) {
 #pragma region Setup
         //MpSession::Setup();
@@ -86,7 +93,6 @@ MAKE_HOOK_MATCH(MultiplayerModeSelectionViewController_DidActivate, &Multiplayer
 #pragma endregion
     }
 }
-
 
 MAKE_HOOK_MATCH(MultiplayerModeSelectionViewController_HandleMenuButton, &MultiplayerModeSelectionViewController::HandleMenuButton, void, MultiplayerModeSelectionViewController* self, MultiplayerModeSelectionViewController::MenuButton menuButton) {
     getLogger().debug("MultiplayerModeSelectionViewController_HandleMenuButton");

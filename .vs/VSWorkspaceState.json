@@ -1,8 +1,8 @@
 {
   "ExpandedNodes": [
     "",
+    "\\extern",
     "\\include",
-    "\\include\\Game",
     "\\include\\UI",
     "\\include\\UI\\Components",
     "\\src",
@@ -11,6 +11,6 @@
     "\\src\\UI",
     "\\src\\UI\\Components"
   ],
-  "SelectedNode": "\\src\\main.cpp",
+  "SelectedNode": "\\logging.ps1",
   "PreviewInSolutionExplorer": false
 }

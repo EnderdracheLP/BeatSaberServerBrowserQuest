@@ -32,9 +32,13 @@ namespace ServerBrowser::Game {
 #pragma region Init
 	void MpModeSelection::SetUp()
 	{
-		_flowCoordinator = UnityEngine::Object::FindObjectOfType<GlobalNamespace::MultiplayerModeSelectionFlowCoordinator*>();
+		getLogger().debug("MpModeSelection::SetUp get MultiplayerModeSelectionFlowCoordinator");
+		_flowCoordinator = UnityEngine::Object::FindObjectOfType<MultiplayerModeSelectionFlowCoordinator*>();
+		getLogger().debug("MpModeSelection::SetUp get multiplayerLobbyConnectionController");
 		_mpLobbyConnectionController = _flowCoordinator->multiplayerLobbyConnectionController;
+		getLogger().debug("MpModeSelection::SetUp get joiningLobbyViewController");
 		_joiningLobbyViewController = _flowCoordinator->joiningLobbyViewController;
+		getLogger().debug("MpModeSelection::SetUp get simpleDialogPromptViewController");
 		_simpleDialogPromptViewController = _flowCoordinator->simpleDialogPromptViewController;
 	}
 

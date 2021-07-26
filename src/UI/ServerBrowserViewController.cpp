@@ -1,17 +1,20 @@
+#include "main.hpp"
 #include "UI/ServerBrowserViewController.hpp"
 #include "Core/HostedGameData.hpp"
 #include "Game/MpModeSelection.hpp"
 
 #include "UnityEngine/GameObject.hpp"
 #include "UnityEngine/UI/VerticalLayoutGroup.hpp"
+#include "UnityEngine/Color.hpp"
 #include "HMUI/Touchable.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
 #include "questui/shared/QuestUI.hpp"
+#include "TMPro/TextAlignmentOptions.hpp"
 #include "Polyglot/Localization.hpp"
-#include "UnityEngine/Color.hpp"
 using namespace UnityEngine;
 using namespace HMUI;
 using namespace GlobalNamespace;
+using namespace QuestUI::BeatSaberUI;
 using namespace ServerBrowser::Core;
 using namespace ServerBrowser::Game;
 using ServerBrowser::UI::Components::ListLoadingControl;
@@ -20,28 +23,200 @@ DEFINE_TYPE(ServerBrowser::UI::ViewControllers, ServerBrowserViewController);
 
 namespace ServerBrowser::UI::ViewControllers {
     //HostedGameFilters ServerBrowserViewController::_filters = new HostedGameFilters();
-    //System::Threading::CancellationTokenSource* ServerBrowserViewController::_imageLoadCancellation = nullptr;
+    //ServerBrowserViewController::_imageLoadCancellation;
     //HostedGameData ServerBrowserViewController::_selectedGame = null;
-    //LoadingControl* ServerBrowserViewController::_loadingControl = nullptr;
-    //UnityEngine::GameObject* GameList;
+    //ServerBrowserViewController::_loadingControl;
+    UnityEngine::GameObject* GameList;
+    UnityEngine::UI::VerticalLayoutGroup* container;
+
+#pragma region BSML UI Components
+    //[UIParams]
+    //public BeatSaberMarkupLanguage.Parser.BSMLParserParams parserParams;
+
+    //[UIComponent("mainContentRoot")]
+    UnityEngine::UI::VerticalLayoutGroup* MainContentRoot;
+
+    //[UIComponent("searchKeyboard")]
+    //public ModalKeyboard SearchKeyboard;
+
+    //[UIComponent("serverMessageText")]
+    TMPro::TextMeshProUGUI* ServerMessageText;
+
+    //[UIComponent("statusText")]
+    TMPro::TextMeshProUGUI* StatusText;
+
+    //[UIComponent("lobbyList")]
+    //CustomListTableData GameList;
+
+    //CustomListTableData GameList
+
+    //[UIComponent("refreshButton")]
+    UnityEngine::UI::Button* RefreshButton;
+
+    //[UIComponent("searchButton")]
+    UnityEngine::UI::Button* SearchButton;
+
+    //[UIComponent("createButton")]
+    UnityEngine::UI::Button* CreateButton;
+
+    //[UIComponent("connectButton")]
+    UnityEngine::UI::Button* ConnectButton;
+
+    //[UIComponent("pageUpButton")]
+    //private Button PageUpButton;
+
+    //[UIComponent("pageDownButton")]
+    //private Button PageDownButton;
+
+    //[UIComponent("loadingModal")]
+    HMUI::ModalView* LoadingModal;
+
+    //[UIComponent("filterModded")]
+    UnityEngine::UI::Button* FilterModdedButton;
+#pragma endregion
+
+#pragma region BSML UI Actions /*
+    [UIAction("searchKeyboardSubmit")]
+    private void SearchKeyboardSubmit(string text)
+    {
+        SearchValue = text;
+
+        // Make main content visible again
+        MainContentRoot.gameObject.SetActive(true);
+
+        // Hit refresh
+        RefreshButtonClick();
+    }
+
+    //[UIAction("refreshButtonClick")]
+    */
+        void ServerBrowserViewController::RefreshButtonClick()
+    {
+            SetInitialUiState();
+        //_ = HostedGameBrowser.FullRefresh(_filters);
+    }
+    /*
+    //[UIAction("searchButtonClick")]
+    void SearchButtonClick()
+    {
+        ClearSelection();
+        parserParams.EmitEvent("openSearchKeyboard");
+    }
+
+    //[UIAction("filterfullClick")]
+    void FilterFullClick()
+    {
+        FilterFull = !FilterFull;
+    }
+
+    //[UIAction("filterInProgressClick")]
+    void FilterInProgressClick()
+    {
+        FilterInProgress = !FilterInProgress;
+    }
+
+    //[UIAction("filterModdedClick")]
+    void FilterModdedClick()
+    {
+        FilterModded = !FilterModded;
+    }
+
+    //[UIAction("createButtonClick")]
+    void CreateButtonClick()
+    {
+        MpModeSelection.OpenCreateServerMenu();
+    }
+
+    //[UIAction("connectButtonClick")]
+    void ConnectButtonClick()
+    {
+        //if (_selectedGame ? .CanJoin ? ? false)
+        //{
+        //    MpConnect.Join(_selectedGame);
+        //}
+        //else
+        //{
+        //    ClearSelection();
+        //}
+    }
+
+    //[UIAction("listSelect")]
+    void ListSelect(HMUI::TableView* tableView, int row)
+    {
+        auto selectedRow = GameList->data[row];
+
+        if (selectedRow == nullptr)
+        {
+            ClearSelection();
+            return;
+        }
+
+        auto cellData = (HostedGameCellData)selectedRow;
+        _selectedGame = cellData->Game;
+
+        ConnectButton->interactable = _selectedGame->CanJoin;
+    }
+
+    //[UIAction("pageUpButtonClick")]
+    void PageUpButtonClick()
+    {
+        if (HostedGameBrowser.PageIndex > 0)
+        {
+            SetInitialUiState();
+            _ = HostedGameBrowser.LoadPage((HostedGameBrowser.PageIndex - 1) * HostedGameBrowser.PageSize, _filters);
+        }
+    }
+
+    //[UIAction("pageDownButtonClick")]
+    void PageDownButtonClick()
+    {
+        if (HostedGameBrowser.PageIndex < HostedGameBrowser.TotalPageCount - 1)
+        {
+            SetInitialUiState();
+            _ = HostedGameBrowser.LoadPage((HostedGameBrowser.PageIndex + 1) * HostedGameBrowser.PageSize, _filters);
+        }
+    }
+*/    #pragma endregion
+
 
 #pragma region Activation / Deactivation
     void ServerBrowserViewController::DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
         getLogger().debug("ServerBrowserViewController::DidActivate");
         if (firstActivation)
         {
-            get_gameObject()->AddComponent<Touchable*>();
-            UnityEngine::UI::VerticalLayoutGroup* container = QuestUI::BeatSaberUI::CreateVerticalLayoutGroup(get_rectTransform());
-            QuestUI::BeatSaberUI::CreateText(container->get_rectTransform(), "[Insert nice UI here]", false);
-            //GameList = QuestUI::BeatSaberUI::CreateScrollView(container->get_rectTransform());
             getLogger().debug("ServerBrowserViewController::DidActivate firstActivation");
+            get_gameObject()->AddComponent<Touchable*>();
+            MainContentRoot = CreateVerticalLayoutGroup(get_rectTransform());
+            CreateText(MainContentRoot->get_rectTransform(), "[Insert nice UI here]", false);
+            GameList = QuestUI::BeatSaberUI::CreateScrollView(MainContentRoot->get_rectTransform());
 
+            ServerMessageText = CreateText(MainContentRoot->get_rectTransform(), "ServerMessageText", false);
+            ServerMessageText->set_alignment(TMPro::TextAlignmentOptions::Center);
+            ServerMessageText->set_fontSize(3.5f);
+            ServerMessageText->get_rectTransform()->set_anchorMin(UnityEngine::Vector2(ServerMessageText->get_rectTransform()->get_anchorMin().x, 2));
+
+            UnityEngine::UI::HorizontalLayoutGroup* MaintContentHorizontalLayout = CreateHorizontalLayoutGroup(MainContentRoot->get_rectTransform());
+            MaintContentHorizontalLayout->set_spacing(2);
+            MaintContentHorizontalLayout->get_rectTransform()->set_anchorMin(UnityEngine::Vector2(0, MaintContentHorizontalLayout->get_rectTransform()->get_anchorMin().y));
+            MaintContentHorizontalLayout->get_rectTransform()->set_anchorMax(UnityEngine::Vector2(0.5f, MaintContentHorizontalLayout->get_rectTransform()->get_anchorMax().y));
+
+            RefreshButton = QuestUI::BeatSaberUI::CreateUIButton(MaintContentHorizontalLayout->get_rectTransform(), "Refresh", 
+                [this]() {
+                    RefreshButtonClick();
+                }
+            );
+
+            UnityEngine::UI::HorizontalLayoutGroup* statusPanel = QuestUI::BeatSaberUI::CreateHorizontalLayoutGroup(MainContentRoot->get_rectTransform());
+            StatusText = QuestUI::BeatSaberUI::CreateText(statusPanel->get_rectTransform(), "Loading...", false);
+            StatusText->set_alignment(TMPro::TextAlignmentOptions::Center);
+            StatusText->set_fontSize(4.0f);
+        }
             // Attach loading control
-            if (_loadingControl == nullptr)
+            if (!_loadingControl)
             {
                 //_loadingControl = ListLoadingControl::Create(GameList->get_gameObject->get_transform);
-                _loadingControl = ListLoadingControl::Create(container->get_transform());
-                if (_loadingControl != nullptr) {
+                _loadingControl = ListLoadingControl::Create(GameList->get_transform());
+                if (_loadingControl) {
                     //_loadingControl->didPressRefreshButtonEvent += RefreshButtonClick;
                 }
             }
@@ -54,8 +229,8 @@ namespace ServerBrowser::UI::ViewControllers {
 
             // Perform initial refresh
             //HostedGameBrowser::FullRefresh(_filters);
-        }
     }
+    
 
     void ServerBrowserViewController::DidDeactivate(bool removedFromHierarchy, bool systemScreenDisabling) {
 
@@ -72,11 +247,12 @@ namespace ServerBrowser::UI::ViewControllers {
         //ClearSelection();
         CancelImageLoading();
 
-        //StatusText::text = "Loading...";
-        //StatusText::color = Color::get_gray();
+        StatusText->set_text(il2cpp_utils::newcsstr("Loading..."));
+        StatusText->set_color(Color::get_gray());
 
-        if (_loadingControl != nullptr)
+        if (_loadingControl) {
             _loadingControl->ShowLoading(il2cpp_utils::newcsstr("Loading servers..."));
+        }
             
         //// make sure the table is fully cleared, if we don't do the cell gameobjects continue to add on every load
         //GameList.data.Clear();
@@ -200,59 +376,7 @@ namespace ServerBrowser::UI::ViewControllers {
 
     public bool IsSearching = > _filters.AnyActive;
     #pragma endregion
-    */
-    #pragma region BSML UI Components
-    //[UIParams]
-    //public BeatSaberMarkupLanguage.Parser.BSMLParserParams parserParams;
 
-    //[UIComponent("mainContentRoot")]
-    //public VerticalLayoutGroup MainContentRoot;
-
-    UnityEngine::UI::VerticalLayoutGroup* MainContentRoot;
-
-    //[UIComponent("searchKeyboard")]
-    //public ModalKeyboard SearchKeyboard;
-
-    //[UIComponent("serverMessageText")]
-    //public TextMeshProUGUI ServerMessageText;
-
-    TMPro::TextMeshProUGUI* ServerMessageText;
-
-    //[UIComponent("statusText")]
-    //public TextMeshProUGUI StatusText;
-
-    TMPro::TextMeshProUGUI* StatusText;
-
-    //[UIComponent("lobbyList")]
-    //public CustomListTableData GameList;
-
-    //CustomListTableData GameList
-
-    //[UIComponent("refreshButton")]
-    UnityEngine::UI::Button* RefreshButton;
-
-    //[UIComponent("searchButton")]
-    UnityEngine::UI::Button* SearchButton;
-
-    //[UIComponent("createButton")]
-    UnityEngine::UI::Button* CreateButton;
-
-    //[UIComponent("connectButton")]
-    UnityEngine::UI::Button* ConnectButton;
-
-    //[UIComponent("pageUpButton")]
-    //private Button PageUpButton;
-
-    //[UIComponent("pageDownButton")]
-    //private Button PageDownButton;
-
-    //[UIComponent("loadingModal")]
-    //public ModalView LoadingModal;
-
-    //[UIComponent("filterModded")]
-    UnityEngine::UI::Button* FilterModdedButton;
-    #pragma endregion
-    /*
     #pragma region BSML UI Bindings
     [UIValue("searchValue")]
     public string SearchValue
@@ -350,110 +474,8 @@ namespace ServerBrowser::UI::ViewControllers {
     }
     #pragma endregion
 
-    #pragma region BSML UI Actions
-    [UIAction("searchKeyboardSubmit")]
-    private void SearchKeyboardSubmit(string text)
-    {
-        SearchValue = text;
-
-        // Make main content visible again
-        MainContentRoot.gameObject.SetActive(true);
-
-        // Hit refresh
-        RefreshButtonClick();
-    }
-
-    [UIAction("refreshButtonClick")]
-    private void RefreshButtonClick()
-    {
-        SetInitialUiState();
-        _ = HostedGameBrowser.FullRefresh(_filters);
-    }
-
-    [UIAction("searchButtonClick")]
-    private void SearchButtonClick()
-    {
-        ClearSelection();
-        parserParams.EmitEvent("openSearchKeyboard");
-    }
-
-    [UIAction("filterfullClick")]
-    private void FilterFullClick()
-    {
-        FilterFull = !FilterFull;
-    }
-
-    [UIAction("filterInProgressClick")]
-    private void FilterInProgressClick()
-    {
-        FilterInProgress = !FilterInProgress;
-    }
-
-    [UIAction("filterModdedClick")]
-    private void FilterModdedClick()
-    {
-        FilterModded = !FilterModded;
-    }
-
-    [UIAction("createButtonClick")]
-    private void CreateButtonClick()
-    {
-        MpModeSelection.OpenCreateServerMenu();
-    }
-
-    [UIAction("connectButtonClick")]
-    private void ConnectButtonClick()
-    {
-        if (_selectedGame ? .CanJoin ? ? false)
-        {
-            MpConnect.Join(_selectedGame);
-        }
-        else
-        {
-            ClearSelection();
-        }
-    }
-
-    [UIAction("listSelect")]
-    private void ListSelect(TableView tableView, int row)
-    {
-        var selectedRow = GameList.data[row];
-
-        if (selectedRow == null)
-        {
-            ClearSelection();
-            return;
-        }
-
-        var cellData = (HostedGameCellData)selectedRow;
-        _selectedGame = cellData.Game;
-
-        ConnectButton.interactable = _selectedGame.CanJoin;
-    }
-
-    [UIAction("pageUpButtonClick")]
-    private void PageUpButtonClick()
-    {
-        if (HostedGameBrowser.PageIndex > 0)
-        {
-            SetInitialUiState();
-            _ = HostedGameBrowser.LoadPage((HostedGameBrowser.PageIndex - 1) * HostedGameBrowser.PageSize, _filters);
-        }
-    }
-
-    [UIAction("pageDownButtonClick")]
-    private void PageDownButtonClick()
-    {
-        if (HostedGameBrowser.PageIndex < HostedGameBrowser.TotalPageCount - 1)
-        {
-            SetInitialUiState();
-            _ = HostedGameBrowser.LoadPage((HostedGameBrowser.PageIndex + 1) * HostedGameBrowser.PageSize, _filters);
-        }
-    }
-    #pragma endregion
-
     #pragma region Custom Cell Behaviors
-    private void CellUpdateCallback(HostedGameCellData cellInfo)
+    void CellUpdateCallback(HostedGameCellData cellInfo)
     {
         GameList.tableView.RefreshCellsContent();
 
@@ -468,11 +490,11 @@ namespace ServerBrowser::UI::ViewControllers {
         }
     }
 
-    private void AfterCellsCreated()
+    void AfterCellsCreated()
     {
-        GameList.tableView.selectionType = TableViewSelectionType.Single;
+        GameList->tableView->selectionType = TableViewSelectionType::Single;
 
-        GameList.tableView.ReloadData(); // should cause visibleCells to be updated
+        GameList->tableView->ReloadData(); // should cause visibleCells to be updated
 
         foreach(var cell in GameList.tableView.visibleCells)
         {
