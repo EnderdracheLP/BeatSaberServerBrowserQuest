@@ -2,6 +2,11 @@
 #include "custom-types/shared/macros.hpp"
 #include "UnityEngine/MonoBehaviour.hpp"
 #include "HMUI/TableView.hpp"
+#include "HMUI/TableView_IDataSource.hpp"
+#include "GlobalNamespace/LevelListTableCell.hpp"
+#include "GlobalNamespace/AnnotatedBeatmapLevelCollectionTableCell.hpp"
+//#include "HMUI/SimpleTextTableCell.hpp"
+using LevelPackTableCell = GlobalNamespace::AnnotatedBeatmapLevelCollectionTableCell;
 
 // TODO: Do I need to implement this BSML class?
 DECLARE_CLASS_CODEGEN_INTERFACES(BeatSaberMarkubLanguage::Components, CustomListTableData, UnityEngine::MonoBehaviour*, HMUI::TableView::IDataSource*,
@@ -11,6 +16,23 @@ public:
 		List, Box, Simple
 	};
 
-	DECLARE_INSTANCE_FIELD_DEFAULT(ListStyle, listStyle, ListStyle::List;)
-	DECLARE_INSTANCE_FIELD(GlobalNamespace::LevelListTableCell, )
+	DECLARE_INSTANCE_FIELD_DEFAULT(ListStyle, listStyle, ListStyle::List);
+	DECLARE_INSTANCE_FIELD(GlobalNamespace::LevelListTableCell*, songListTableCellInstance);
+	DECLARE_INSTANCE_FIELD(LevelPackTableCell*, levelPackTableCellInstance);
+	//DECLARE_INSTANCE_FIELD(HMUI::SimpleTextTableCell)
+
+	DECLARE_INSTANCE_FIELD_DEFAULT(System::List_1<CustomCellInfo*>*, data, il2cpp_utils::New<System::List_1<CustomCellInfo*>*>());
+	DECLARE_INSTANCE_FIELD_DEFAULT(float, cellSize, 8.5f);
+	DECLARE_INSTANCE_FIELD_DEFAULT(Il2CppString*, reuseIdentifier, il2cpp_utils::newcsstr(BSMLListTableCell));
+	DECLARE_INSTANCE_FIELD(HMUI::TableView*, tableView);
+
+	DECLARE_INSTANCE_FIELD_DEFAULT(bool, expandCell, false);
+
+	DECLARE_INSTANCE_FIELD(ListStyle, Style);
+	DECLARE_INSTANCE_METHOD(ListStyle, get_Style);
+	DECLARE_INSTANCE_METHOD(void, set_Style);
+
+	DECLARE_INSTANCE_METHOD(GlobalNamespace::LevelListTableCell*, GetTableCell);
+
+
 )

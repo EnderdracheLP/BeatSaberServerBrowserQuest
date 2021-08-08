@@ -69,7 +69,7 @@ namespace ServerBrowser::Game {
 			//else
 			//{
 				// Clearing the override should fall back to the correct official server
-				ClearMasterServerOverride();
+				//ClearMasterServerOverride();
 			//}
 		}
 		else

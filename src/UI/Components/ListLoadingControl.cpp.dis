@@ -1,6 +1,7 @@
 #include "UI/Components/ListLoadingControl.hpp"
 #include "UnityEngine/GameObject.hpp"
-#include "GlobalNamespace/GameServersListTableView.hpp"
+#include "UnityEngine/Resources.hpp"
+//#include "GlobalNamespace/GameServersListTableView.hpp"
 using namespace GlobalNamespace;
 using namespace UnityEngine;
 
@@ -12,14 +13,15 @@ namespace ServerBrowser::UI::Components {
 		if (_controlTemplate) {
 			return;
 		}
-		GameServersListTableView* nativeGameServerList = Object::FindObjectOfType<GameServersListTableView*>();
+		//GameServersListTableView* nativeGameServerList = Resources::FindObjectsOfTypeAll<GameServersListTableView*>()->values[0]->get_gameObject();
 
-		if (!nativeGameServerList) {
-			return;
-		}
+		//if (!nativeGameServerList) {
+		//	return;
+		//}
+		GameObject* existingLoadingControl = Resources::FindObjectsOfTypeAll<LoadingControl*>()->values[0]->get_gameObject();
 
-		Il2CppString* MainLoadingControl = il2cpp_utils::newcsstr("TableView/Viewport/MainLoadingControl");
-		_controlTemplate = nativeGameServerList->get_gameObject()->get_transform()->Find(MainLoadingControl);
+		//Il2CppString* MainLoadingControl = il2cpp_utils::newcsstr("TableView/Viewport/MainLoadingControl");
+		_controlTemplate = existingLoadingControl->get_transform();
 	}
 	LoadingControl* ListLoadingControl::Create(Transform* parentTransform) {
 		LoadTemplate();

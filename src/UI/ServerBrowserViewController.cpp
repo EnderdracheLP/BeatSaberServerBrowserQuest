@@ -3,21 +3,30 @@
 #include "Core/HostedGameData.hpp"
 #include "Game/MpModeSelection.hpp"
 
+#include "GlobalNamespace/LevelListTableCell.hpp"
+
 #include "UnityEngine/GameObject.hpp"
 #include "UnityEngine/UI/VerticalLayoutGroup.hpp"
 #include "UnityEngine/Color.hpp"
+
 #include "HMUI/Touchable.hpp"
+#include "HMUI/TableView.hpp"
+
 #include "questui/shared/BeatSaberUI.hpp"
 #include "questui/shared/QuestUI.hpp"
+
 #include "TMPro/TextAlignmentOptions.hpp"
+
 #include "Polyglot/Localization.hpp"
+
+#include "UnityEngine/Resources.hpp"
 using namespace UnityEngine;
 using namespace HMUI;
 using namespace GlobalNamespace;
 using namespace QuestUI::BeatSaberUI;
 using namespace ServerBrowser::Core;
 using namespace ServerBrowser::Game;
-using ServerBrowser::UI::Components::ListLoadingControl;
+//using ServerBrowser::UI::Components::ListLoadingControl;
 
 DEFINE_TYPE(ServerBrowser::UI::ViewControllers, ServerBrowserViewController);
 
@@ -184,21 +193,29 @@ namespace ServerBrowser::UI::ViewControllers {
         getLogger().debug("ServerBrowserViewController::DidActivate");
         if (firstActivation)
         {
+            // TODO: Add the LevelListTableCell and such stuff for the GameList
             getLogger().debug("ServerBrowserViewController::DidActivate firstActivation");
             get_gameObject()->AddComponent<Touchable*>();
             MainContentRoot = CreateVerticalLayoutGroup(get_rectTransform());
-            CreateText(MainContentRoot->get_rectTransform(), "[Insert nice UI here]", false);
-            GameList = QuestUI::BeatSaberUI::CreateScrollView(MainContentRoot->get_rectTransform());
+            //GameList = QuestUI::BeatSaberUI::CreateScrollView(MainContentRoot->get_rectTransform());
 
             ServerMessageText = CreateText(MainContentRoot->get_rectTransform(), "ServerMessageText", false);
-            ServerMessageText->set_alignment(TMPro::TextAlignmentOptions::Center);
-            ServerMessageText->set_fontSize(3.5f);
-            ServerMessageText->get_rectTransform()->set_anchorMin(UnityEngine::Vector2(ServerMessageText->get_rectTransform()->get_anchorMin().x, 2));
+            //ServerMessageText->set_alignment(TMPro::TextAlignmentOptions::Center);
+            //ServerMessageText->set_fontSize(3.5f);
+            //ServerMessageText->get_rectTransform()->set_anchorMin(UnityEngine::Vector2(ServerMessageText->get_rectTransform()->get_anchorMin().x, 2));
 
             UnityEngine::UI::HorizontalLayoutGroup* MaintContentHorizontalLayout = CreateHorizontalLayoutGroup(MainContentRoot->get_rectTransform());
-            MaintContentHorizontalLayout->set_spacing(2);
-            MaintContentHorizontalLayout->get_rectTransform()->set_anchorMin(UnityEngine::Vector2(0, MaintContentHorizontalLayout->get_rectTransform()->get_anchorMin().y));
-            MaintContentHorizontalLayout->get_rectTransform()->set_anchorMax(UnityEngine::Vector2(0.5f, MaintContentHorizontalLayout->get_rectTransform()->get_anchorMax().y));
+            //MaintContentHorizontalLayout->set_spacing(2);
+            //MaintContentHorizontalLayout->get_rectTransform()->set_anchorMin(UnityEngine::Vector2(0, MaintContentHorizontalLayout->get_rectTransform()->get_anchorMin().y));
+            //MaintContentHorizontalLayout->get_rectTransform()->set_anchorMax(UnityEngine::Vector2(0.5f, MaintContentHorizontalLayout->get_rectTransform()->get_anchorMax().y));
+
+            auto container = BeatSaberUI::CreateScrollView(get_transform());
+            ExternalComponents* externalComponents = container->GetComponent<ExternalComponents*>();
+            RectTransform* scrollTransform = externalComponents->Get<RectTransform*>();
+            scrollTransform->set_anchoredPosition(UnityEngine::Vector2(0.0f, -4.0f));
+            scrollTransform->set_sizeDelta(UnityEngine::Vector2(-54.0f, -8.0f));
+
+            //CreateEntries(container->get_transform());
 
             RefreshButton = QuestUI::BeatSaberUI::CreateUIButton(MaintContentHorizontalLayout->get_rectTransform(), "Refresh", 
                 [this]() {
@@ -206,19 +223,27 @@ namespace ServerBrowser::UI::ViewControllers {
                 }
             );
 
-            UnityEngine::UI::HorizontalLayoutGroup* statusPanel = QuestUI::BeatSaberUI::CreateHorizontalLayoutGroup(MainContentRoot->get_rectTransform());
-            StatusText = QuestUI::BeatSaberUI::CreateText(statusPanel->get_rectTransform(), "Loading...", false);
-            StatusText->set_alignment(TMPro::TextAlignmentOptions::Center);
-            StatusText->set_fontSize(4.0f);
+            //UnityEngine::UI::HorizontalLayoutGroup* statusPanel = QuestUI::BeatSaberUI::CreateHorizontalLayoutGroup(MainContentRoot->get_rectTransform());
+            //StatusText = QuestUI::BeatSaberUI::CreateText(statusPanel->get_rectTransform(), "Loading...", false);
+            //StatusText->set_alignment(TMPro::TextAlignmentOptions::Center);
+            //StatusText->set_fontSize(4.0f);
         }
             // Attach loading control
-            if (!_loadingControl)
+            if (!loadingControl)
             {
-                //_loadingControl = ListLoadingControl::Create(GameList->get_gameObject->get_transform);
-                _loadingControl = ListLoadingControl::Create(GameList->get_transform());
-                if (_loadingControl) {
-                    //_loadingControl->didPressRefreshButtonEvent += RefreshButtonClick;
-                }
+                GameObject* existingLoadingControl = Resources::FindObjectsOfTypeAll<LoadingControl*>()->values[0]->get_gameObject();
+                GameObject* loadinControlGameObject = UnityEngine::GameObject::Instantiate(existingLoadingControl, this->get_gameObject()->get_transform());
+                auto loadingControlTransform = loadinControlGameObject->get_transform();
+                loadingControl = loadinControlGameObject->GetComponent<LoadingControl*>();
+                //loadingControl->loadingText->set_text(il2cpp_utils::newcsstr("Loading..."));
+                loadingControl->set_enabled(true);
+                ////std::function<void()> onRefreshButtonClick(RefreshButtonClick);
+                ////_loadingControl = ListLoadingControl::Create(GameList->get_gameObject->get_transform);
+                //_loadingControl = ListLoadingControl::Create(this->get_gameObject()->get_transform());
+                //if (_loadingControl) {
+                //    //_loadingControl->didPressRefreshButtonEvent = il2cpp_utils::MakeDelegate<System::Action*>(classof(System::Action*), onRefreshButtonClick);
+                //}
+
             }
 
             // Begin listening for API browse responses
@@ -247,11 +272,11 @@ namespace ServerBrowser::UI::ViewControllers {
         //ClearSelection();
         CancelImageLoading();
 
-        StatusText->set_text(il2cpp_utils::newcsstr("Loading..."));
-        StatusText->set_color(Color::get_gray());
+        //StatusText->set_text(il2cpp_utils::newcsstr("Loading..."));
+        //StatusText->set_color(Color::get_gray());
 
-        if (_loadingControl) {
-            _loadingControl->ShowLoading(il2cpp_utils::newcsstr("Loading servers..."));
+        if (loadingControl) {
+            loadingControl->ShowLoading(il2cpp_utils::newcsstr("Loading servers..."));
         }
             
         //// make sure the table is fully cleared, if we don't do the cell gameobjects continue to add on every load

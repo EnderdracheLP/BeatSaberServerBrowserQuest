@@ -1,7 +1,6 @@
 #pragma once
 #include "main.hpp"
-#include "UI/Components/ListLoadingControl.hpp"
-
+//#include "UI/Components/ListLoadingControl.hpp"
 #include "custom-types/shared/macros.hpp"
 #include "HMUI/ViewController.hpp"
 
@@ -15,7 +14,7 @@ DECLARE_CLASS_CODEGEN(ServerBrowser::UI::ViewControllers, ServerBrowserViewContr
     //    HostedGameFilters _filters = new HostedGameFilters();
     DECLARE_INSTANCE_FIELD_DEFAULT(System::Threading::CancellationTokenSource*, _imageLoadCancellation, nullptr);
         //HostedGameData _selectedGame;
-    DECLARE_INSTANCE_FIELD_DEFAULT(GlobalNamespace::LoadingControl*, _loadingControl, nullptr);
+    DECLARE_INSTANCE_FIELD_DEFAULT(GlobalNamespace::LoadingControl*, loadingControl, nullptr);
 
     DECLARE_INSTANCE_METHOD(void, RefreshButtonClick);
     DECLARE_INSTANCE_METHOD(void, SetInitialUiState);
