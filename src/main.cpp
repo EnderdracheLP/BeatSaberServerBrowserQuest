@@ -38,6 +38,7 @@ using namespace UnityEngine;
 using namespace ServerBrowser::UI;
 using namespace ServerBrowser::Game;
 
+#include "BSSB_API.hpp"
 
 static ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
 
@@ -57,6 +58,18 @@ Logger& getLogger() {
 //ServerBrowser::UI::ServerBrowserFlowCoordinator* SBFlowCd;
 
 MAKE_HOOK_MATCH(MultiplayerModeSelectionViewController_DidActivate, &MultiplayerModeSelectionViewController::DidActivate, void, MultiplayerModeSelectionViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
+    
+    ServerBrowser::API::BrowseAsync(
+        [](std::optional<ServerBrowser::API::Page> page) {
+            if (page.has_value()) {
+                getLogger().debug("%s", page.value().Getmessage().c_str());
+            }
+            else {
+                getLogger().debug("Page doesn't have value");
+            }
+        }
+    );
+    
     getLogger().debug("MultiplayerModeSelectionViewController_DidActivate");
     MultiplayerModeSelectionViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
     getLogger().debug("MultiplayerModeSelectionViewController get gameBrowserButtom");

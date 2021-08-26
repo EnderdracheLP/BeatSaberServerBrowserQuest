@@ -1,16 +1,16 @@
 {
   "ExpandedNodes": [
     "",
-    "\\extern\\codegen",
-    "\\extern\\codegen\\include",
-    "\\extern\\codegen\\include\\HMUI",
     "\\include",
     "\\include\\UI",
-    "\\include\\UI\\Components",
+    "\\shared",
+    "\\shared\\API",
+    "\\shared\\API\\ServerBrowser",
     "\\src",
-    "\\src\\UI",
-    "\\src\\UI\\Components"
+    "\\src\\API",
+    "\\src\\API\\ServerBrowser",
+    "\\src\\UI"
   ],
-  "SelectedNode": "\\logging.ps1",
+  "SelectedNode": "\\CppProperties.json",
   "PreviewInSolutionExplorer": false
 }
