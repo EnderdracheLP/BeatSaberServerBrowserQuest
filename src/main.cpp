@@ -38,8 +38,6 @@ using namespace UnityEngine;
 using namespace ServerBrowser::UI;
 using namespace ServerBrowser::Game;
 
-#include "BSSB_API.hpp"
-
 static ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
 
 // Loads the config from disk using our modInfo, then returns it for use
@@ -58,18 +56,6 @@ Logger& getLogger() {
 //ServerBrowser::UI::ServerBrowserFlowCoordinator* SBFlowCd;
 
 MAKE_HOOK_MATCH(MultiplayerModeSelectionViewController_DidActivate, &MultiplayerModeSelectionViewController::DidActivate, void, MultiplayerModeSelectionViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
-    
-    ServerBrowser::API::BrowseAsync(
-        [](std::optional<ServerBrowser::API::Page> page) {
-            if (page.has_value()) {
-                getLogger().debug("%s", page.value().Getmessage().c_str());
-            }
-            else {
-                getLogger().debug("Page doesn't have value");
-            }
-        }
-    );
-    
     getLogger().debug("MultiplayerModeSelectionViewController_DidActivate");
     MultiplayerModeSelectionViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
     getLogger().debug("MultiplayerModeSelectionViewController get gameBrowserButtom");
@@ -100,7 +86,7 @@ MAKE_HOOK_MATCH(MultiplayerModeSelectionViewController_DidActivate, &Multiplayer
             transform->get_position().y + 0.4f,
             transform->get_position().z
         ));
-        transform->set_localScale(UnityEngine::Vector3(1.25f, 1.25f, 1.25f));
+        transform->set_localScale({ 1.25f, 1.25f, 1.25f });
         btnGameBrowser->GetComponentInChildren<HMUI::CurvedTextMeshPro*>()
             ->SetText(il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("Server Browser"));
 #pragma endregion

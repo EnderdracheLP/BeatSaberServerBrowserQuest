@@ -84,23 +84,23 @@ namespace ServerBrowser::Game {
 		getLogger().info("--> Connecting to lobby destination now"
 			" (ServerCode=%s, HostSecret=%s,"
 			" ServerType=%s, ServerBrowserId=%d)", 
-			game.ServerCode.c_str(),
-			to_utf8(csstrtostr(game.HostSecret)).c_str(),
-			to_utf8(csstrtostr(game.ServerType)).c_str(),
-			game.Id);
+			game.get_ServerCode().c_str(),
+			game.get_HostSecret()->c_str(),
+			game.get_ServerType()->c_str(),
+			game.get_Id());
 		//Plugin.Log.Info("--> Connecting to lobby destination now" +
 		//	$" (ServerCode={game.ServerCode}, HostSecret={game.HostSecret}," +
 		//	$" ServerType={game.ServerType}, ServerBrowserId={game.Id})");
 
 		_flowCoordinator->joiningLobbyCancellationTokenSource = THROW_UNLESS(il2cpp_utils::New<CancellationTokenSource*>());
 
-		Il2CppString* ServerCode = il2cpp_utils::newcsstr(game.ServerCode);
+		Il2CppString* ServerCode = il2cpp_utils::newcsstr(game.get_ServerCode());
 		SelectMultiplayerLobbyDestination* MpLobbyDest = THROW_UNLESS(il2cpp_utils::New<SelectMultiplayerLobbyDestination*>(ServerCode));
-		MpLobbyDest->lobbySecret = game.HostSecret;
+		MpLobbyDest->lobbySecret = il2cpp_utils::newcsstr(game.get_HostSecret().value());
 
 		SelectMultiplayerLobbyDestination* Destination;
-        if (game.HostSecret)
-			Destination = CRASH_UNLESS(il2cpp_utils::New<SelectMultiplayerLobbyDestination*>(game.HostSecret));
+        if (game.get_HostSecret().has_value())
+			Destination = CRASH_UNLESS(il2cpp_utils::New<SelectMultiplayerLobbyDestination*>(il2cpp_utils::newcsstr(game.get_HostSecret().value())));
 		else if (ServerCode)
 			Destination = CRASH_UNLESS(il2cpp_utils::New<SelectMultiplayerLobbyDestination*>(ServerCode));
 
@@ -111,7 +111,7 @@ namespace ServerBrowser::Game {
 			//il2Cpp_utils::New(MpLobbyDestination(ServerCode, game.HostSecret))
 		);
 
-		Il2CppString* LVC_InitStr = il2cpp_utils::newcsstr(string_format("%s (%s)", game.GameName.c_str(), game.ServerCode.c_str()));
+		Il2CppString* LVC_InitStr = il2cpp_utils::newcsstr(string_format("%s (%s)", game.get_GameName().c_str(), game.get_ServerCode().c_str()));
 		//_joiningLobbyViewController->Init($"{game.GameName} ({game.ServerCode})");
 		_joiningLobbyViewController->Init(LVC_InitStr);
 

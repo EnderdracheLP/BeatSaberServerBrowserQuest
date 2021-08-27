@@ -8,14 +8,29 @@ namespace namespaze { \
     public: \
         void Deserialize(const rapidjson::Value& jsonValue); \
     impl \
+        /*std::string Serialize();*/ \
     }; \
-} \
+}
 
 #define GETTER_VALUE(type, name) \
 private: \
     type name; \
 public: \
     const type& Get##name() const { return name; }
+
+#define JSON_VALUE(type, name) \
+private: \
+    type name; \
+public: \
+    const type& Get##name() const { return name; } \
+    void Set##name(type value);
+
+#define JSON_VALUE_OPTIONAL(type, name) \
+private: \
+    std::optional<type> name; \
+public: \
+    const std::optional<type> Get##name() const { return name; } \
+    void Set##name(type value);
 
 #define GETTER_VALUE_OPTIONAL(type, name) \
 private: \
@@ -26,6 +41,40 @@ public: \
 #define DESERIALIZE_METHOD(namespaze, name, impl) \
 void namespaze::name::Deserialize(const rapidjson::Value& jsonValue) { \
     impl \
+}
+
+#define SERIALIZE_STRING_METHOD(namespaze, name, impl) \
+const std::string namespaze::name::SerializeToString() { \
+    rapidjson::Document doc; \
+    auto& alloc = doc.GetAllocator(); \
+    doc.SetObject(); \
+    impl \
+    rapidjson::StringBuffer buffer; \
+    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer); \
+    doc.Accept(writer); \
+    return buffer.GetString(); \
+}
+
+#define SERIALIZE_VALUE(name, jsonName) \
+doc.AddMember(#jsonName, name, alloc);
+
+//#define SERIALIZE_VALUE_OPTIONAL(name, jsonName) \
+//if(name.has_value()) { \
+//    doc.AddMember(#jsonName, name, alloc); \
+//} else { \
+//    doc.AddMember(#jsonName, nullptr, alloc); \
+//}
+
+#define SERIALIZE_VALUE_OPTIONAL(name, jsonName) \
+doc.AddMember(#jsonName, name.value(), alloc);
+
+#define DESERIALIZE_CLASS_OPTIONAL(name, jsonName, type) \
+if(jsonValue.HasMember(#jsonName) && jsonValue[#jsonName].IsObject()) { \
+    type val##name; \
+    name = val##name;\
+    name.value().Deserialize(jsonValue[#jsonName]); \
+} else { \
+    name = std::nullopt; \
 }
 
 #define DESERIALIZE_VALUE(name, jsonName, type) \

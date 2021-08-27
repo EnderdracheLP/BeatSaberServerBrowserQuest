@@ -38,6 +38,8 @@ using UnityEngine::UI::LayoutElement;
 using UnityEngine::UI::ContentSizeFitter;
 //using ServerBrowser::UI::Components::ListLoadingControl;
 
+#include "Core/BSSBMasterAPI.hpp"
+
 DEFINE_TYPE(ServerBrowser::UI::ViewControllers, ServerBrowserViewController);
 
 namespace ServerBrowser::UI::ViewControllers {
@@ -212,8 +214,8 @@ namespace ServerBrowser::UI::ViewControllers {
             // <text id="serverMessageText" text="" align="Center" font-size="3.5" anchor-min-y="2"></text>
             ServerMessageText = CreateText(get_transform(), "ServerMessageText", false);
             ServerMessageText->set_alignment(TMPro::TextAlignmentOptions::Center);
-            ServerMessageText->set_fontSize(3.5f);
-            ServerMessageText->get_rectTransform()->set_anchorMin({ 0.50f, 3.0f });
+            ServerMessageText->set_fontSize(5.5f); // Default 3.5f
+            ServerMessageText->get_rectTransform()->set_anchorMin({ 0.5f, 2.5f });
 
             UnityEngine::UI::HorizontalLayoutGroup* MaintContentHorizontalLayout = CreateHorizontalLayoutGroup(MainContentRoot->get_transform());
             auto sizeFitter = MaintContentHorizontalLayout->get_gameObject()->AddComponent<UnityEngine::UI::ContentSizeFitter*>();
@@ -362,6 +364,19 @@ namespace ServerBrowser::UI::ViewControllers {
 #pragma region Core UI Code
     void ServerBrowserViewController::SetInitialUiState() {
         getLogger().debug("ServerBrowserViewController::SetInitialUiState");
+
+        // Temp Code for testing
+        ServerBrowser::Core::BSSBMasterAPI::BrowseAsync(
+            [](std::optional<ServerBrowser::Core::ServerBrowserResult> page) {
+                if (page.has_value()) {
+                    getLogger().debug("%s", page.value().Getmessage().c_str());
+                    ServerMessageText->set_text(il2cpp_utils::newcsstr(page.value().Getmessage()));
+                }
+                else {
+                    getLogger().debug("Page doesn't have value");
+                }
+            }
+        );
 
         ServerBrowser::Game::MpModeSelection::SetTitle("Server Browser");
 

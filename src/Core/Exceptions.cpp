@@ -1,5 +1,5 @@
 #include "beatsaber-hook/shared/utils/utils-functions.h"
-#include "Exceptions.hpp"
+#include "Core/Exceptions.hpp"
 
 namespace ServerBrowser {
     JsonException::JsonException(ServerBrowser::Exceptions key, const std::string& message) : message(message) {

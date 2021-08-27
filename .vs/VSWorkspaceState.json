@@ -1,16 +1,17 @@
 {
   "ExpandedNodes": [
     "",
-    "\\include",
-    "\\include\\UI",
-    "\\shared",
-    "\\shared\\API",
-    "\\shared\\API\\ServerBrowser",
-    "\\src",
-    "\\src\\API",
-    "\\src\\API\\ServerBrowser",
-    "\\src\\UI"
+    "\\extern\\codegen",
+    "\\extern\\codegen\\include",
+    "\\extern\\questui",
+    "\\extern\\questui\\include",
+    "\\extern\\questui\\include\\Sprites",
+    "\\extern\\questui\\shared",
+    "\\extern\\questui\\shared\\CustomTypes",
+    "\\extern\\questui\\shared\\CustomTypes\\Components",
+    "\\extern\\questui\\shared\\CustomTypes\\Components\\FloatingScreen",
+    "\\extern\\questui\\shared\\CustomTypes\\Data"
   ],
-  "SelectedNode": "\\CppProperties.json",
+  "SelectedNode": "\\src\\main.cpp",
   "PreviewInSolutionExplorer": false
 }

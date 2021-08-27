@@ -8,7 +8,8 @@
         "VERSION=\"0.1.0\"",
         "__GNUC__",
         "__aarch64__",
-        "ANDROID"
+        "ANDROID",
+        "_LIBCPP_STD_VER=20"
       ],
       "includePath": [
         "${workspaceRoot}/**",
