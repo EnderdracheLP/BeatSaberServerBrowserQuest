@@ -66,7 +66,7 @@ namespace ServerBrowser::Core {
 		return il2cpp_utils::newcsstr(string_format("%s, %s", masterServerDescr.c_str(), moddedDescr.c_str()));
 	}
 
-	Il2CppString* HostedGameData::DescribeDifficulty(bool withColorTag) {
+	std::string HostedGameData::DescribeDifficulty(bool withColorTag) {
 		std::string text;
 		std::string colorHex;
 
@@ -119,7 +119,7 @@ namespace ServerBrowser::Core {
 			}
 		}
 		else text = "Unknown";
-		return il2cpp_utils::newcsstr(text);
+		return text;
 	}
 }
 #pragma endregion

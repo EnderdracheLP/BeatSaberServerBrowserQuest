@@ -30,7 +30,7 @@ namespace ServerBrowser::Core {
 #pragma region Describe
         Il2CppString* Describe();
         Il2CppString* DescribeType();
-        Il2CppString* DescribeDifficulty(bool withColorTag = false);
+        std::string DescribeDifficulty(bool withColorTag = false);
 #pragma endregion
 
 #pragma region Fields

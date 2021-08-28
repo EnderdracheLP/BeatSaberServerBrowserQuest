@@ -1,17 +1,15 @@
 {
   "ExpandedNodes": [
     "",
-    "\\extern\\codegen",
-    "\\extern\\codegen\\include",
-    "\\extern\\questui",
-    "\\extern\\questui\\include",
-    "\\extern\\questui\\include\\Sprites",
-    "\\extern\\questui\\shared",
-    "\\extern\\questui\\shared\\CustomTypes",
-    "\\extern\\questui\\shared\\CustomTypes\\Components",
-    "\\extern\\questui\\shared\\CustomTypes\\Components\\FloatingScreen",
-    "\\extern\\questui\\shared\\CustomTypes\\Data"
+    "\\include",
+    "\\include\\Core",
+    "\\include\\Game",
+    "\\shared",
+    "\\shared\\Core",
+    "\\src",
+    "\\src\\Core",
+    "\\src\\Game"
   ],
-  "SelectedNode": "\\src\\main.cpp",
+  "SelectedNode": "\\src\\Core\\HostedGameBrowser.cpp",
   "PreviewInSolutionExplorer": false
 }

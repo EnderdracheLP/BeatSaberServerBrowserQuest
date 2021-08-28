@@ -1,5 +1,6 @@
 #include "main.hpp"
 #include "Core/BSSBMasterAPI.hpp"
+//#include "Core/HostedGameFilters.hpp"
 
 #include "Utils/WebUtils.hpp"
 
@@ -11,10 +12,12 @@
 namespace ServerBrowser::Core {
     std::string BSSBMasterAPI::exception;
 
-    std::optional<ServerBrowser::Core::ServerBrowserResult> BSSBMasterAPI::Browse(std::string platform, int filterFull, int vanilla) {
-        std::string browsePath = BASE_URL + "/browse?platform=" + platform;
-        if (filterFull > 0) browsePath += "&filterFull=" + std::to_string(filterFull);
-        if (vanilla > 0) browsePath += "&vanilla=" + std::to_string(vanilla);
+    std::optional<ServerBrowser::Core::ServerBrowserResult> BSSBMasterAPI::Browse(int offset/*, HostedGameFilters filters*/) {
+        exception.clear();
+        std::string browsePath = BASE_URL + "/browse?platform=" + /*MpLocalPlayer::get_PlatformId()*/"oculus";
+        if (offset > 0)browsePath += "&offset" + std::to_string(offset);
+        //if (filterFull > 0) browsePath += "&filterFull=" + /*std::to_string(filterFull)*/"0";
+        //if (vanilla > 0) browsePath += "&vanilla=" + /*std::to_string(vanilla)*/"0";
         std::optional<rapidjson::Document> json;
         json = WebUtils::GetJSON(browsePath);
         if (!json.has_value())
@@ -39,11 +42,12 @@ namespace ServerBrowser::Core {
     //    return bytes;
     //}
 
-    void BSSBMasterAPI::BrowseAsync(std::function<void(std::optional<ServerBrowser::Core::ServerBrowserResult>)> finished, std::string platform, int filterFull, int vanilla) {
+    void BSSBMasterAPI::BrowseAsync(int offset, /*HostedGameFilters filters,*/ std::function<void(std::optional<ServerBrowser::Core::ServerBrowserResult>)> finished) {
         exception.clear();
-        std::string browsePath = BASE_URL + "/browse?platform=" + platform;
-        if (filterFull > 0) browsePath += "&filterFull=" + std::to_string(filterFull);
-        if (vanilla > 0) browsePath += "&vanilla=" + std::to_string(vanilla);
+        std::string browsePath = BASE_URL + "/browse?platform=" + /*MpLocalPlayer::get_PlatformId()*/"oculus";
+        if (offset > 0)browsePath += "&offset" + std::to_string(offset);
+        //if (filterFull > 0) browsePath += "&filterFull=" + /*std::to_string(filterFull)*/"0";
+        //if (vanilla > 0) browsePath += "&vanilla=" + /*std::to_string(vanilla)*/"0";
         WebUtils::GetJSONAsync(browsePath,
             [finished](long httpCode, bool error, rapidjson::Document& document) {
                 if (error) {

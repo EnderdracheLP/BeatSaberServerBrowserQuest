@@ -1,6 +1,8 @@
 #include "main.hpp"
 #include "UI/ServerBrowserViewController.hpp"
+#include "UI/Components/HostedGameCellData.hpp"
 #include "Core/HostedGameData.hpp"
+#include "Core/HostedGameBrowser.hpp"
 #include "Game/MpModeSelection.hpp"
 
 #include "GlobalNamespace/LevelListTableCell.hpp"
@@ -12,7 +14,6 @@
 #include "UnityEngine/RectOffset.hpp"
 
 #include "HMUI/Touchable.hpp"
-#include "HMUI/TableView.hpp"
 #include "HMUI/TableView_ScrollPositionType.hpp"
 
 #include "questui/shared/BeatSaberUI.hpp"
@@ -20,7 +21,7 @@
 #include "questui/shared/CustomTypes/Components/ExternalComponents.hpp"
 #include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
 #include "questui/shared/CustomTypes/Components/List/QuestUITableView.hpp"
-#include "questui/include/Sprites/carats.hpp"
+#include "Utils/Sprites/carats.hpp"
 
 #include "TMPro/TextAlignmentOptions.hpp"
 
@@ -161,22 +162,23 @@ namespace ServerBrowser::UI::ViewControllers {
     }
 
     //[UIAction("listSelect")]
-    void ListSelect(HMUI::TableView* tableView, int row)
+    */
+    void ServerBrowserViewController::ListSelect(HMUI::TableView* tableView, int row)
     {
-        auto selectedRow = GameList->data[row];
-
-        if (selectedRow == nullptr)
+        if (row > GameList->data.size())
         {
-            ClearSelection();
+            //ClearSelection();
             return;
         }
 
-        auto cellData = (HostedGameCellData)selectedRow;
-        _selectedGame = cellData->Game;
+        QuestUI::CustomListTableData::CustomCellInfo& selectedRow = GameList->data.at(row);
 
-        ConnectButton->interactable = _selectedGame->CanJoin;
+        ServerBrowser::UI::Components::HostedGameCellData cellData = reinterpret_cast<ServerBrowser::UI::Components::HostedGameCellData&>(selectedRow);
+        selectedGame = cellData.get_Game();
+
+        ConnectButton->set_interactable(selectedGame.CanJoin());
     }
-
+    /*
     //[UIAction("pageUpButtonClick")]
     void PageUpButtonClick()
     {
@@ -276,12 +278,6 @@ namespace ServerBrowser::UI::ViewControllers {
             QuestUI::BeatSaberUI::SetButtonSprites(PageUpButton, carat_up_inactive_sprite, carat_up_sprite);
             QuestUI::BeatSaberUI::SetButtonSprites(PageDownButton, carat_down_inactive_sprite, carat_down_sprite);
 
-            //GameList = CreateScrollableList(MainContentRoot->get_transform(), 
-            //    [](int index) {
-            //        getLogger().debug("Cell clicked with Index: %d", index);
-            //    }
-            //);
-
             getLogger().debug("ServerBrowserViewController::DidActivate Finished Create GameList");
 #pragma endregion
 
@@ -349,7 +345,7 @@ namespace ServerBrowser::UI::ViewControllers {
             SetInitialUiState();
 
             // Perform initial refresh
-            //HostedGameBrowser::FullRefresh(_filters);
+            HostedGameBrowser::FullRefresh(/*_filters*/);
     }
     
 
@@ -366,7 +362,8 @@ namespace ServerBrowser::UI::ViewControllers {
         getLogger().debug("ServerBrowserViewController::SetInitialUiState");
 
         // Temp Code for testing
-        ServerBrowser::Core::BSSBMasterAPI::BrowseAsync(
+        // TODO: Remove later on
+        ServerBrowser::Core::BSSBMasterAPI::BrowseAsync(0,
             [](std::optional<ServerBrowser::Core::ServerBrowserResult> page) {
                 if (page.has_value()) {
                     getLogger().debug("%s", page.value().Getmessage().c_str());
