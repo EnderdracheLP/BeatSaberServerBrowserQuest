@@ -1,15 +1,16 @@
 {
   "ExpandedNodes": [
     "",
-    "\\include",
-    "\\include\\Core",
-    "\\include\\Game",
-    "\\shared",
-    "\\shared\\Core",
+    "\\extern",
+    "\\extern\\beatsaber-hook",
+    "\\extern\\beatsaber-hook\\shared",
+    "\\extern\\beatsaber-hook\\shared\\utils",
+    "\\extern\\questui",
+    "\\libs",
+    "\\libs\\arm64-v8a",
     "\\src",
-    "\\src\\Core",
-    "\\src\\Game"
+    "\\src\\Assets"
   ],
-  "SelectedNode": "\\src\\Core\\HostedGameBrowser.cpp",
+  "SelectedNode": "\\libs\\arm64-v8a",
   "PreviewInSolutionExplorer": false
 }

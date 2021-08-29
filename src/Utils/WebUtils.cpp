@@ -5,7 +5,7 @@
 #include "libcurl/shared/easy.h"
 
 #define TIMEOUT 10
-#define USER_AGENT (std::string("ServerBrowser/") + VERSION + "(BeatSaber/1.16.2) (Oculus)").c_str()
+#define USER_AGENT std::string("ServerBrowser/" VERSION " (BeatSaber/1.16.2) (Oculus)").c_str()
 #define X_BSSB "X-BSSB: ✔"
 
 namespace WebUtils {

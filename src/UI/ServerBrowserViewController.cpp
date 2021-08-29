@@ -1,6 +1,5 @@
 #include "main.hpp"
 #include "UI/ServerBrowserViewController.hpp"
-#include "UI/Components/HostedGameCellData.hpp"
 #include "Core/HostedGameData.hpp"
 #include "Core/HostedGameBrowser.hpp"
 #include "Game/MpModeSelection.hpp"
@@ -18,7 +17,7 @@
 
 #include "questui/shared/BeatSaberUI.hpp"
 #include "questui/shared/QuestUI.hpp"
-#include "questui/shared/CustomTypes/Components/ExternalComponents.hpp"
+#include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
 #include "questui/shared/CustomTypes/Components/Backgroundable.hpp"
 #include "questui/shared/CustomTypes/Components/List/QuestUITableView.hpp"
 #include "Utils/Sprites/carats.hpp"
@@ -48,6 +47,8 @@ namespace ServerBrowser::UI::ViewControllers {
     //ServerBrowserViewController::_imageLoadCancellation;
     //HostedGameData ServerBrowserViewController::_selectedGame = null;
     //ServerBrowserViewController::_loadingControl;
+
+    //std::vector<Components::HostedGameCellData> gameCellData;
 
 #pragma region BSML UI Components
     //[UIParams]
@@ -114,7 +115,7 @@ namespace ServerBrowser::UI::ViewControllers {
         void ServerBrowserViewController::RefreshButtonClick()
     {
             SetInitialUiState();
-        //_ = HostedGameBrowser.FullRefresh(_filters);
+            HostedGameBrowser::FullRefresh(/*_filters*/);
     }
     /*
     //[UIAction("searchButtonClick")]
@@ -167,14 +168,14 @@ namespace ServerBrowser::UI::ViewControllers {
     {
         if (row > GameList->data.size())
         {
-            //ClearSelection();
+            ClearSelection();
             return;
         }
 
-        QuestUI::CustomListTableData::CustomCellInfo& selectedRow = GameList->data.at(row);
+        auto selectedRow = GameList->data[row];
 
-        ServerBrowser::UI::Components::HostedGameCellData cellData = reinterpret_cast<ServerBrowser::UI::Components::HostedGameCellData&>(selectedRow);
-        selectedGame = cellData.get_Game();
+        auto cellData = reinterpret_cast<ServerBrowser::UI::Components::HostedGameCellData*>(selectedRow);
+        selectedGame = cellData->get_Game();
 
         ConnectButton->set_interactable(selectedGame.CanJoin());
     }
@@ -330,8 +331,8 @@ namespace ServerBrowser::UI::ViewControllers {
                 //_loadingControl = ListLoadingControl::Create(this->get_gameObject()->get_transform());
                 if (loadingControl) {
                     loadingControl->didPressRefreshButtonEvent = il2cpp_utils::MakeDelegate<System::Action*>(classof(System::Action*), 
-                        (std::function<void()>)[] {
-                            getLogger().debug("FUN");
+                        (std::function<void()>)[this] {
+                            RefreshButtonClick();
                         }
                     );
                 }
@@ -339,7 +340,9 @@ namespace ServerBrowser::UI::ViewControllers {
             }
 
             // Begin listening for API browse responses
-            //HostedGameBrowser::OnUpdate += LobbyBrowser_OnUpdate;
+            HostedGameBrowser::OnUpdate = [this] {
+                LobbyBrowser_OnUpdate();
+            };
 
             // Reset the UI
             SetInitialUiState();
@@ -361,27 +364,13 @@ namespace ServerBrowser::UI::ViewControllers {
     void ServerBrowserViewController::SetInitialUiState() {
         getLogger().debug("ServerBrowserViewController::SetInitialUiState");
 
-        // Temp Code for testing
-        // TODO: Remove later on
-        ServerBrowser::Core::BSSBMasterAPI::BrowseAsync(0,
-            [](std::optional<ServerBrowser::Core::ServerBrowserResult> page) {
-                if (page.has_value()) {
-                    getLogger().debug("%s", page.value().Getmessage().c_str());
-                    ServerMessageText->set_text(il2cpp_utils::newcsstr(page.value().Getmessage()));
-                }
-                else {
-                    getLogger().debug("Page doesn't have value");
-                }
-            }
-        );
-
         ServerBrowser::Game::MpModeSelection::SetTitle("Server Browser");
 
-        //ClearSelection();
+        ClearSelection();
         CancelImageLoading();
 
-        //StatusText->set_text(il2cpp_utils::newcsstr("Loading..."));
-        //StatusText->set_color(Color::get_gray());
+        StatusText->set_text(il2cpp_utils::newcsstr("Loading..."));
+        StatusText->set_color(Color::get_gray());
 
         if (loadingControl) {
             loadingControl->ShowLoading(il2cpp_utils::newcsstr("Loading servers..."));
@@ -422,91 +411,131 @@ namespace ServerBrowser::UI::ViewControllers {
         }
     }
 
-    /*
-    void LobbyBrowser_OnUpdate()
+    void ServerBrowserViewController::ClearSelection()
     {
-        GameList->data.Clear();
-        CancelImageLoading();
+        if (GameList && GameList->tableView) {
+            GameList->tableView->ClearSelection();
+            ConnectButton->set_interactable(false);
+            //selectedGame;
+        }
+    }
 
-        if (!System::String::IsNullOrEmpty(HostedGameBrowser.ServerMessage))
+    void ServerBrowserViewController::LobbyBrowser_OnUpdate()
+    {
+        for (auto data : GameList->data) {
+            delete data;
+        }
+        GameList->data.clear();
+        QuestUI::MainThreadScheduler::Schedule(
+            [this] {
+                CancelImageLoading();
+            });
+
+        if (!HostedGameBrowser::get_ServerMessage().empty())
         {
-            ServerMessageText.text = HostedGameBrowser.ServerMessage;
-            ServerMessageText.enabled = true;
+            ServerMessageText->set_text(il2cpp_utils::newcsstr(HostedGameBrowser::get_ServerMessage()));
+            ServerMessageText->set_enabled(true);
         }
         else
         {
-            ServerMessageText.enabled = false;
+            ServerMessageText->set_enabled(false);
         }
 
-        if (!HostedGameBrowser.ConnectionOk)
+        if (!HostedGameBrowser::get_ConnectionOk())
         {
-            StatusText::text = "Failed to get server list";
-            StatusText::color = Color.get_red();
+            StatusText->set_text(il2cpp_utils::newcsstr("Failed to get server list"));
+            StatusText->set_color(Color::get_red());
         }
-        else if (!HostedGameBrowser::AnyResultsOnPage)
+        else if (!HostedGameBrowser::get_AnyResultsOnPage())
         {
-            if (HostedGameBrowser::TotalResultCount == 0)
+            if (HostedGameBrowser::get_TotalResultCount() == 0)
             {
-                if (IsSearching)
+                //if (IsSearching)
+                //{
+                //    StatusText->set_text(i2cpp_utils::newcsstr("No servers found matching your search"));
+                //}
+                //else
                 {
-                    StatusText::text = "No servers found matching your search";
-                }
-                else
-                {
-                    StatusText::text = "Sorry, no servers found";
+                    StatusText->set_text(il2cpp_utils::newcsstr("Sorry, no servers found"));
                 }
 
-                if (_loadingControl != nullptr)
-                    _loadingControl::ShowText("No servers found", true);
+                if (loadingControl != nullptr)
+                    QuestUI::MainThreadScheduler::Schedule(
+                        [this] {
+                            loadingControl->ShowText(il2cpp_utils::newcsstr("No servers found"), true);
+                        });
             }
             else
             {
-                StatusText.text = "This page is empty";
+                StatusText->set_text(il2cpp_utils::newcsstr("This page is empty"));
                 RefreshButtonClick(); // this is awkward so force a refresh
             }
 
-            StatusText.color = Color.get_red();
+            StatusText->set_color(Color::get_red());
         }
         else
         {
-            StatusText::text = $"Found {HostedGameBrowser.TotalResultCount} "
-                + (HostedGameBrowser.TotalResultCount == 1 ? "server" : "servers")
-                + $" (Page {HostedGameBrowser.PageIndex + 1} of {HostedGameBrowser.TotalPageCount})";
+            //StatusText.text = $"Found {HostedGameBrowser.TotalResultCount} "
+            //    + (HostedGameBrowser.TotalResultCount == 1 ? "server" : "servers")
+            //    + $" (Page {HostedGameBrowser.PageIndex + 1} of {HostedGameBrowser.TotalPageCount})";
+            StatusText->set_text(
+                il2cpp_utils::newcsstr(string_format(
+            "Found %d %s "
+            "(Page %d of %d)",
+                HostedGameBrowser::get_TotalResultCount(), 
+                HostedGameBrowser::get_TotalResultCount() == 1 ? "server" : "servers",
+                HostedGameBrowser::get_PageIndex(),
+                HostedGameBrowser::get_TotalPageCount()
+                )));
 
-            StatusText.color = Color.green;
+            StatusText->set_color(Color::get_green());
 
-            if (IsSearching)
-            {
-                StatusText.text += " (Filtered)";
-            }
+            //if (IsSearching)
+            //{
+            //    StatusText.text += " (Filtered)";
+            //}
 
-            foreach(var lobby in HostedGameBrowser.LobbiesOnPage)
-            {
-                GameList.data.Add(new HostedGameCellData(_imageLoadCancellation, CellUpdateCallback, lobby));
-            }
+            QuestUI::MainThreadScheduler::Schedule(
+                [this] {
+                    int idx = 0;
+                    for (auto& lobby : HostedGameBrowser::get_LobbiesOnPage()) {
+                        GameList->data.push_back(reinterpret_cast<QuestUI::CustomListTableData::CustomCellInfo*>(new Components::HostedGameCellData(_imageLoadCancellation, [this](Components::HostedGameCellData* cellInfo) { CellUpdateCallback(cellInfo); }, lobby)));
+                        GameList->CellForIdx(GameList->tableView, idx++);
+                    }
+                });
 
-            if (_loadingControl != null)
-                _loadingControl.Hide();
+
+            //GameList->data.data() = gameCellData.data();
+            //foreach(var lobby in HostedGameBrowser.LobbiesOnPage)
+            //{
+            //    GameList.data.Add(new HostedGameCellData(_imageLoadCancellation, CellUpdateCallback, lobby));
+            //}
+
+            if (loadingControl != nullptr)
+                QuestUI::MainThreadScheduler::Schedule(
+                    [this] {
+                        loadingControl->Hide();
+                    });
         }
 
-        if (!MpSession.GetLocalPlayerHasMultiplayerExtensions())
-        {
-            StatusText.text += "\r\nMultiplayerExtensions not detected, hiding modded games";
-            StatusText.color = Color.yellow;
-            FilterModdedButton.interactable = false;
-        }
+        //if (!MpSession::GetLocalPlayerHasMultiplayerExtensions())
+        //{
+        //    StatusText->set_text(il2cpp_utils::newcsstr(to_utf8(csstrtostr(StatusText->get_text())) + "\r\nMultiQuestensions not detected, hiding modded games"));
+        //    StatusText->set_color(Color::get_yellow());
+        //    //FilterModdedButton->set_interactable(false);
+        //}
 
         AfterCellsCreated();
 
-        RefreshButton.interactable = true;
+        RefreshButton->set_interactable(true);
 
-        SearchButton.interactable = (IsSearching || HostedGameBrowser.AnyResultsOnPage);
-        SearchButton.SetButtonText(IsSearching ? "<color=#32CD32>Search</color>" : "Search");
+        //SearchButton.interactable = (IsSearching || HostedGameBrowser.AnyResultsOnPage);
+        //SearchButton.SetButtonText(IsSearching ? "<color=#32CD32>Search</color>" : "Search");
 
-        PageUpButton.interactable = HostedGameBrowser.PageIndex > 0;
-        PageDownButton.interactable = HostedGameBrowser.PageIndex < HostedGameBrowser.TotalPageCount - 1;
+        PageUpButton->set_interactable(HostedGameBrowser::get_PageIndex() > 0);
+        PageDownButton->set_interactable(HostedGameBrowser::get_PageIndex() < HostedGameBrowser::get_TotalPageCount() - 1);
     }
-
+    /*
     public bool IsSearching = > _filters.AnyActive;
     #pragma endregion
 
@@ -606,47 +635,47 @@ namespace ServerBrowser::UI::ViewControllers {
         }
     }
     #pragma endregion
+    */
+    #pragma region Custom Cell Behaviors 
 
-    #pragma region Custom Cell Behaviors
-    void CellUpdateCallback(HostedGameCellData cellInfo)
+    void ServerBrowserViewController::CellUpdateCallback(Components::HostedGameCellData* cellInfo)
     {
-        GameList.tableView.RefreshCellsContent();
+        GameList->tableView->RefreshCellsContent();
 
-        foreach(var cell in GameList.tableView.visibleCells)
-        {
-            var extensions = cell.gameObject.GetComponent<HostedGameCellExtensions>();
+        //foreach(var cell in GameList.tableView.visibleCells)
+        //{
+        //    var extensions = cell.gameObject.GetComponent<HostedGameCellExtensions>();
 
-            if (extensions != null)
-            {
-                extensions.RefreshContent((HostedGameCellData)GameList.data[cell.idx]);
-            }
-        }
+        //    if (extensions != null)
+        //    {
+        //        extensions.RefreshContent((HostedGameCellData)GameList.data[cell.idx]);
+        //    }
+        //}
     }
 
-    void AfterCellsCreated()
+    void ServerBrowserViewController::AfterCellsCreated()
     {
         GameList->tableView->selectionType = TableViewSelectionType::Single;
 
         GameList->tableView->ReloadData(); // should cause visibleCells to be updated
 
-        foreach(var cell in GameList.tableView.visibleCells)
-        {
-            var extensions = cell.gameObject.GetComponent<HostedGameCellExtensions>();
-            var data = (HostedGameCellData)GameList.data[cell.idx];
+        //foreach(var cell in GameList.tableView.visibleCells)
+        //{
+        //    var extensions = cell.gameObject.GetComponent<HostedGameCellExtensions>();
+        //    var data = (HostedGameCellData)GameList.data[cell.idx];
 
-            if (extensions == null)
-            {
-                cell.gameObject.AddComponent<HostedGameCellExtensions>().Configure(cell, data);
-            }
-            else
-            {
-                extensions.RefreshContent(data);
-            }
-        }
+        //    if (extensions == null)
+        //    {
+        //        cell.gameObject.AddComponent<HostedGameCellExtensions>().Configure(cell, data);
+        //    }
+        //    else
+        //    {
+        //        extensions.RefreshContent(data);
+        //    }
+        //}
 
         ClearSelection();
     }
     #pragma endregion
-}
-*/
+
 }

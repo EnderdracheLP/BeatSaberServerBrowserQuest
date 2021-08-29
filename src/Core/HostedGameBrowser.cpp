@@ -1,23 +1,28 @@
+//TODO: Remove temp main.hpp include
+#include "main.hpp"
+
 #include "Core/HostedGameBrowser.hpp"
 #include "Core/BSSBMasterAPI.hpp"
 #include <cmath>
 
 namespace ServerBrowser::Core {
+    std::function<void()> HostedGameBrowser::OnUpdate = nullptr;
+
     std::optional<ServerBrowserResult> HostedGameBrowser::lastServerResult;
     std::map<int, HostedGameData> HostedGameBrowser::lobbyObjects;
     std::vector<HostedGameData> HostedGameBrowser::lobbiesOnPage;
     int HostedGameBrowser::offset;
 
-    void HostedGameBrowser::FullRefresh(/*HostedGameFilters filters,*/ std::function<void()> finished) {
+    void HostedGameBrowser::FullRefresh(/*HostedGameFilters filters*/) {
         lastServerResult = std::nullopt;
         lobbyObjects.clear();
         lobbiesOnPage.clear();
 
-        LoadPage(0,/* filters,*/ finished);
+        LoadPage(0/*, filters*/);
     }
-    void HostedGameBrowser::LoadPage(int pageOffset, /*HostedGameFilters filters,*/ std::function<void()> finished) {
+    void HostedGameBrowser::LoadPage(int pageOffset/*, HostedGameFilters filters*/) {
         // Send API Request
-        BSSBMasterAPI::BrowseAsync(pageOffset, /*filters, */
+        BSSBMasterAPI::BrowseAsync(pageOffset, /*filters,*/
             [&](std::optional<ServerBrowserResult> result) {
                 // Update state
                 if (result.has_value()) {
@@ -27,7 +32,8 @@ namespace ServerBrowser::Core {
                     // If we got results, process and index the lobby info
                     std::vector<HostedGameData> nextLobbiesOnPage;
 
-                    for (HostedGameData lobby : lastServerResult.value().Getlobbies()) {
+                    for (HostedGameData lobby : lastServerResult->Getlobbies()) {
+                        getLogger().debug("Adding Lobby with Id: %d", lobby.get_Id());
                         lobbyObjects.insert_or_assign(lobby.get_Id(), lobby);
                         nextLobbiesOnPage.push_back(lobby);
                     }
@@ -35,7 +41,7 @@ namespace ServerBrowser::Core {
                     lobbiesOnPage = nextLobbiesOnPage;
 
                     // Fire update event for the UI
-                    finished();
+                    if (OnUpdate) OnUpdate();
                 }
             });
     }
@@ -57,7 +63,7 @@ namespace ServerBrowser::Core {
     int HostedGameBrowser::get_PageSize() {
         return lastServerResult.has_value() ? lastServerResult->Getlimit() : 10;
     }
-    std::vector<HostedGameData> HostedGameBrowser::get_LobbiesOnPage() {
+    std::vector<HostedGameData>& HostedGameBrowser::get_LobbiesOnPage() {
         return lobbiesOnPage;
     }
     std::string HostedGameBrowser::get_ServerMessage() {
