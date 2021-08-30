@@ -243,17 +243,19 @@ namespace ServerBrowser::UI::ViewControllers {
             //    }
             //);
 
+            UnityEngine::Vector2 GameListSizeDelta{ 90.0f, 60.0f };
+
             auto vertical = CreateVerticalLayoutGroup(MainContentRoot->get_transform());
             auto layout = vertical->get_gameObject()->AddComponent<LayoutElement*>();
-            vertical->get_rectTransform()->set_sizeDelta({ 35.0f, 60.0f });
+            vertical->get_rectTransform()->set_sizeDelta(GameListSizeDelta);
             vertical->get_rectTransform()->set_anchoredPosition({ 0.0f, 0.0f });
             vertical->set_childForceExpandHeight(false);
             vertical->set_childControlHeight(false);
             vertical->set_childScaleHeight(false);
-            layout->set_preferredHeight(60.0f);
-            layout->set_preferredWidth(35.0f);
+            layout->set_preferredHeight(GameListSizeDelta.y);
+            layout->set_preferredWidth(GameListSizeDelta.x);
 
-            GameList = ServerBrowser::UI::Components::CreateGameList(vertical->get_transform(), { 0.0f, 0.0f }, Vector2(35.0f, 60.0f - 16.0f),
+            GameList = ServerBrowser::UI::Components::CreateGameList(vertical->get_transform(), { 0.0f, 0.0f }, Vector2(GameListSizeDelta.x, GameListSizeDelta.y - 16.0f),
                 [](int index) {
                     // TODO: Do stuff here!
                     getLogger().debug("Cell clicked with Index: %d", index);
@@ -656,8 +658,11 @@ namespace ServerBrowser::UI::ViewControllers {
 
     void ServerBrowserViewController::CellUpdateCallback(Components::HostedGameCellData* cellInfo)
     {
-        getLogger().debug("CellUpdateCallback called");
-        GameList->tableView->RefreshCellsContent();
+        QuestUI::MainThreadScheduler::Schedule(
+            [this] {
+                getLogger().debug("CellUpdateCallback called");
+                GameList->tableView->RefreshCellsContent();
+            });
 
         //foreach(var cell in GameList.tableView.visibleCells)
         //{
@@ -672,14 +677,17 @@ namespace ServerBrowser::UI::ViewControllers {
 
     void ServerBrowserViewController::AfterCellsCreated()
     {
-        getLogger().debug("AfterCellsCreated called");
+        QuestUI::MainThreadScheduler::Schedule(
+            [this] {
+                getLogger().debug("AfterCellsCreated called");
 
-        GameList->tableView->selectionType = TableViewSelectionType::Single;
+                GameList->tableView->selectionType = TableViewSelectionType::Single;
 
-        GameList->tableView->ReloadData(); // should cause visibleCells to be updated
+                GameList->tableView->ReloadData(); // should cause visibleCells to be updated
 
-        // TODO: Remove code when not needed TEMP Code for Refresh
-        GameList->tableView->RefreshCells(true, true);
+                //// TODO: Remove code when not needed TEMP Code for Refresh
+                //GameList->tableView->RefreshCells(true, true);
+            });
 
         //foreach(var cell in GameList.tableView.visibleCells)
         //{
