@@ -212,7 +212,6 @@ namespace ServerBrowser::UI::ViewControllers {
             get_gameObject()->AddComponent<Touchable*>();
 
             MainContentRoot = CreateVerticalLayoutGroup(get_transform());
-            //GameList = QuestUI::BeatSaberUI::CreateScrollView(MainContentRoot->get_rectTransform());
 
             // <text id="serverMessageText" text="" align="Center" font-size="3.5" anchor-min-y="2"></text>
             ServerMessageText = CreateText(get_transform(), "ServerMessageText", false);
@@ -497,13 +496,15 @@ namespace ServerBrowser::UI::ViewControllers {
 
             QuestUI::MainThreadScheduler::Schedule(
                 [this] {
-                    int idx = 0;
+                    //int idx = 0;
                     for (auto& lobby : HostedGameBrowser::get_LobbiesOnPage()) {
-                        GameList->data.push_back(reinterpret_cast<QuestUI::CustomListTableData::CustomCellInfo*>(new Components::HostedGameCellData(_imageLoadCancellation, [this](Components::HostedGameCellData* cellInfo) { CellUpdateCallback(cellInfo); }, lobby)));
-                        GameList->CellForIdx(GameList->tableView, idx++);
+                        GameList->data.emplace_back(reinterpret_cast<QuestUI::CustomListTableData::CustomCellInfo*>(new Components::HostedGameCellData(_imageLoadCancellation, [this](Components::HostedGameCellData* cellInfo) { CellUpdateCallback(cellInfo); }, lobby)));
+                        //GameList->CellForIdx(GameList->tableView, idx++);
                     }
-                });
 
+                    // TODO: Remove debug code like this
+                    getLogger().debug("%s", GameList->data[0]->text.c_str());
+                });
 
             //GameList->data.data() = gameCellData.data();
             //foreach(var lobby in HostedGameBrowser.LobbiesOnPage)
@@ -640,6 +641,7 @@ namespace ServerBrowser::UI::ViewControllers {
 
     void ServerBrowserViewController::CellUpdateCallback(Components::HostedGameCellData* cellInfo)
     {
+        getLogger().debug("CellUpdateCallback called");
         GameList->tableView->RefreshCellsContent();
 
         //foreach(var cell in GameList.tableView.visibleCells)
@@ -655,9 +657,14 @@ namespace ServerBrowser::UI::ViewControllers {
 
     void ServerBrowserViewController::AfterCellsCreated()
     {
+        getLogger().debug("AfterCellsCreated called");
+
         GameList->tableView->selectionType = TableViewSelectionType::Single;
 
         GameList->tableView->ReloadData(); // should cause visibleCells to be updated
+
+        // TODO: Remove code when not needed TEMP Code for Refresh
+        GameList->tableView->RefreshCells(true, true);
 
         //foreach(var cell in GameList.tableView.visibleCells)
         //{

@@ -64,13 +64,19 @@ namespace ServerBrowser::UI::Components {
         catch (const std::exception& ex) {
             getLogger().error("Could not set cover art for level%s: %s", Game.get_LevelId().value().c_str(), ex.what());
         }
+        getLogger().debug("Done with UpdateUi in HostedGameCellData");
     }
 
     void HostedGameCellData::SetCoverArt() {
-        if (!Game.get_LevelId().has_value() && Game.get_LevelId().value().empty() || Game.get_LobbyState() != MultiplayerLobbyState::GameRunning) {
+        getLogger().debug("Running SetCoverArt in HostedGameCellData");
+        if (!Game.get_LevelId().has_value() || Game.get_LevelId().has_value() && Game.get_LevelId().value().empty() || Game.get_LobbyState() != MultiplayerLobbyState::GameRunning) {
             // No level info / we are in a lobby
+            getLogger().info("No level info, assuming they're in a lobby");
             UpdateIcon(Sprites::get_PortalUser());
             return;
+        }
+        if (Game.get_LevelId().has_value()) {
+            getLogger().debug("Game has LevelID: %s", Game.get_LevelId()->c_str());
         }
 
         BSSBMasterAPI::GetCoverImageAsync(Game,
@@ -90,6 +96,7 @@ namespace ServerBrowser::UI::Components {
     }
     
     void HostedGameCellData::UpdateIcon(UnityEngine::Sprite* nextIcon) {
+        getLogger().debug("Running UpdateIcon");
         if (icon == nullptr || icon->get_name() != nextIcon->get_name()) {
             icon = nextIcon;
             onContentChange(this);

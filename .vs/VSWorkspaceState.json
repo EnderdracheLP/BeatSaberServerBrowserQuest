@@ -2,15 +2,19 @@
   "ExpandedNodes": [
     "",
     "\\extern",
-    "\\extern\\beatsaber-hook",
-    "\\extern\\beatsaber-hook\\shared",
-    "\\extern\\beatsaber-hook\\shared\\utils",
     "\\extern\\questui",
-    "\\libs",
-    "\\libs\\arm64-v8a",
+    "\\extern\\questui\\shared",
+    "\\extern\\questui\\shared\\CustomTypes",
+    "\\extern\\questui\\shared\\CustomTypes\\Components",
+    "\\extern\\questui\\shared\\CustomTypes\\Components\\FloatingScreen",
+    "\\include",
+    "\\include\\UI",
+    "\\include\\Utils",
     "\\src",
-    "\\src\\Assets"
+    "\\src\\Core",
+    "\\src\\UI",
+    "\\src\\Utils"
   ],
-  "SelectedNode": "\\libs\\arm64-v8a",
+  "SelectedNode": "\\src\\Utils\\WebUtils.cpp",
   "PreviewInSolutionExplorer": false
 }

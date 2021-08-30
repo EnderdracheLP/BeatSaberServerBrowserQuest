@@ -58,7 +58,7 @@ namespace ServerBrowser::Core {
         std::string MasterServerHost;
         int MasterServerPort;
         std::optional<std::string> EndedAt;
-        std::string MpExVersion;
+        std::optional<std::string> MpExVersion;
         SemVer ModVersion;
         SemVer GameVersion;
         std::optional<std::string> ServerType;
@@ -87,7 +87,7 @@ namespace ServerBrowser::Core {
         const std::string& get_MasterServerHost() const { return MasterServerHost; }
         const int& get_MasterServerPort() const { return MasterServerPort; }
         const std::optional<std::string> get_EndedAt() const { return EndedAt; }
-        const std::string& get_MpExVersion() const { return MpExVersion; }
+        const std::optional<std::string> get_MpExVersion() const { return MpExVersion; }
         const SemVer& get_ModVersion() const { return ModVersion; }
         const SemVer& get_GameVersion() const { return GameVersion; }
         const std::optional<std::string> get_ServerType() const { return ServerType; }

@@ -6,13 +6,13 @@ namespace ServerBrowser::Game {
 
 	void MpConnect::Join(HostedGameData game) {
 		// MQE Version check
-		if (!game.get_MpExVersion().empty()) {
+		if (!game.get_MpExVersion().has_value()) {
 			std::string ourMQE_Version = "Undefined";
 
 
-			if (ourMQE_Version.empty() || ourMQE_Version != game.get_MpExVersion()) {
+			if (ourMQE_Version.empty() || ourMQE_Version != game.get_MpExVersion().value()) {
 				std::string ourMQE_VersionStr = (!ourMQE_Version.empty() ? ourMQE_Version : "Not installed");
-				std::string theirMpExVersionStr = game.get_MpExVersion();
+				std::string theirMpExVersionStr = game.get_MpExVersion().value();
 
 				getLogger().warning("Blocking game join because of MultiQuestensions/MultiplayerExtensions version mismatch ours: %s, theirs: %s", 
 					ourMQE_Version.c_str(), theirMpExVersionStr.c_str());

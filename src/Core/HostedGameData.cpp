@@ -56,8 +56,8 @@ namespace ServerBrowser::Core {
 		if (IsModded) {
 			moddedDescr = "Modded";
 
-			if (!MpExVersion.empty()) {
-				moddedDescr += MpExVersion;
+			if (!MpExVersion->empty()) {
+				moddedDescr += MpExVersion.value();
 			}
 		}
 		else {
@@ -147,7 +147,7 @@ SERIALIZE_STRING_METHOD(ServerBrowser::Core, HostedGameData,
 	SERIALIZE_VALUE(MasterServerHost, masterServerHost)
 	SERIALIZE_VALUE(MasterServerPort, masterServerPort)
 	SERIALIZE_VALUE_OPTIONAL(EndedAt, endedAt)
-	SERIALIZE_VALUE(MpExVersion, mpExVersion)
+	SERIALIZE_VALUE_OPTIONAL(MpExVersion, mpExVersion)
 	rapidjson::Value modVer(rapidjson::kObjectType);
 	modVer.PushBack(ModVersion.GetMajor(), alloc).PushBack(ModVersion.GetMinor(), alloc).PushBack(ModVersion.GetBuild(), alloc);
 	if (ModVersion.GetRevision().has_value()) modVer.PushBack(ModVersion.GetRevision().value(), alloc);
@@ -184,7 +184,7 @@ SERIALIZE_STRING_METHOD(ServerBrowser::Core, HostedGameData,
 			DESERIALIZE_VALUE(MasterServerHost, masterServerHost, String)
 			DESERIALIZE_VALUE(MasterServerPort, masterServerPort, Int)
 			DESERIALIZE_VALUE_OPTIONAL(EndedAt, endedAt, String)
-			DESERIALIZE_VALUE(MpExVersion, mpExVersion, String)
+			DESERIALIZE_VALUE_OPTIONAL(MpExVersion, mpExVersion, String)
 			DESERIALIZE_CLASS(ModVersion, modVersion)
 			DESERIALIZE_CLASS(GameVersion, gameVersion)
 			DESERIALIZE_VALUE_OPTIONAL(ServerType, serverType, String)
