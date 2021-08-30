@@ -21,12 +21,14 @@ namespace ServerBrowser::Core {
         LoadPage(0/*, filters*/);
     }
     void HostedGameBrowser::LoadPage(int pageOffset/*, HostedGameFilters filters*/) {
+        getLogger().debug("Check pageOffset is: %d", pageOffset);
         // Send API Request
         BSSBMasterAPI::BrowseAsync(pageOffset, /*filters,*/
-            [&](std::optional<ServerBrowserResult> result) {
+            [&, pageOffset](std::optional<ServerBrowserResult> result) {
                 // Update state
                 if (result.has_value()) {
                     offset = pageOffset;
+                    getLogger().debug("offset is now: %d", offset);
                     lastServerResult = result;
 
                     // If we got results, process and index the lobby info
@@ -55,10 +57,14 @@ namespace ServerBrowser::Core {
         return lastServerResult.has_value() ? lastServerResult->Getcount() : 0;
     }
     int HostedGameBrowser::get_PageIndex() {
-        return floor(offset / get_PageSize());
+        getLogger().debug("offset is: %d", offset);
+        getLogger().debug("PageSize is: %d", get_PageSize());
+        int result = floor(offset / get_PageSize());
+        getLogger().debug("Result is: %d", result);
+        return result;
     }
     int HostedGameBrowser::get_TotalPageCount() {
-        return ceil(get_TotalResultCount() / get_PageSize());
+        return (int)ceil((double)get_TotalResultCount() / (double)get_PageSize());
     }
     int HostedGameBrowser::get_PageSize() {
         return lastServerResult.has_value() ? lastServerResult->Getlimit() : 10;

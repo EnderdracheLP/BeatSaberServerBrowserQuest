@@ -1,6 +1,7 @@
 #pragma once
 #include "main.hpp"
 //#include "UI/Components/ListLoadingControl.hpp"
+#include "UI/Components/CustomListTableData.hpp"
 #include "UI/Components/HostedGameCellData.hpp"
 #include "custom-types/shared/macros.hpp"
 #include "Core/HostedGameData.hpp"

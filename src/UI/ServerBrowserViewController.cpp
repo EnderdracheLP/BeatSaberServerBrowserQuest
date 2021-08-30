@@ -67,7 +67,7 @@ namespace ServerBrowser::UI::ViewControllers {
     TMPro::TextMeshProUGUI* StatusText;
 
     //[UIComponent("lobbyList")]
-    CustomListTableData* GameList;
+    ServerBrowser::UI::Components::CustomListTableData* GameList;
 
     //[UIComponent("refreshButton")]
     UnityEngine::UI::Button* RefreshButton;
@@ -217,18 +217,32 @@ namespace ServerBrowser::UI::ViewControllers {
             ServerMessageText = CreateText(get_transform(), "ServerMessageText", false);
             ServerMessageText->set_alignment(TMPro::TextAlignmentOptions::Center);
             ServerMessageText->set_fontSize(5.5f); // Default 3.5f
-            ServerMessageText->get_rectTransform()->set_anchorMin({ 0.5f, 2.5f });
+            ServerMessageText->get_rectTransform()->set_anchorMin({ 0.5f, 2.2f });
 
-            UnityEngine::UI::HorizontalLayoutGroup* MaintContentHorizontalLayout = CreateHorizontalLayoutGroup(MainContentRoot->get_transform());
-            auto sizeFitter = MaintContentHorizontalLayout->get_gameObject()->AddComponent<UnityEngine::UI::ContentSizeFitter*>();
+            UnityEngine::UI::HorizontalLayoutGroup* MainContentHorizontalLayout = CreateHorizontalLayoutGroup(MainContentRoot->get_transform());
+            auto sizeFitter = MainContentHorizontalLayout->get_gameObject()->AddComponent<UnityEngine::UI::ContentSizeFitter*>();
             sizeFitter->set_horizontalFit(UnityEngine::UI::ContentSizeFitter::FitMode::PreferredSize);
             sizeFitter->set_verticalFit(UnityEngine::UI::ContentSizeFitter::FitMode::PreferredSize);
-            MaintContentHorizontalLayout->set_spacing(2);
-            MaintContentHorizontalLayout->get_rectTransform()->set_anchorMin({ 0, 0 });
-            MaintContentHorizontalLayout->get_rectTransform()->set_anchorMax({ 0.5f, 0 });
+            MainContentHorizontalLayout->set_spacing(2);
+            MainContentHorizontalLayout->get_rectTransform()->set_anchorMin({ 0, 0 });
+            MainContentHorizontalLayout->get_rectTransform()->set_anchorMax({ 0.5f, 0 });
 
 #pragma region Create GameList
             getLogger().debug("ServerBrowserViewController::DidActivate Create GameList");
+            //ServerBrowser::UI::Components::CreateScrollableCustomListTableData(MainContentRoot->get_transform(), [](int index) {
+            //    // TODO: Do stuff here!
+            //    getLogger().debug("Cell clicked with Index: %d", index);
+            //    },
+            //    [this] {
+            //        // TODO: Do Stuff on UP Button Press!
+            //        getLogger().debug("Up Button Pressed!");
+            //    },
+            //    [this] {
+            //    // TODO: Do Stuff on DOWN Button Press!
+            //    getLogger().debug("Down Button Pressed!");
+            //    }
+            //);
+
             auto vertical = CreateVerticalLayoutGroup(MainContentRoot->get_transform());
             auto layout = vertical->get_gameObject()->AddComponent<LayoutElement*>();
             vertical->get_rectTransform()->set_sizeDelta({ 35.0f, 60.0f });
@@ -239,7 +253,7 @@ namespace ServerBrowser::UI::ViewControllers {
             layout->set_preferredHeight(60.0f);
             layout->set_preferredWidth(35.0f);
 
-            GameList = CreateList(vertical->get_transform(), Vector2(35.0f, 60.0f - 16.0f),
+            GameList = ServerBrowser::UI::Components::CreateGameList(vertical->get_transform(), { 0.0f, 0.0f }, Vector2(35.0f, 60.0f - 16.0f),
                 [](int index) {
                     // TODO: Do stuff here!
                     getLogger().debug("Cell clicked with Index: %d", index);
@@ -297,19 +311,20 @@ namespace ServerBrowser::UI::ViewControllers {
 
             //CreateEntries(container->get_transform());
 
-            RefreshButton = QuestUI::BeatSaberUI::CreateUIButton(MaintContentHorizontalLayout->get_rectTransform(), "Refresh", 
+            RefreshButton = QuestUI::BeatSaberUI::CreateUIButton(MainContentHorizontalLayout->get_rectTransform(), "Refresh",
                 [this]() {
                     RefreshButtonClick();
                 }
             );
 
-            CreateButton = QuestUI::BeatSaberUI::CreateUIButton(MaintContentHorizontalLayout->get_rectTransform(), "Create",
+            CreateButton = QuestUI::BeatSaberUI::CreateUIButton(MainContentHorizontalLayout->get_rectTransform(), "Create",
                 [this]() {
-                    getLogger().debug("Lets create something, too lazy now though");
+                    getLogger().info("Opening CreatServerMenu");
+                    MpModeSelection::OpenCreateServerMenu();
                 }
             );
 
-            ConnectButton = QuestUI::BeatSaberUI::CreateUIButton(MaintContentHorizontalLayout->get_rectTransform(), "Connect", "PlayButton",
+            ConnectButton = QuestUI::BeatSaberUI::CreateUIButton(MainContentHorizontalLayout->get_rectTransform(), "Connect", "PlayButton",
                 [this]() {
                     getLogger().debug("Lets connect something, too lazy now though");
                 }
@@ -498,7 +513,7 @@ namespace ServerBrowser::UI::ViewControllers {
                 [this] {
                     //int idx = 0;
                     for (auto& lobby : HostedGameBrowser::get_LobbiesOnPage()) {
-                        GameList->data.emplace_back(reinterpret_cast<QuestUI::CustomListTableData::CustomCellInfo*>(new Components::HostedGameCellData(_imageLoadCancellation, [this](Components::HostedGameCellData* cellInfo) { CellUpdateCallback(cellInfo); }, lobby)));
+                        GameList->data.emplace_back(reinterpret_cast<ServerBrowser::UI::Components::CustomListTableData::CustomCellInfo*>(new Components::HostedGameCellData(_imageLoadCancellation, [this](Components::HostedGameCellData* cellInfo) { CellUpdateCallback(cellInfo); }, lobby)));
                         //GameList->CellForIdx(GameList->tableView, idx++);
                     }
 
@@ -533,8 +548,8 @@ namespace ServerBrowser::UI::ViewControllers {
         //SearchButton.interactable = (IsSearching || HostedGameBrowser.AnyResultsOnPage);
         //SearchButton.SetButtonText(IsSearching ? "<color=#32CD32>Search</color>" : "Search");
 
-        PageUpButton->set_interactable(HostedGameBrowser::get_PageIndex() > 0);
-        PageDownButton->set_interactable(HostedGameBrowser::get_PageIndex() < HostedGameBrowser::get_TotalPageCount() - 1);
+        //PageUpButton->set_interactable(HostedGameBrowser::get_PageIndex() > 0);
+        //PageDownButton->set_interactable(HostedGameBrowser::get_PageIndex() < HostedGameBrowser::get_TotalPageCount() - 1);
     }
     /*
     public bool IsSearching = > _filters.AnyActive;
