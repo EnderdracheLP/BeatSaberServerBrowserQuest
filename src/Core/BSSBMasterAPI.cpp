@@ -45,9 +45,10 @@ namespace ServerBrowser::Core {
     void BSSBMasterAPI::BrowseAsync(int offset, /*HostedGameFilters filters,*/ std::function<void(std::optional<ServerBrowser::Core::ServerBrowserResult>)> finished) {
         exception.clear();
         std::string browsePath = BASE_URL + "/browse?platform=" + /*MpLocalPlayer::get_PlatformId()*/"oculus";
-        if (offset > 0)browsePath += "&offset" + std::to_string(offset);
+        if (offset > 0)browsePath += "&offset=" + std::to_string(offset);
         //if (filterFull > 0) browsePath += "&filterFull=" + /*std::to_string(filterFull)*/"0";
         //if (vanilla > 0) browsePath += "&vanilla=" + /*std::to_string(vanilla)*/"0";
+        getLogger().debug("browsePath is: %s", browsePath.c_str());
         WebUtils::GetJSONAsync(browsePath,
             [finished](long httpCode, bool error, rapidjson::Document& document) {
                 if (error) {

@@ -186,27 +186,27 @@ namespace ServerBrowser::UI::ViewControllers {
     //[UIAction("pageUpButtonClick")]
     void ServerBrowserViewController::PageUpButtonClick()
     {
-        QuestUI::MainThreadScheduler::Schedule(
-            [/*&, */this] {
+        //QuestUI::MainThreadScheduler::Schedule(
+        //    [/*&, */this] {
                 if (HostedGameBrowser::get_PageIndex() > 0)
                 {
                     SetInitialUiState();
                     HostedGameBrowser::LoadPage((HostedGameBrowser::get_PageIndex() - 1) * HostedGameBrowser::get_PageSize()/*, _filters*/);
                 }
-            });
+            //});
     }
 
     //[UIAction("pageDownButtonClick")]
     void ServerBrowserViewController::PageDownButtonClick()
     {
-        QuestUI::MainThreadScheduler::Schedule(
-            [/*&, */this] {
+        //QuestUI::MainThreadScheduler::Schedule(
+        //    [/*&, */this] {
                 if (HostedGameBrowser::get_PageIndex() < HostedGameBrowser::get_TotalPageCount() - 1)
                 {
                     SetInitialUiState();
                     HostedGameBrowser::LoadPage((HostedGameBrowser::get_PageIndex() + 1) * HostedGameBrowser::get_PageSize()/*, _filters*/);
                 }
-            });
+            //});
     }
    #pragma endregion
 
