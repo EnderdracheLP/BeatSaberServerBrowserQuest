@@ -64,8 +64,8 @@ namespace ServerBrowser::Game {
 #pragma endregion
 
 	void MpModeSelection::OpenCreateServerMenu() {
-		// Make sure any overrides are cleared when we're going to host
-		MpConnect::ClearMasterServerOverride();
+		// TODO: Make sure any overrides are cleared when we're going to host
+		//MpConnect::ClearMasterServerOverride();
 
 		// TODO: If we are initiating the server menu from our UI, assume the intent is to host a game
 		//Plugin.Config.LobbyAnnounceToggle = true;
@@ -96,7 +96,8 @@ namespace ServerBrowser::Game {
 
 		Il2CppString* ServerCode = il2cpp_utils::newcsstr(game.get_ServerCode());
 		SelectMultiplayerLobbyDestination* MpLobbyDest = THROW_UNLESS(il2cpp_utils::New<SelectMultiplayerLobbyDestination*>(ServerCode));
-		MpLobbyDest->lobbySecret = il2cpp_utils::newcsstr(game.get_HostSecret().value());
+		if (game.get_HostSecret().has_value())
+			MpLobbyDest->lobbySecret = il2cpp_utils::newcsstr(game.get_HostSecret().value());
 
 		SelectMultiplayerLobbyDestination* Destination;
         if (game.get_HostSecret().has_value())

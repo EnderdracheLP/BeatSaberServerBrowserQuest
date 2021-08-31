@@ -1,10 +1,13 @@
 #include "main.hpp"
 #include "UI/ServerBrowserViewController.hpp"
+#include "UI/Components/HostedGameCellExtensions.hpp"
 #include "Core/HostedGameData.hpp"
 #include "Core/HostedGameBrowser.hpp"
 #include "Game/MpModeSelection.hpp"
+#include "Game/MpConnect.hpp"
 
 #include "GlobalNamespace/LevelListTableCell.hpp"
+#include "System/Collections/Generic/List_1.hpp"
 
 #include "UnityEngine/GameObject.hpp"
 #include "UnityEngine/UI/VerticalLayoutGroup.hpp"
@@ -150,20 +153,20 @@ namespace ServerBrowser::UI::ViewControllers {
     }
 
     //[UIAction("connectButtonClick")]
-    void ConnectButtonClick()
+    */
+    void ServerBrowserViewController::ConnectButtonClick()
     {
-        //if (_selectedGame ? .CanJoin ? ? false)
-        //{
-        //    MpConnect.Join(_selectedGame);
-        //}
-        //else
-        //{
-        //    ClearSelection();
-        //}
+        if (selectedGame.has_value() && selectedGame->CanJoin())
+        {
+            MpConnect::Join(selectedGame.value());
+        }
+        else
+        {
+            ClearSelection();
+        }
     }
 
     //[UIAction("listSelect")]
-    */
     void ServerBrowserViewController::ListSelect(HMUI::TableView* tableView, int row)
     {
         if (row > GameList->data.size())
@@ -177,29 +180,35 @@ namespace ServerBrowser::UI::ViewControllers {
         auto cellData = reinterpret_cast<ServerBrowser::UI::Components::HostedGameCellData*>(selectedRow);
         selectedGame = cellData->get_Game();
 
-        ConnectButton->set_interactable(selectedGame.CanJoin());
+        ConnectButton->set_interactable(selectedGame->CanJoin());
     }
-    /*
+
     //[UIAction("pageUpButtonClick")]
-    void PageUpButtonClick()
+    void ServerBrowserViewController::PageUpButtonClick()
     {
-        if (HostedGameBrowser.PageIndex > 0)
-        {
-            SetInitialUiState();
-            _ = HostedGameBrowser.LoadPage((HostedGameBrowser.PageIndex - 1) * HostedGameBrowser.PageSize, _filters);
-        }
+        QuestUI::MainThreadScheduler::Schedule(
+            [/*&, */this] {
+                if (HostedGameBrowser::get_PageIndex() > 0)
+                {
+                    SetInitialUiState();
+                    HostedGameBrowser::LoadPage((HostedGameBrowser::get_PageIndex() - 1) * HostedGameBrowser::get_PageSize()/*, _filters*/);
+                }
+            });
     }
 
     //[UIAction("pageDownButtonClick")]
-    void PageDownButtonClick()
+    void ServerBrowserViewController::PageDownButtonClick()
     {
-        if (HostedGameBrowser.PageIndex < HostedGameBrowser.TotalPageCount - 1)
-        {
-            SetInitialUiState();
-            _ = HostedGameBrowser.LoadPage((HostedGameBrowser.PageIndex + 1) * HostedGameBrowser.PageSize, _filters);
-        }
+        QuestUI::MainThreadScheduler::Schedule(
+            [/*&, */this] {
+                if (HostedGameBrowser::get_PageIndex() < HostedGameBrowser::get_TotalPageCount() - 1)
+                {
+                    SetInitialUiState();
+                    HostedGameBrowser::LoadPage((HostedGameBrowser::get_PageIndex() + 1) * HostedGameBrowser::get_PageSize()/*, _filters*/);
+                }
+            });
     }
-*/    #pragma endregion
+   #pragma endregion
 
 
 #pragma region Activation / Deactivation
@@ -256,9 +265,10 @@ namespace ServerBrowser::UI::ViewControllers {
             layout->set_preferredWidth(GameListSizeDelta.x);
 
             GameList = ServerBrowser::UI::Components::CreateGameList(vertical->get_transform(), { 0.0f, 0.0f }, Vector2(GameListSizeDelta.x, GameListSizeDelta.y - 16.0f),
-                [](int index) {
+                [this](int index) {
                     // TODO: Do stuff here!
                     getLogger().debug("Cell clicked with Index: %d", index);
+                    ListSelect(GameList->tableView, index);
                 }
             );
             auto rect = GameList->GetComponent<RectTransform*>();
@@ -270,6 +280,7 @@ namespace ServerBrowser::UI::ViewControllers {
                 GameList->tableView->ScrollToCellWithIdx(idx, HMUI::TableView::ScrollPositionType::Beginning, true);
                 // TODO: Do Stuff on UP Button Press!
                 getLogger().debug("Up Button Pressed!");
+                PageUpButtonClick();
                 });
             PageUpButton->get_transform()->SetAsFirstSibling();
 
@@ -281,6 +292,7 @@ namespace ServerBrowser::UI::ViewControllers {
                 GameList->tableView->ScrollToCellWithIdx(idx, HMUI::TableView::ScrollPositionType::Beginning, true);
                 // TODO: Do Stuff on DOWN Button Press!
                 getLogger().debug("Down Button Pressed!");
+                PageDownButtonClick();
                 });
             PageDownButton->get_transform()->SetAsLastSibling();
 
@@ -328,6 +340,7 @@ namespace ServerBrowser::UI::ViewControllers {
 
             ConnectButton = QuestUI::BeatSaberUI::CreateUIButton(MainContentHorizontalLayout->get_rectTransform(), "Connect", "PlayButton",
                 [this]() {
+                    ConnectButtonClick();
                     getLogger().debug("Lets connect something, too lazy now though");
                 }
             );
@@ -393,6 +406,9 @@ namespace ServerBrowser::UI::ViewControllers {
         }
             
         // make sure the table is fully cleared, if we don't do the cell gameobjects continue to add on every load
+        for (auto data : GameList->data) {
+            delete data;
+        }
         GameList->data.clear();
         GameList->tableView->DeleteCells(0, GameList->NumberOfCells());
 
@@ -402,12 +418,12 @@ namespace ServerBrowser::UI::ViewControllers {
         ////SearchButton->get_gameObject()->SetActive(true);
         //CreateButton->get_gameObject()->SetActive(true);
 
-        //RefreshButton->set_interactable(false);
-        ////SearchButton->set_interactable(false);
-        //ConnectButton->set_interactable(false);
+        RefreshButton->set_interactable(false);
+        //SearchButton->set_interactable(false);
+        ConnectButton->set_interactable(false);
 
-        //PageUpButton->set_interactable(false);
-        //PageDownButton->set_interactable(false);
+        PageUpButton->set_interactable(false);
+        PageDownButton->set_interactable(false);
     }
 
     void ServerBrowserViewController::CancelImageLoading(bool reset) {
@@ -432,7 +448,7 @@ namespace ServerBrowser::UI::ViewControllers {
         if (GameList && GameList->tableView) {
             GameList->tableView->ClearSelection();
             ConnectButton->set_interactable(false);
-            //selectedGame;
+            selectedGame = std::nullopt;
         }
     }
 
@@ -500,7 +516,7 @@ namespace ServerBrowser::UI::ViewControllers {
             "(Page %d of %d)",
                 HostedGameBrowser::get_TotalResultCount(), 
                 HostedGameBrowser::get_TotalResultCount() == 1 ? "server" : "servers",
-                HostedGameBrowser::get_PageIndex(),
+                HostedGameBrowser::get_PageIndex() + 1,
                 HostedGameBrowser::get_TotalPageCount()
                 )));
 
@@ -550,8 +566,8 @@ namespace ServerBrowser::UI::ViewControllers {
         //SearchButton.interactable = (IsSearching || HostedGameBrowser.AnyResultsOnPage);
         //SearchButton.SetButtonText(IsSearching ? "<color=#32CD32>Search</color>" : "Search");
 
-        //PageUpButton->set_interactable(HostedGameBrowser::get_PageIndex() > 0);
-        //PageDownButton->set_interactable(HostedGameBrowser::get_PageIndex() < HostedGameBrowser::get_TotalPageCount() - 1);
+        PageUpButton->set_interactable(HostedGameBrowser::get_PageIndex() > 0);
+        PageDownButton->set_interactable(HostedGameBrowser::get_PageIndex() < HostedGameBrowser::get_TotalPageCount() - 1);
     }
     /*
     public bool IsSearching = > _filters.AnyActive;
@@ -662,6 +678,15 @@ namespace ServerBrowser::UI::ViewControllers {
             [this] {
                 getLogger().debug("CellUpdateCallback called");
                 GameList->tableView->RefreshCellsContent();
+
+            for (int i = 0; i < GameList->tableView->visibleCells->get_Count(); i++) {
+                auto cell = GameList->tableView->visibleCells->get_Item(i);
+                auto extensions = cell->get_gameObject()->GetComponent<Components::HostedGameCellExtensions*>();
+
+                if (extensions) {
+                    extensions->RefreshContent(reinterpret_cast<Components::HostedGameCellData*>(GameList->data[i]));
+                }
+            }
             });
 
         //foreach(var cell in GameList.tableView.visibleCells)
@@ -677,6 +702,7 @@ namespace ServerBrowser::UI::ViewControllers {
 
     void ServerBrowserViewController::AfterCellsCreated()
     {
+        // NOTE: This has to be run on the MainThread
         QuestUI::MainThreadScheduler::Schedule(
             [this] {
                 getLogger().debug("AfterCellsCreated called");
@@ -685,9 +711,21 @@ namespace ServerBrowser::UI::ViewControllers {
 
                 GameList->tableView->ReloadData(); // should cause visibleCells to be updated
 
-                //// TODO: Remove code when not needed TEMP Code for Refresh
-                //GameList->tableView->RefreshCells(true, true);
+                for (int i = 0; i < GameList->tableView->visibleCells->get_Count(); i++) {
+                    auto cell = GameList->tableView->visibleCells->get_Item(i);
+                    auto extensions = cell->get_gameObject()->GetComponent<Components::HostedGameCellExtensions*>();
+                    auto data = reinterpret_cast<Components::HostedGameCellData*>(GameList->data[i]);
+
+                    if (!extensions) {
+                        cell->get_gameObject()->AddComponent<Components::HostedGameCellExtensions*>()->Configure(cell, data);
+                    }
+                    else {
+                        extensions->RefreshContent(data);
+                    }
+                }
+
             });
+
 
         //foreach(var cell in GameList.tableView.visibleCells)
         //{

@@ -129,8 +129,6 @@ namespace ServerBrowser::UI::Components
 
                 TextMeshProUGUI* nameText = tableCell->songNameText;
                 TextMeshProUGUI* authorText = tableCell->songAuthorText;
-                nameText->set_richText(true);
-                authorText->set_richText(true);
                 tableCell->songBpmText->get_gameObject()->SetActive(false);
                 tableCell->songDurationText->get_gameObject()->SetActive(false);
                 tableCell->favoritesBadgeImage->get_gameObject()->SetActive(false);

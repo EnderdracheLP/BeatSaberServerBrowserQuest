@@ -9,7 +9,6 @@ namespace ServerBrowser::Game {
 		if (!game.get_MpExVersion().has_value()) {
 			std::string ourMQE_Version = "Undefined";
 
-
 			if (ourMQE_Version.empty() || ourMQE_Version != game.get_MpExVersion().value()) {
 				std::string ourMQE_VersionStr = (!ourMQE_Version.empty() ? ourMQE_Version : "Not installed");
 				std::string theirMpExVersionStr = game.get_MpExVersion().value();
@@ -75,7 +74,7 @@ namespace ServerBrowser::Game {
 		else
 		{
 			// Game is hosted on a custom master server, we need to override
-			SetMasterServerOverride(game.get_MasterServerHost(), game.get_MasterServerPort() != 0 ? game.get_MasterServerPort() : DEFAULT_MASTER_PORT);
+			//SetMasterServerOverride(game.get_MasterServerHost(), game.get_MasterServerPort() != 0 ? game.get_MasterServerPort() : DEFAULT_MASTER_PORT);
 		}
 
 		// Trigger the actual join via server code
@@ -84,38 +83,38 @@ namespace ServerBrowser::Game {
 
 #pragma region Master Server Management
 
-	MasterServerEndPoint* MpConnect::get_OverrideEndPoint() {
+	//MasterServerEndPoint* MpConnect::get_OverrideEndPoint() {
 
-	}
+	//}
 
-	MasterServerEndPoint* MpConnect::get_LastUsedMasterServer() {
+	//MasterServerEndPoint* MpConnect::get_LastUsedMasterServer() {
 
-	}
-	void MpConnect::set_OverrideEndPoint(MasterServerEndPoint* NewOverrideEndPoint) {
+	//}
+	//void MpConnect::set_OverrideEndPoint(MasterServerEndPoint* NewOverrideEndPoint) {
 
-	}
-	void MpConnect::set_LastUsedMasterServer(MasterServerEndPoint* LastUsedEndPoint) {
+	//}
+	//void MpConnect::set_LastUsedMasterServer(MasterServerEndPoint* LastUsedEndPoint) {
 
-	}
+	//}
 
-	bool MpConnect::get_ShouldDisableCertificateValidation() {
+	//bool MpConnect::get_ShouldDisableCertificateValidation() {
 
-	}
+	//}
 
-	void MpConnect::ReportCurrentMasterServerValue(MasterServerEndPoint* currentEndPoint) {
+	//void MpConnect::ReportCurrentMasterServerValue(MasterServerEndPoint* currentEndPoint) {
 
-	}
+	//}
 
-	void MpConnect::SetMasterServerOverride(std::string hostName, int port) {
+	//void MpConnect::SetMasterServerOverride(std::string hostName, int port) {
 
-	}
+	//}
 
-	void MpConnect::SetMasterServerOverride(MasterServerEndPoint* overrideEndPoint) {
+	//void MpConnect::SetMasterServerOverride(MasterServerEndPoint* overrideEndPoint) {
 
-	}
+	//}
 
-	void MpConnect::ClearMasterServerOverride() {
+	//void MpConnect::ClearMasterServerOverride() {
 
-	}
+	//}
 #pragma endregion
 }

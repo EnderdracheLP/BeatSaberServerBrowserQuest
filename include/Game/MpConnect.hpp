@@ -18,34 +18,35 @@ namespace ServerBrowser::Game {
 		#define DEFAULT_MASTER_PORT 2328
 
 		static void Join(HostedGameData game);
-
+		
 #pragma region Master Server Management
-	private:
-		static MasterServerEndPoint* _officialEndPoint;
-		static MasterServerEndPoint* _moddedEndPoint;
-		static bool _usingModdedServer;
+		// TODO: Implement this possibly
+	//private:
+	//	static MasterServerEndPoint* _officialEndPoint;
+	//	static MasterServerEndPoint* _moddedEndPoint;
+	//	static bool _usingModdedServer;
 
-	public: 		
-		static MasterServerEndPoint* OverrideEndPoint;
-		MasterServerEndPoint* get_OverrideEndPoint();
+	//public: 		
+	//	static MasterServerEndPoint* OverrideEndPoint;
+	//	MasterServerEndPoint* get_OverrideEndPoint();
 
-		static MasterServerEndPoint* LastUsedMasterServer;
-		MasterServerEndPoint* get_LastUsedMasterServer();
-	private:
-		void set_OverrideEndPoint(MasterServerEndPoint* NewOverrideEndPoint);
-		void set_LastUsedMasterServer(MasterServerEndPoint* LastUsedEndPoint);
+	//	static MasterServerEndPoint* LastUsedMasterServer;
+	//	MasterServerEndPoint* get_LastUsedMasterServer();
+	//private:
+	//	void set_OverrideEndPoint(MasterServerEndPoint* NewOverrideEndPoint);
+	//	void set_LastUsedMasterServer(MasterServerEndPoint* LastUsedEndPoint);
 
-	public:
-		static bool ShouldDisableCertificateValidation;
-		bool get_ShouldDisableCertificateValidation();
+	//public:
+	//	static bool ShouldDisableCertificateValidation;
+	//	bool get_ShouldDisableCertificateValidation();
 
-		static void ReportCurrentMasterServerValue(MasterServerEndPoint* currentEndPoint);
+	//	static void ReportCurrentMasterServerValue(MasterServerEndPoint* currentEndPoint);
 
-		static void SetMasterServerOverride(std::string hostName, int port = DEFAULT_MASTER_PORT);
+	//	static void SetMasterServerOverride(std::string hostName, int port = DEFAULT_MASTER_PORT);
 
-		static void SetMasterServerOverride(MasterServerEndPoint* overrideEndPoint);
+	//	static void SetMasterServerOverride(MasterServerEndPoint* overrideEndPoint);
 
-		static void ClearMasterServerOverride();
+	//	static void ClearMasterServerOverride();
 #pragma endregion
 	};
 }

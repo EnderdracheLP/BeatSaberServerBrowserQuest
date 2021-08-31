@@ -21,7 +21,7 @@ namespace ServerBrowser::Core {
 		else return false;
     }
     bool HostedGameData::CanJoin() {
-        return !ServerCode.empty() || !HostSecret.has_value();
+        return !ServerCode.empty() || !HostSecret.has_value() && !HostSecret->empty();
     }
 #pragma endregion
 #pragma region Describe

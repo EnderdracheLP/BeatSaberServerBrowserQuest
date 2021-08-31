@@ -17,14 +17,17 @@ DECLARE_CLASS_CODEGEN(ServerBrowser::UI::ViewControllers, ServerBrowserViewContr
     //private:
     //    HostedGameFilters _filters = new HostedGameFilters();
     DECLARE_INSTANCE_FIELD_DEFAULT(System::Threading::CancellationTokenSource*, _imageLoadCancellation, nullptr);
-    ServerBrowser::Core::HostedGameData selectedGame;
+    std::optional<ServerBrowser::Core::HostedGameData> selectedGame;
     DECLARE_INSTANCE_FIELD_DEFAULT(GlobalNamespace::LoadingControl*, loadingControl, nullptr);
 
     void CellUpdateCallback(Components::HostedGameCellData* cellInfo);
     DECLARE_INSTANCE_METHOD(void, LobbyBrowser_OnUpdate);
     DECLARE_INSTANCE_METHOD(void, RefreshButtonClick);
     DECLARE_INSTANCE_METHOD(void, AfterCellsCreated);
+    DECLARE_INSTANCE_METHOD(void, ConnectButtonClick);
     DECLARE_INSTANCE_METHOD(void, ListSelect, HMUI::TableView* tableView, int row);
+    DECLARE_INSTANCE_METHOD(void, PageUpButtonClick);
+    DECLARE_INSTANCE_METHOD(void, PageDownButtonClick);
     DECLARE_INSTANCE_METHOD(void, SetInitialUiState);
     DECLARE_INSTANCE_METHOD(void, CancelImageLoading, bool reset = true);
     DECLARE_INSTANCE_METHOD(void, ClearSelection);

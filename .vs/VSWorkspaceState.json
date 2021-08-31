@@ -6,15 +6,11 @@
     "\\extern\\questui\\shared",
     "\\extern\\questui\\shared\\CustomTypes",
     "\\extern\\questui\\shared\\CustomTypes\\Components",
-    "\\extern\\questui\\shared\\CustomTypes\\Components\\FloatingScreen",
+    "\\extern\\questui\\shared\\CustomTypes\\Data",
     "\\include",
     "\\include\\UI",
-    "\\include\\Utils",
-    "\\src",
-    "\\src\\Core",
-    "\\src\\UI",
-    "\\src\\Utils"
+    "\\include\\UI\\Components"
   ],
-  "SelectedNode": "\\src\\Utils\\WebUtils.cpp",
+  "SelectedNode": "\\extern\\questui\\shared\\CustomTypes\\Components\\List\\QuestUITableView.hpp",
   "PreviewInSolutionExplorer": false
 }
