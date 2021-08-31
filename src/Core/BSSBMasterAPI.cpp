@@ -98,6 +98,7 @@ namespace ServerBrowser::Core {
         if (coverURL.has_value()) {
             std::string URL = coverURL.value();
             URL.erase(remove(URL.begin(), URL.end(), '\\'), URL.end());
+            getLogger().debug("CoverURL is: %s", URL.c_str());
             WebUtils::GetAsync(URL, FILE_DOWNLOAD_TIMEOUT,
                 [lobby, finished](long httpCode, std::string data) {
                     std::vector<uint8_t> bytes(data.begin(), data.end());
