@@ -6,7 +6,7 @@ namespace ServerBrowser::Game {
 
 	void MpConnect::Join(HostedGameData game) {
 		// MQE Version check
-		if (!game.get_MpExVersion().has_value()) {
+		if (game.get_MpExVersion().has_value()) {
 			std::string ourMQE_Version = "Undefined";
 
 			if (ourMQE_Version.empty() || ourMQE_Version != game.get_MpExVersion().value()) {

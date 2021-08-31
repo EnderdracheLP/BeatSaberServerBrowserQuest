@@ -252,7 +252,7 @@ namespace ServerBrowser::UI::ViewControllers {
             //    }
             //);
 
-            UnityEngine::Vector2 GameListSizeDelta{ 90.0f, 60.0f };
+            UnityEngine::Vector2 GameListSizeDelta{ 90.0f, 70.0f };
 
             auto vertical = CreateVerticalLayoutGroup(MainContentRoot->get_transform());
             auto layout = vertical->get_gameObject()->AddComponent<LayoutElement*>();
