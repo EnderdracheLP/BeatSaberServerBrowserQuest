@@ -7,20 +7,24 @@ namespace ServerBrowser::Game {
 	void MpConnect::Join(HostedGameData game) {
 		// MQE Version check
 		if (game.get_MpExVersion().has_value()) {
-			std::string ourMQE_Version = "Undefined";
+			//std::string ourMQE_Version = "Undefined";
+			std::string ourMQE_Version = "0.1.0";
 
-			if (ourMQE_Version.empty() || ourMQE_Version != game.get_MpExVersion().value()) {
+			//semver::version checkRange2{ ourMQE_Version };
+			//checkRange2.minor++;
+			//auto range = semver::range::detail::range(string_format(">=%s <%s", ourMQE_Version.c_str(), checkRange2.to_string().c_str()));
+			if (game.get_MpExVersion()->to_string() != ourMQE_Version/*range.satisfies(game.get_MpExVersion().value(), true)*/) {
 				std::string ourMQE_VersionStr = (!ourMQE_Version.empty() ? ourMQE_Version : "Not installed");
-				std::string theirMpExVersionStr = game.get_MpExVersion().value();
+				std::string theirMpExVersionStr = game.get_MpExVersion()->to_string();
 
 				getLogger().warning("Blocking game join because of MultiQuestensions/MultiplayerExtensions version mismatch ours: %s, theirs: %s", 
 					ourMQE_Version.c_str(), theirMpExVersionStr.c_str());
 
 				std::string MQE_Error(string_format(
-					"MultiQuestensions/MultiplayerExtensions version difference detected!"
-					"Please ensure you and the host are both using the latest version."
-					""
-					"Your version: %s"
+					"MultiQuestensions/MultiplayerExtensions version difference detected!\r\n"
+					"Please ensure you and the host are both using the latest version.\r\n"
+					"\r\n"
+					"Your version: %s\r\n"
 					"Their version: %s",
 					ourMQE_VersionStr.c_str(),
 					theirMpExVersionStr.c_str()
@@ -36,7 +40,7 @@ namespace ServerBrowser::Game {
 		}
 
 		// Master server switching
-		if (game.get_MasterServerHost().empty() || game.get_MasterServerHost().ends_with(OFFICIAL_MASTER_SUFFIX)) {
+		if (!game.get_MasterServerHost().empty() || game.get_MasterServerHost().ends_with(OFFICIAL_MASTER_SUFFIX)) {
 			// Game is hosted on the player platform's official master server
 			//if (_usingModdedServer || !_officialEndPoint) {
 			//	 If we normally use a modded server (e.g. because BeatTogether is installed), we need to now force-connect to our official server

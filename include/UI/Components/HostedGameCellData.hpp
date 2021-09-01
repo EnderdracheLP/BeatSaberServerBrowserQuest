@@ -17,8 +17,8 @@ namespace ServerBrowser::UI::Components {
 		static System::Threading::CancellationTokenSource* cancellationTokenSource;
 		static std::function<void(HostedGameCellData*)> onContentChange;
 
-		void SetCoverArt();
-		void UpdateIcon(UnityEngine::Sprite* nextIcon);
+		//void SetCoverArt();
+		//void UpdateIcon(UnityEngine::Sprite* nextIcon);
 	public:
 		ServerBrowser::Core::HostedGameData get_Game();
 

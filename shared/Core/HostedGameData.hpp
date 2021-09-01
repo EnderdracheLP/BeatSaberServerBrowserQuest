@@ -2,9 +2,10 @@
 #include "main.hpp"
 #include "GlobalNamespace/MultiplayerLobbyState.hpp"
 #include "GlobalNamespace/BeatmapDifficulty.hpp"
+#include "semver/include/semver.hpp" // SemVer Submodule for version matching
 #include <optional>
 #include "TypeMacros.hpp"
-#include "SemVer.hpp"
+//#include "SemVer.hpp"
 
 namespace ServerBrowser::Core {
     class HostedGameData {
@@ -58,9 +59,11 @@ namespace ServerBrowser::Core {
         std::string MasterServerHost;
         int MasterServerPort;
         std::optional<std::string> EndedAt;
-        std::optional<std::string> MpExVersion;
-        SemVer ModVersion;
-        SemVer GameVersion;
+        std::optional<semver::version> MpExVersion;
+        semver::version ModVersion;
+        semver::version GameVersion;
+        //SemVer ModVersion;
+        //SemVer GameVersion;
         std::optional<std::string> ServerType;
         std::optional<std::string> HostSecret;
         std::optional<std::string> Endpoint;
@@ -87,9 +90,11 @@ namespace ServerBrowser::Core {
         const std::string& get_MasterServerHost() const { return MasterServerHost; }
         const int& get_MasterServerPort() const { return MasterServerPort; }
         const std::optional<std::string> get_EndedAt() const { return EndedAt; }
-        const std::optional<std::string> get_MpExVersion() const { return MpExVersion; }
-        const SemVer& get_ModVersion() const { return ModVersion; }
-        const SemVer& get_GameVersion() const { return GameVersion; }
+        const std::optional<semver::version> get_MpExVersion() const { return MpExVersion; }
+        const semver::version& get_ModVersion() const { return ModVersion; }
+        const semver::version& get_GameVersion() const { return GameVersion; }
+        //const SemVer& get_ModVersion() const { return ModVersion; }
+        //const SemVer& get_GameVersion() const { return GameVersion; }
         const std::optional<std::string> get_ServerType() const { return ServerType; }
         const std::optional<std::string> get_HostSecret() const { return HostSecret; }
         const std::optional<std::string> get_Endpoint() const { return Endpoint; }

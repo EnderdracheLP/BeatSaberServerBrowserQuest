@@ -45,11 +45,11 @@ namespace ServerBrowser::UI::Components {
         subText = "";
 
         if (Game.get_LobbyState() == MultiplayerLobbyState::GameRunning && Game.get_LevelId().has_value()) {
-            if (!Game.get_SongAuthor().value().empty()) {
+            if (Game.get_SongAuthor().has_value() && !Game.get_SongAuthor()->empty()) {
                 subText += Game.get_SongAuthor().value() + " - ";
             }
-
-            subText += Game.get_SongName().value();
+            if (Game.get_SongName().has_value() && !Game.get_SongName()->empty())
+                subText += Game.get_SongName().value();
         }
         else {
             subText += "In lobby";
@@ -60,7 +60,7 @@ namespace ServerBrowser::UI::Components {
         }
 
         //try {
-            SetCoverArt();
+            //SetCoverArt();
         //}
         //catch (const std::exception& ex) {
         //    getLogger().error("Could not set cover art for level%s: %s", Game.get_LevelId().value().c_str(), ex.what());
@@ -68,54 +68,56 @@ namespace ServerBrowser::UI::Components {
         getLogger().debug("Done with UpdateUi in HostedGameCellData");
     }
 
-    void HostedGameCellData::SetCoverArt() {
-        getLogger().debug("Running SetCoverArt in HostedGameCellData");
-        if (Game.get_LevelId().has_value()) {
-            getLogger().debug("Game has LevelID: %s", Game.get_LevelId()->c_str());
-        }
-        else {
-            getLogger().debug("Game has no levelID");
-        }
-        getLogger().debug("LobbyState is: %d", Game.get_LobbyState());
-        if (!Game.get_LevelId().has_value() || Game.get_LobbyState() != MultiplayerLobbyState::GameRunning) {
-            // No level info / we are in a lobby
-            getLogger().info("No level info, assuming they're in a lobby");
-            UpdateIcon(Sprites::get_PortalUser());
-            return;
-        }
+    //void HostedGameCellData::SetCoverArt() {
+    //    getLogger().debug("SetCoverArt in HostedGameCellData is broken, not implemented");
 
-        //BSSBMasterAPI::GetCoverImageAsync(Game,
-        //    [this](std::vector<uint8_t> coverArtBytes) {
-        //        QuestUI::MainThreadScheduler::Schedule(
-        //            [this, coverArtBytes] {
-        //                std::vector<uint8_t> coverVector = coverArtBytes;
-        //                auto coverArtSprite = QuestUI::BeatSaberUI::ArrayToSprite(il2cpp_utils::vectorToArray(coverVector));
-        //                if (coverArtSprite) {
-        //                    // Official level, or installed custom level found
-        //                    UpdateIcon(coverArtSprite);
-        //                    return;
-        //                }
-        //                else {
-        //                    getLogger().error("Failed to get level info");
-        //                    // Failed to get level info, show beatsaver icon as placeholder
-        //                    UpdateIcon(Sprites::get_BeatSaverIcon());
-        //                }
-        //            });
-        //    }
-        //);
-    }
-    
-    void HostedGameCellData::UpdateIcon(UnityEngine::Sprite* nextIcon) {
-        getLogger().debug("Running UpdateIcon"); 
-        if ((icon == nullptr || icon != nextIcon) && nextIcon) {
-            getLogger().debug("Updating Icon");
-            icon = nextIcon;
-            getLogger().debug("Set new Icon");
-            //getLogger().debug("Calling onContentChange");
-            //onContentChange(this);
-        }
-        else {
-            getLogger().debug("Did not update Icon");
-        }
-    }
+    //    getLogger().debug("Running SetCoverArt in HostedGameCellData");
+    //    getLogger().debug("LobbyState is: %d", Game.get_LobbyState());
+    //    if (!Game.get_LevelId().has_value() || Game.get_LobbyState() != MultiplayerLobbyState::GameRunning) {
+    //        // No level info / we are in a lobby
+    //        getLogger().info("No level info, assuming they're in a lobby");
+    //        UpdateIcon(Sprites::get_PortalUser());
+    //        QuestUI::MainThreadScheduler::Schedule(
+    //            [this] {
+    //                onContentChange(this);
+    //            });
+    //        return;
+    //    }
+
+    //    //BSSBMasterAPI::GetCoverImageAsync(Game,
+    //    //    [this](std::vector<uint8_t> coverArtBytes) {
+    //    //        QuestUI::MainThreadScheduler::Schedule(
+    //    //            [this, coverArtBytes] {
+    //    //                std::vector<uint8_t> coverVector = coverArtBytes;
+    //    //                auto coverArtSprite = QuestUI::BeatSaberUI::ArrayToSprite(il2cpp_utils::vectorToArray(coverVector));
+    //    //                if (coverArtSprite) {
+    //    //                    // Official level, or installed custom level found
+    //    //                    UpdateIcon(coverArtSprite);
+    //    //                    onContentChange(this);
+    //    //                    return;
+    //    //                }
+    //    //                else {
+    //    //                    getLogger().error("Failed to get level info");
+    //    //                    // Failed to get level info, show beatsaver icon as placeholder
+    //    //                    UpdateIcon(Sprites::get_BeatSaverIcon());
+    //    //                    onContentChange(this);
+    //    //                }
+    //    //            });
+    //    //    }
+    //    //);
+    //}
+    //
+    //void HostedGameCellData::UpdateIcon(UnityEngine::Sprite* nextIcon) {
+    //    getLogger().debug("Running UpdateIcon"); 
+    //    if ((icon == nullptr || icon != nextIcon) && nextIcon) {
+    //        getLogger().debug("Updating Icon");
+    //        icon = nextIcon;
+    //        getLogger().debug("Set new Icon");
+    //        //getLogger().debug("Calling onContentChange");
+    //        //onContentChange(this);
+    //    }
+    //    else {
+    //        getLogger().debug("Did not update Icon");
+    //    }
+    //}
 }

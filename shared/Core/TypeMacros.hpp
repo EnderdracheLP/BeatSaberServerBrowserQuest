@@ -100,7 +100,15 @@ if (!jsonValue.HasMember(#jsonName)) throw ServerBrowser::JsonException(ServerBr
 if (!jsonValue[#jsonName].IsObject()) throw ServerBrowser::JsonException(ServerBrowser::Exceptions::WrongType, #jsonName ", Type expected was: JsonObject"); \
 name.Deserialize(jsonValue[#jsonName]);
 
-#define DESERIALIZE_CLASS_OPTIONAL(name, jsonName, type) \
+//#define DESERIALIZE_SEMVER_OPTIONAL(name, jsonName) \
+//if(jsonValue.HasMember(#jsonName) && jsonValue[#jsonName].IsObject) { \
+//    auto object = jsonValue[#jsonName].GetObject(); \
+//     \
+//} else { \
+//    name = std::nullopt; \
+//}
+
+#define DESERIALIZE_SEMVER_OPTIONAL(name, jsonName) \
 if(jsonValue.HasMember(#jsonName) && jsonValue[#jsonName].IsObject()) { \
     type val##name; \
     name = val##name;\

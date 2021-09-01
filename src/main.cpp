@@ -33,6 +33,8 @@
 #include "GlobalNamespace/CreateServerViewController.hpp"
 #include "GlobalNamespace/GameServerBrowserFlowCoordinator.hpp"
 #include "GlobalNamespace/GameServerBrowserViewController.hpp"
+#include "GlobalNamespace/MultiplayerLobbyConnectionController.hpp"
+#include "GlobalNamespace/ConnectionFailedReason.hpp"
 using namespace GlobalNamespace;
 using namespace UnityEngine;
 using namespace ServerBrowser::UI;
@@ -124,6 +126,39 @@ MAKE_HOOK_MATCH(CreateServerViewController_DidActivate, &CreateServerViewControl
     CreateServerViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
 }
 
+MAKE_HOOK_MATCH(MultiplayerModeSelectionFlowCoordinator_PresentConnectionErrorDialog, &MultiplayerModeSelectionFlowCoordinator::PresentConnectionErrorDialog, void, MultiplayerModeSelectionFlowCoordinator* self, GlobalNamespace::MultiplayerLobbyConnectionController::LobbyConnectionType connectionType, GlobalNamespace::ConnectionFailedReason reason) {
+    getLogger().warning("Multiplayer connection failed, reason: %d", reason.value);
+
+    if (MpModeSelection::WeInitiatedConnection) {
+        //GlobalModState.ShouldDisableEncryption = false; // always re-enable encryption for master server
+
+        if (MpModeSelection::WeAbortedJoin) {
+            MpModeSelection::PresentConnectionFailedError("Connection failed", "The selected server instance is no longer available.");
+            return;
+        }
+
+        if (reason == ConnectionFailedReason::ConnectionCanceled) {
+            // ...and if it's just a self-cancel, return to the browser immediately.
+            MpModeSelection::CancelLobbyJoin();
+            MpModeSelection::MakeServerBrowserTopView();
+        }
+        else
+        {
+            MpModeSelection::PresentConnectionFailedError
+            (
+                "Connection failed",
+                "Some reason I should give\nhonestly too lazy for that now"/*ConnectionErrorText.Generate(reason)*/,
+                reason != ConnectionFailedReason::InvalidPassword
+                && reason != ConnectionFailedReason::VersionMismatch
+            );
+        }
+        return;
+    }
+    else {
+        MultiplayerModeSelectionFlowCoordinator_PresentConnectionErrorDialog(self, connectionType, reason);
+    }
+}
+
 //MAKE_HOOK_MATCH(GameServerBrowserFlowCoordinator_DidActivate, &GameServerBrowserFlowCoordinator::DidActivate, void, GameServerBrowserFlowCoordinator* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
 //    getLogger().debug("GameServerBrowserFlowCoordinator_DidActivate");
 //    //GameServerBrowserFlowCoordinator_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
@@ -170,6 +205,7 @@ extern "C" void load() {
     INSTALL_HOOK(getLogger(), CreateServerViewController_DidActivate);
     //INSTALL_HOOK(getLogger(), GameServerBrowserFlowCoordinator_DidActivate);
     INSTALL_HOOK(getLogger(), MultiplayerModeSelectionFlowCoordinator_HandleMultiplayerLobbyControllerDidFinish);
+    INSTALL_HOOK(getLogger(), MultiplayerModeSelectionFlowCoordinator_PresentConnectionErrorDialog);
     //INSTALL_HOOK(getLogger(), GameServerBrowserFlowCoordinator_BackButtonWasPressed);
     //INSTALL_HOOK(getLogger(), GameServerBrowserViewController_DidActivate);
     getLogger().info("Installed all hooks!");

@@ -56,8 +56,8 @@ namespace ServerBrowser::Core {
 		if (IsModded) {
 			moddedDescr = "Modded";
 
-			if (!MpExVersion->empty()) {
-				moddedDescr += MpExVersion.value();
+			if (MpExVersion.has_value()) {
+				moddedDescr += " " + MpExVersion->to_string();
 			}
 		}
 		else {
@@ -147,14 +147,16 @@ SERIALIZE_STRING_METHOD(ServerBrowser::Core, HostedGameData,
 	SERIALIZE_VALUE(MasterServerHost, masterServerHost)
 	SERIALIZE_VALUE(MasterServerPort, masterServerPort)
 	SERIALIZE_VALUE_OPTIONAL(EndedAt, endedAt)
-	SERIALIZE_VALUE_OPTIONAL(MpExVersion, mpExVersion)
+	//SERIALIZE_VALUE_OPTIONAL(MpExVersion, mpExVersion)
+	if (MpExVersion.has_value())
+		doc.AddMember("mpExVersion", MpExVersion->to_string(), alloc);
 	rapidjson::Value modVer(rapidjson::kObjectType);
-	modVer.PushBack(ModVersion.GetMajor(), alloc).PushBack(ModVersion.GetMinor(), alloc).PushBack(ModVersion.GetBuild(), alloc);
-	if (ModVersion.GetRevision().has_value()) modVer.PushBack(ModVersion.GetRevision().value(), alloc);
+	modVer.PushBack(ModVersion.major, alloc).PushBack(ModVersion.minor, alloc).PushBack(ModVersion.patch, alloc);
+	if (ModVersion.prerelease_number > 0) modVer.PushBack(ModVersion.prerelease_number, alloc);
 	doc.AddMember("modVersion", modVer, alloc);
 	rapidjson::Value gameVer(rapidjson::kObjectType);
-	gameVer.PushBack(GameVersion.GetMajor(), alloc).PushBack(GameVersion.GetMinor(), alloc).PushBack(GameVersion.GetBuild(), alloc);
-	if (GameVersion.GetRevision().has_value()) gameVer.PushBack(GameVersion.GetRevision().value(), alloc);
+	gameVer.PushBack(GameVersion.major, alloc).PushBack(GameVersion.minor, alloc).PushBack(GameVersion.patch, alloc);
+	if (GameVersion.prerelease_number > 0) gameVer.PushBack(GameVersion.prerelease_number, alloc);
 	doc.AddMember("gameVersion", gameVer, alloc);
 	SERIALIZE_VALUE_OPTIONAL(ServerType, serverType)
 	SERIALIZE_VALUE_OPTIONAL(HostSecret, hostSecret)
@@ -184,9 +186,28 @@ SERIALIZE_STRING_METHOD(ServerBrowser::Core, HostedGameData,
 			DESERIALIZE_VALUE(MasterServerHost, masterServerHost, String)
 			DESERIALIZE_VALUE(MasterServerPort, masterServerPort, Int)
 			DESERIALIZE_VALUE_OPTIONAL(EndedAt, endedAt, String)
-			DESERIALIZE_VALUE_OPTIONAL(MpExVersion, mpExVersion, String)
-			DESERIALIZE_CLASS(ModVersion, modVersion)
-			DESERIALIZE_CLASS(GameVersion, gameVersion)
+			//DESERIALIZE_VALUE_OPTIONAL(MpExVersion, mpExVersion, String)
+			if (jsonValue.HasMember("mpExVersion") && jsonValue["mpExVersion"].IsString()) {
+				MpExVersion = semver::from_string_noexcept(jsonValue["mpExVersion"].GetString());
+			}
+			if (jsonValue.HasMember("modVersion") && jsonValue["modVersion"].IsObject()) {
+				auto modVer = jsonValue["modVersion"].GetObject();
+				ModVersion.major = modVer["major"].GetInt();
+				ModVersion.minor = modVer["minor"].GetInt();
+				ModVersion.patch = modVer["build"].GetInt();
+				if (modVer.HasMember("revision") && modVer["revision"].IsInt())
+					ModVersion.prerelease_number = modVer["revision"].GetInt();
+			}
+			if (jsonValue.HasMember("gameVersion") && jsonValue["gameVersion"].IsObject()) {
+				auto gameVer = jsonValue["gameVersion"].GetObject();
+				GameVersion.major = gameVer["major"].GetInt();
+				GameVersion.minor = gameVer["minor"].GetInt();
+				GameVersion.patch = gameVer["build"].GetInt();
+				if (gameVer.HasMember("revision") && gameVer["revision"].IsInt())
+					GameVersion.prerelease_number = gameVer["revision"].GetInt();
+			}
+			//DESERIALIZE_CLASS(ModVersion, modVersion)
+			//DESERIALIZE_CLASS(GameVersion, gameVersion)
 			DESERIALIZE_VALUE_OPTIONAL(ServerType, serverType, String)
 			DESERIALIZE_VALUE_OPTIONAL(HostSecret, hostSecret, String)
 			DESERIALIZE_VALUE_OPTIONAL(Endpoint, endpoint, String)

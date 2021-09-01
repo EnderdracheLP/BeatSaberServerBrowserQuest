@@ -94,20 +94,19 @@ namespace ServerBrowser::Game {
 
 		_flowCoordinator->joiningLobbyCancellationTokenSource = THROW_UNLESS(il2cpp_utils::New<CancellationTokenSource*>());
 
-		Il2CppString* ServerCode = il2cpp_utils::newcsstr(game.get_ServerCode());
-		SelectMultiplayerLobbyDestination* MpLobbyDest = THROW_UNLESS(il2cpp_utils::New<SelectMultiplayerLobbyDestination*>(ServerCode));
+		SelectMultiplayerLobbyDestination* MpLobbyDest = THROW_UNLESS(il2cpp_utils::New<SelectMultiplayerLobbyDestination*>(il2cpp_utils::newcsstr(game.get_ServerCode())));
 		if (game.get_HostSecret().has_value())
 			MpLobbyDest->lobbySecret = il2cpp_utils::newcsstr(game.get_HostSecret().value());
 
-		SelectMultiplayerLobbyDestination* Destination;
-        if (game.get_HostSecret().has_value())
-			Destination = CRASH_UNLESS(il2cpp_utils::New<SelectMultiplayerLobbyDestination*>(il2cpp_utils::newcsstr(game.get_HostSecret().value())));
-		else if (ServerCode)
-			Destination = CRASH_UNLESS(il2cpp_utils::New<SelectMultiplayerLobbyDestination*>(ServerCode));
+		//SelectMultiplayerLobbyDestination* Destination;
+  //      if (game.get_HostSecret().has_value())
+		//	Destination = CRASH_UNLESS(il2cpp_utils::New<SelectMultiplayerLobbyDestination*>(il2cpp_utils::newcsstr(game.get_HostSecret().value())));
+		//else if (ServerCode)
+		//	Destination = CRASH_UNLESS(il2cpp_utils::New<SelectMultiplayerLobbyDestination*>(ServerCode));
 
 
 		_mpLobbyConnectionController->CreateOrConnectToDestinationParty(
-			Destination
+			MpLobbyDest
 			//MpLobbyDest
 			//il2Cpp_utils::New(MpLobbyDestination(ServerCode, game.HostSecret))
 		);
