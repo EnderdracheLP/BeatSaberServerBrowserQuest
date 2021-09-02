@@ -238,20 +238,6 @@ namespace ServerBrowser::UI::ViewControllers {
 
 #pragma region Create GameList
             getLogger().debug("ServerBrowserViewController::DidActivate Create GameList");
-            //ServerBrowser::UI::Components::CreateScrollableCustomListTableData(MainContentRoot->get_transform(), [](int index) {
-            //    // TODO: Do stuff here!
-            //    getLogger().debug("Cell clicked with Index: %d", index);
-            //    },
-            //    [this] {
-            //        // TODO: Do Stuff on UP Button Press!
-            //        getLogger().debug("Up Button Pressed!");
-            //    },
-            //    [this] {
-            //    // TODO: Do Stuff on DOWN Button Press!
-            //    getLogger().debug("Down Button Pressed!");
-            //    }
-            //);
-
             UnityEngine::Vector2 GameListSizeDelta{ 90.0f, 70.0f };
 
             auto vertical = CreateVerticalLayoutGroup(MainContentRoot->get_transform());
@@ -327,6 +313,7 @@ namespace ServerBrowser::UI::ViewControllers {
 
             RefreshButton = QuestUI::BeatSaberUI::CreateUIButton(MainContentHorizontalLayout->get_rectTransform(), "Refresh",
                 [this]() {
+                    getLogger().debug("RefreshButtonClick");
                     RefreshButtonClick();
                 }
             );
@@ -340,8 +327,8 @@ namespace ServerBrowser::UI::ViewControllers {
 
             ConnectButton = QuestUI::BeatSaberUI::CreateUIButton(MainContentHorizontalLayout->get_rectTransform(), "Connect", "PlayButton",
                 [this]() {
+                    getLogger().debug("ConnectButtonClick");
                     ConnectButtonClick();
-                    getLogger().debug("Lets connect something, too lazy now though");
                 }
             );
 
@@ -561,7 +548,8 @@ namespace ServerBrowser::UI::ViewControllers {
 
         AfterCellsCreated();
 
-        RefreshButton->set_interactable(true);
+        if (RefreshButton)
+            RefreshButton->set_interactable(true);
 
         //SearchButton.interactable = (IsSearching || HostedGameBrowser.AnyResultsOnPage);
         //SearchButton.SetButtonText(IsSearching ? "<color=#32CD32>Search</color>" : "Search");

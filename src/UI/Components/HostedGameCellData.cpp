@@ -1,12 +1,7 @@
 #include "main.hpp"
-#include "GlobalNamespace/MultiplayerLobbyState.hpp"
-#include "questui/shared/BeatSaberUI.hpp"
-#include "Core/BSSBMasterAPI.hpp"
 #include "UI/Components/HostedGameCellData.hpp"
 #include "Assets/Sprites.hpp"
-#include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
 using GlobalNamespace::MultiplayerLobbyState;
-using ServerBrowser::Core::BSSBMasterAPI;
 using ServerBrowser::Core::HostedGameData;
 using ServerBrowser::Assets::Sprites;
 

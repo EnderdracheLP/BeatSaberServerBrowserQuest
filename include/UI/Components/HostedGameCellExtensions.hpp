@@ -26,6 +26,7 @@ DECLARE_CLASS_CODEGEN(ServerBrowser::UI::Components, HostedGameCellExtensions, U
     HostedGameCellData _cellInfo;
 
     DECLARE_INSTANCE_FIELD(HMUI::ImageView*, background);
+    DECLARE_INSTANCE_FIELD(HMUI::ImageView*, coverImage);
 
     DECLARE_INSTANCE_FIELD(Action3, OnSelectionDidChange);
     //std::function<void(HMUI::SelectableCell*, HMUI::SelectableCell::TransitionType, ::Il2CppObject*)> fun;

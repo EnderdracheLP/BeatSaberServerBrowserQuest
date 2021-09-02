@@ -1,4 +1,6 @@
 #include "UI/Components/HostedGameCellExtensions.hpp"
+#include "Core/BSSBMasterAPI.hpp"
+#include "Assets/Sprites.hpp"
 
 #include "TMPro/TextMeshProUGUI.hpp"
 
@@ -6,8 +8,16 @@
 #include "UnityEngine/RectTransform.hpp"
 #include "UnityEngine/Component.hpp"
 #include "UnityEngine/Color.hpp"
+
+#include "GlobalNamespace/MultiplayerLobbyState.hpp"
+
+#include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
+#include "questui/shared/BeatSaberUI.hpp"
 using namespace HMUI;
+using namespace GlobalNamespace;
 using UnityEngine::Color;
+using ServerBrowser::Core::BSSBMasterAPI;
+using ServerBrowser::Assets::Sprites;
 
 DEFINE_TYPE(ServerBrowser::UI::Components, HostedGameCellExtensions);
 
@@ -18,6 +28,7 @@ namespace ServerBrowser::UI::Components {
         _cellInfo = *cellInfo;
 
         background = cell->get_transform()->Find(il2cpp_utils::newcsstr("Background"))->GetComponent<ImageView*>();
+        coverImage = cell->get_transform()->Find(il2cpp_utils::newcsstr("CoverImage"))->GetComponent<ImageView*>();
 
         std::function<void(HMUI::SelectableCell*, HMUI::SelectableCell::TransitionType, ::Il2CppObject*)> fun = [this](SelectableCell* cell, SelectableCell::TransitionType transition, Il2CppObject* obj) { RefreshContent(); };
         OnSelectionDidChange = il2cpp_utils::MakeDelegate<System::Action_3<HMUI::SelectableCell*, HMUI::SelectableCell::TransitionType, ::Il2CppObject*>*>(classof(System::Action_3<HMUI::SelectableCell*, HMUI::SelectableCell::TransitionType, ::Il2CppObject*>*), fun);
@@ -93,8 +104,37 @@ namespace ServerBrowser::UI::Components {
 
         auto game = _cellInfo.get_Game();
 
+        getLogger().debug("Running SetCoverArt in HostedGameCellExtensions");
+        getLogger().debug("LobbyState is: %d", game.get_LobbyState());
+        if (!game.get_LevelId().has_value() || game.get_LobbyState() != MultiplayerLobbyState::GameRunning) {
+            // No level info / we are in a lobby
+            getLogger().info("No level info, assuming they're in a lobby");
+            coverImage->set_sprite(Sprites::get_PortalUser());
+            return;
+        }
+        else {
+            BSSBMasterAPI::GetCoverImageAsync(game,
+                [this](std::vector<uint8_t> coverArtBytes) {
+                    QuestUI::MainThreadScheduler::Schedule(
+                        [this, coverArtBytes] {
+                            std::vector<uint8_t> coverVector = coverArtBytes;
+                            auto coverArtSprite = QuestUI::BeatSaberUI::ArrayToSprite(il2cpp_utils::vectorToArray(coverVector));
+                            if (coverArtSprite) {
+                                // Official level, or installed custom level found
+                                coverImage->set_sprite(coverArtSprite);
+                            }
+                            else {
+                                getLogger().error("Failed to get level info");
+                                // Failed to get level info, show beatsaver icon as placeholder
+                                coverImage->set_sprite(Sprites::get_BeatSaverIcon());
+                            }
+                        });
+                }
+            );
+        }
+
         // Player count
-        SongTime->set_text(il2cpp_utils::newcsstr(string_format("%d/%d",game.get_PlayerCount(), game.get_PlayerLimit())));
+        SongTime->set_text(il2cpp_utils::newcsstr(string_format("%d/%d", game.get_PlayerCount(), game.get_PlayerLimit())));
         SongTime->set_fontSize(4);
 
         // Lobby type (server + modded/vanilla indicator)

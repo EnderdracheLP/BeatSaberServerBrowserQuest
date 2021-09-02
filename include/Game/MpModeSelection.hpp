@@ -1,6 +1,7 @@
 #pragma once
 #include "main.hpp"
 #include "Core/HostedGameData.hpp"
+#include "Core/GlobalModState.hpp"
 #include "GlobalNamespace/MultiplayerModeSelectionFlowCoordinator.hpp"
 #include "GlobalNamespace/MultiplayerLobbyConnectionController.hpp"
 #include "GlobalNamespace/JoiningLobbyViewController.hpp"
@@ -9,13 +10,14 @@
 #include "HMUI/ViewController_AnimationDirection.hpp"
 #include "HMUI/ViewController_AnimationType.hpp"
 #include "System/Action.hpp"
+using ServerBrowser::Core::GlobalModState;
 
 namespace ServerBrowser::Game {
 	class MpModeSelection {
 	public:
-		static bool WeInitiatedConnection;
-		static bool WeAbortedJoin;
-		static ServerBrowser::Core::HostedGameData LastConnectToHostedGame;
+		//static bool WeInitiatedConnection;
+		//static bool WeAbortedJoin;
+		//static ServerBrowser::Core::HostedGameData LastConnectToHostedGame;
 
 		// Remove the below for next update
 		static Il2CppString* InjectQuickPlaySecret;
@@ -42,7 +44,7 @@ namespace ServerBrowser::Game {
 #pragma endregion
 
 		static void OpenCreateServerMenu();
-		static void ConnectToHostedGame(ServerBrowser::Core::HostedGameData game);
+		static void ConnectToHostedGame(std::optional<ServerBrowser::Core::HostedGameData> game);
 		static void PresentConnectionFailedError(std::string errorTitle = "Connection failed", std::string errorMessage = "", bool canRetry = true);
 		// ^ set to static
 		static void CancelLobbyJoin(bool hideLoading = true);

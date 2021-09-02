@@ -1,18 +1,10 @@
 {
   "ExpandedNodes": [
     "",
-    "\\extern",
-    "\\extern\\custom-types",
-    "\\extern\\custom-types\\shared",
     "\\include",
-    "\\include\\Game",
-    "\\src",
-    "\\src\\Core",
-    "\\src\\Game",
-    "\\src\\UI",
-    "\\src\\UI\\Components",
-    "\\src\\Utils"
+    "\\include\\Core",
+    "\\shared",
+    "\\shared\\Core"
   ],
-  "SelectedNode": "\\src\\main.cpp",
   "PreviewInSolutionExplorer": false
 }

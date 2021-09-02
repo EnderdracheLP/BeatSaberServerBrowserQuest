@@ -24,6 +24,7 @@ namespace ServerBrowser::Core {
 #pragma region Helpers
         bool IsOnCustomMaster();
         bool IsDedicatedServer();
+        bool IsBeatDedi();
         bool IsQuickPlayServer();
         bool CanJoin();
 #pragma endregion

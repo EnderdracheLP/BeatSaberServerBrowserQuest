@@ -4,7 +4,9 @@
 //#include "UI/ServerBrowserViewController.hpp"
 #include "Core/HostedGameData.hpp"
 //#include "UI/Components/ListLoadingControl.hpp"
+#include "Core/GlobalModState.hpp"
 #include "Game/MpModeSelection.hpp"
+#include "Utils/ConnectionErrorText.hpp"
 #include "UI/PluginUi.hpp"
 
 #include "HMUI/ViewController.hpp"
@@ -39,6 +41,8 @@ using namespace GlobalNamespace;
 using namespace UnityEngine;
 using namespace ServerBrowser::UI;
 using namespace ServerBrowser::Game;
+using namespace ServerBrowser::Core;
+using namespace ServerBrowser::Utils;
 
 static ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
 
@@ -60,7 +64,7 @@ Logger& getLogger() {
 MAKE_HOOK_MATCH(MultiplayerModeSelectionViewController_DidActivate, &MultiplayerModeSelectionViewController::DidActivate, void, MultiplayerModeSelectionViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     getLogger().debug("MultiplayerModeSelectionViewController_DidActivate");
     MultiplayerModeSelectionViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
-    getLogger().debug("MultiplayerModeSelectionViewController get gameBrowserButtom");
+    //getLogger().debug("MultiplayerModeSelectionViewController get gameBrowserButtom");
     UnityEngine::UI::Button* btnGameBrowser = self->gameBrowserButton;
     btnGameBrowser->set_enabled(true);
     btnGameBrowser->get_gameObject()->SetActive(true);
@@ -68,11 +72,11 @@ MAKE_HOOK_MATCH(MultiplayerModeSelectionViewController_DidActivate, &Multiplayer
     Array<Component*>* comp = btnGameBrowser->GetComponents<Component*>();
     for (int i = 0; i < comp->get_Length(); i++) {
         comp->values[i]->get_gameObject()->SetActive(true);
-        getLogger().debug("Components values[%d] name: %s", i, to_utf8(csstrtostr(comp->values[i]->ToString())).c_str());
+        //getLogger().debug("Components values[%d] name: %s", i, to_utf8(csstrtostr(comp->values[i]->ToString())).c_str());
     }
 
 
-    getLogger().debug("MultiplayerModeSelectionViewController firstActivation");
+    //getLogger().debug("MultiplayerModeSelectionViewController firstActivation");
     if (firstActivation) {
 #pragma region Setup
         //MpSession::Setup();
@@ -95,13 +99,13 @@ MAKE_HOOK_MATCH(MultiplayerModeSelectionViewController_DidActivate, &Multiplayer
     }
 }
 
-MAKE_HOOK_MATCH(MultiplayerModeSelectionViewController_HandleMenuButton, &MultiplayerModeSelectionViewController::HandleMenuButton, void, MultiplayerModeSelectionViewController* self, MultiplayerModeSelectionViewController::MenuButton menuButton) {
-    getLogger().debug("MultiplayerModeSelectionViewController_HandleMenuButton");
-    if (menuButton == MultiplayerModeSelectionViewController::MenuButton::GameBrowser) {
-        getLogger().debug("GameBrowserButton Pressed");
-    }
-    /*else*/ MultiplayerModeSelectionViewController_HandleMenuButton(self, menuButton);
-}
+//MAKE_HOOK_MATCH(MultiplayerModeSelectionViewController_HandleMenuButton, &MultiplayerModeSelectionViewController::HandleMenuButton, void, MultiplayerModeSelectionViewController* self, MultiplayerModeSelectionViewController::MenuButton menuButton) {
+//    getLogger().debug("MultiplayerModeSelectionViewController_HandleMenuButton");
+//    if (menuButton == MultiplayerModeSelectionViewController::MenuButton::GameBrowser) {
+//        getLogger().debug("GameBrowserButton Pressed");
+//    }
+//    /*else*/ MultiplayerModeSelectionViewController_HandleMenuButton(self, menuButton);
+//}
 
 MAKE_HOOK_MATCH(MultiplayerModeSelectionFlowCoordinator_HandleMultiplayerLobbyControllerDidFinish, &MultiplayerModeSelectionFlowCoordinator::HandleMultiplayerLobbyControllerDidFinish, void, MultiplayerModeSelectionFlowCoordinator* self, MultiplayerModeSelectionViewController* viewController, MultiplayerModeSelectionViewController::MenuButton menuButton) {
     // TODO: Make sure any overrides are cleared when we're going to connect or host
@@ -114,8 +118,7 @@ MAKE_HOOK_MATCH(MultiplayerModeSelectionFlowCoordinator_HandleMultiplayerLobbyCo
     }
     else {
         // Going to a non-serverbrowser part of the online menu
-        MpModeSelection::WeInitiatedConnection = false;
-        MpModeSelection::WeAbortedJoin = false;
+        GlobalModState::Reset();
     }
     MultiplayerModeSelectionFlowCoordinator_HandleMultiplayerLobbyControllerDidFinish(self, viewController, menuButton);
 }
@@ -129,10 +132,10 @@ MAKE_HOOK_MATCH(CreateServerViewController_DidActivate, &CreateServerViewControl
 MAKE_HOOK_MATCH(MultiplayerModeSelectionFlowCoordinator_PresentConnectionErrorDialog, &MultiplayerModeSelectionFlowCoordinator::PresentConnectionErrorDialog, void, MultiplayerModeSelectionFlowCoordinator* self, GlobalNamespace::MultiplayerLobbyConnectionController::LobbyConnectionType connectionType, GlobalNamespace::ConnectionFailedReason reason) {
     getLogger().warning("Multiplayer connection failed, reason: %d", reason.value);
 
-    if (MpModeSelection::WeInitiatedConnection) {
-        //GlobalModState.ShouldDisableEncryption = false; // always re-enable encryption for master server
+    if (GlobalModState::WeInitiatedConnection) {
+        GlobalModState::ShouldDisableEncryption = false; // always re-enable encryption for master server
 
-        if (MpModeSelection::WeAbortedJoin) {
+        if (GlobalModState::WeAbortedJoin) {
             MpModeSelection::PresentConnectionFailedError("Connection failed", "The selected server instance is no longer available.");
             return;
         }
@@ -147,7 +150,7 @@ MAKE_HOOK_MATCH(MultiplayerModeSelectionFlowCoordinator_PresentConnectionErrorDi
             MpModeSelection::PresentConnectionFailedError
             (
                 "Connection failed",
-                "Some reason I should give\nhonestly too lazy for that now"/*ConnectionErrorText.Generate(reason)*/,
+                ConnectionErrorText::Generate(reason),
                 reason != ConnectionFailedReason::InvalidPassword
                 && reason != ConnectionFailedReason::VersionMismatch
             );
@@ -158,30 +161,6 @@ MAKE_HOOK_MATCH(MultiplayerModeSelectionFlowCoordinator_PresentConnectionErrorDi
         MultiplayerModeSelectionFlowCoordinator_PresentConnectionErrorDialog(self, connectionType, reason);
     }
 }
-
-//MAKE_HOOK_MATCH(GameServerBrowserFlowCoordinator_DidActivate, &GameServerBrowserFlowCoordinator::DidActivate, void, GameServerBrowserFlowCoordinator* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
-//    getLogger().debug("GameServerBrowserFlowCoordinator_DidActivate");
-//    //GameServerBrowserFlowCoordinator_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
-//    self->set_showBackButton(true);
-//    self->SetTitle(il2cpp_utils::newcsstr("Server Browser"), HMUI::ViewController::AnimationDirection::Vertical);
-//    //self->parentFlowCoordinator->ReplaceChildFlowCoordinator(SBFlowCd, nullptr, HMUI::ViewController::AnimationDirection::Horizontal, false);
-//    //self->parentFlowCoordinator->DismissFlowCoordinator(self, HMUI::ViewController::AnimationDirection::Horizontal, nullptr, false);
-//
-//    //GameServerBrowserViewController* GBVC = GameServerBrowserViewController::New_ctor();
-//    //
-//    //self->ProvideInitialViewControllers(GBVC, nullptr, nullptr, nullptr, nullptr);
-//}
-
-//MAKE_HOOK_FIND_CLASS_UNSAFE_INSTANCE(GameServerBrowserFlowCoordinator_BackButtonWasPressed, "", "GameServerBrowserFlowCoordinator", "BackButtonWasPressed", void, GameServerBrowserFlowCoordinator* self, HMUI::ViewController* topViewController) {
-//    getLogger().debug("GameServerBrowserFlowCoordinator_BackButtonWasPressed");
-//    GameServerBrowserFlowCoordinator_BackButtonWasPressed(self, topViewController);
-//    self->parentFlowCoordinator->DismissFlowCoordinator(self, HMUI::ViewController::AnimationDirection::Horizontal, nullptr, false);
-//}
-//
-//MAKE_HOOK_FIND_CLASS_UNSAFE_INSTANCE(GameServerBrowserViewController_DidActivate, "", "GameServerBrowserViewController", "DidActivate", void, GameServerBrowserViewController* self, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
-//    getLogger().debug("GameServerBrowserViewController_DidActivate");
-//    GameServerBrowserViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
-//}
 
 // Called at the early stages of game loading
 extern "C" void setup(ModInfo& info) {
@@ -203,10 +182,7 @@ extern "C" void load() {
     getLogger().info("Installing hooks...");
     INSTALL_HOOK(getLogger(), MultiplayerModeSelectionViewController_DidActivate);
     INSTALL_HOOK(getLogger(), CreateServerViewController_DidActivate);
-    //INSTALL_HOOK(getLogger(), GameServerBrowserFlowCoordinator_DidActivate);
     INSTALL_HOOK(getLogger(), MultiplayerModeSelectionFlowCoordinator_HandleMultiplayerLobbyControllerDidFinish);
     INSTALL_HOOK(getLogger(), MultiplayerModeSelectionFlowCoordinator_PresentConnectionErrorDialog);
-    //INSTALL_HOOK(getLogger(), GameServerBrowserFlowCoordinator_BackButtonWasPressed);
-    //INSTALL_HOOK(getLogger(), GameServerBrowserViewController_DidActivate);
     getLogger().info("Installed all hooks!");
 }

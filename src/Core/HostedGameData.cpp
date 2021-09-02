@@ -14,6 +14,12 @@ namespace ServerBrowser::Core {
 		}
 		else return false;
     }
+	bool HostedGameData::IsBeatDedi() {
+		if (ServerType.has_value()) {
+			return ServerType.value() == ServerTypeBeatDediCustom || ServerType.value() == ServerTypeBeatDediQuickplay;
+		}
+		else return false;
+	}
     bool HostedGameData::IsQuickPlayServer() {
 		if (ServerType.has_value()) {
 			return ServerType.value() == ServerTypeBeatDediQuickplay || ServerType.value() == ServerTypeVanillaQuickplay;
