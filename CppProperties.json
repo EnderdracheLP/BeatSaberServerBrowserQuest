@@ -1,6 +1,7 @@
 {
   "configurations": [
     {
+      "compilerPath": "${workspaceRoot}/../android-ndk-r23/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++",
       "cppStandard": "c++20",
       "cStandard": "c17",
       "defines": [
@@ -8,19 +9,19 @@
         "VERSION=\"0.1.0\"",
         "__GNUC__",
         "__aarch64__",
-        "ANDROID",
-        "_LIBCPP_STD_VER=20"
+        "ANDROID"
       ],
       "includePath": [
-        "${workspaceRoot}/**",
+        "${workspaceRoot}/",
         "${workspaceRoot}/shared/**",
         "${workspaceRoot}/include/**",
-        "${workspaceRoot}/extern/**",
+        "${workspaceRoot}/extern/",
         "${workspaceRoot}/extern/libil2cpp/il2cpp/libil2cpp/**",
-        "${workspaceRoot}/extern/codegen/include/**",
-        "${workspaceRoot}/../android-ndk-r22/**",
-        "${workspaceRoot}/../android-ndk-r22/sources/cxx-stl/llvm-libc++abi/include",
-        "${workspaceRoot}/../android-ndk-r22/sources/cxx-stl/llvm-libc++/include"
+        "${workspaceRoot}/extern/codegen/include/",
+        "${workspaceRoot}/../android-ndk-r23/sources/cxx-stl/llvm-libc++abi/include",
+        "${workspaceRoot}/../android-ndk-r23/sources/cxx-stl/llvm-libc++/include",
+        "${workspaceRoot}/../android-ndk-r23/sources/cxx-stl/system/include",
+        "${workspaceRoot}/../android-ndk-r23/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/include/**"
       ],
       "intelliSenseMode": "android-clang-arm64",
       "name": "Quest"

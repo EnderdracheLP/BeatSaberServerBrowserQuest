@@ -40,7 +40,7 @@ namespace ServerBrowser::Game {
 		}
 
 		// Master server switching
-		if (!game.get_MasterServerHost().empty() || game.get_MasterServerHost().ends_with(OFFICIAL_MASTER_SUFFIX)) {
+		if (!game.get_MasterServerHost().has_value() || game.get_MasterServerHost()->ends_with(OFFICIAL_MASTER_SUFFIX)) {
 			// Game is hosted on the player platform's official master server
 			//if (_usingModdedServer || !_officialEndPoint) {
 			//	 If we normally use a modded server (e.g. because BeatTogether is installed), we need to now force-connect to our official server
@@ -71,14 +71,14 @@ namespace ServerBrowser::Game {
 			//}
 			//else
 			//{
-				// Clearing the override should fall back to the correct official server
-				//ClearMasterServerOverride();
+				 //Clearing the override should fall back to the correct official server
+				ClearMasterServerOverride();
 			//}
 		}
 		else
 		{
 			// Game is hosted on a custom master server, we need to override
-			//SetMasterServerOverride(game.get_MasterServerHost(), game.get_MasterServerPort() != 0 ? game.get_MasterServerPort() : DEFAULT_MASTER_PORT);
+			SetMasterServerOverride(game.get_MasterServerHost().value(), game.get_MasterServerPort() != 0 ? game.get_MasterServerPort() : DEFAULT_MASTER_PORT);
 		}
 
 		// Trigger the actual join via server code
@@ -87,9 +87,13 @@ namespace ServerBrowser::Game {
 
 #pragma region Master Server Management
 
-	//MasterServerEndPoint* MpConnect::get_OverrideEndPoint() {
+	MasterServerEndPoint* MpConnect::OverrideEndPoint;
 
-	//}
+	MasterServerEndPoint* MpConnect::LastUsedMasterServer;
+
+	MasterServerEndPoint* MpConnect::get_OverrideEndPoint() {
+		return OverrideEndPoint;
+	}
 
 	//MasterServerEndPoint* MpConnect::get_LastUsedMasterServer() {
 
@@ -101,24 +105,68 @@ namespace ServerBrowser::Game {
 
 	//}
 
-	//bool MpConnect::get_ShouldDisableCertificateValidation() {
+	bool MpConnect::get_ShouldDisableCertificateValidation() {
+		// We should disable certificate validation (X509CertificateUtilityPatch) if we are overriding to unofficial masters
+		return OverrideEndPoint != nullptr && !OverrideEndPoint->hostName->EndsWith(il2cpp_utils::newcsstr(OFFICIAL_MASTER_SUFFIX));
+	}
 
-	//}
+	void MpConnect::ReportCurrentMasterServerValue(MasterServerEndPoint* currentEndPoint) {
+		bool isFirstReport = !LastUsedMasterServer;
 
-	//void MpConnect::ReportCurrentMasterServerValue(MasterServerEndPoint* currentEndPoint) {
+		LastUsedMasterServer = currentEndPoint;
 
-	//}
+		if (OverrideEndPoint && currentEndPoint->Equals(OverrideEndPoint))
+		{
+			// This is our own override, not useful information
+			return;
+		}
 
-	//void MpConnect::SetMasterServerOverride(std::string hostName, int port) {
+		auto hostName = currentEndPoint->hostName;
 
-	//}
+		if (hostName->EndsWith(il2cpp_utils::newcsstr(OFFICIAL_MASTER_SUFFIX)))
+		{
+			// This is the official / default master server (likely not using a server mod)
+			//_officialEndPoint = currentEndPoint;
+			//_usingModdedServer = false;
 
-	//void MpConnect::SetMasterServerOverride(MasterServerEndPoint* overrideEndPoint) {
+			if (isFirstReport)
+			{
+				getLogger().info("Default master server appears to be official: ");
+			}
 
-	//}
+			return;
+		}
 
-	//void MpConnect::ClearMasterServerOverride() {
+		// This is neither our override nor an official server, which means another mod is doing this
+		//_moddedEndPoint = currentEndPoint;
+		//_usingModdedServer = true;
 
-	//}
+		if (isFirstReport)
+		{
+			getLogger().warning("Default master server appears to be modded: ");
+		}
+	}
+
+	void MpConnect::SetMasterServerOverride(std::string hostName, int port) {
+		SetMasterServerOverride(MasterServerEndPoint::New_ctor<il2cpp_utils::CreationType::Manual>(il2cpp_utils::newcsstr(hostName), port));
+	}
+
+	void MpConnect::SetMasterServerOverride(MasterServerEndPoint* overrideEndPoint) {
+		if (!OverrideEndPoint || !OverrideEndPoint->Equals(overrideEndPoint))
+		{
+			delete OverrideEndPoint;
+			getLogger().info("Setting master server override now: %s", to_utf8(csstrtostr(overrideEndPoint->ToString())).c_str());
+			OverrideEndPoint = overrideEndPoint;
+		}
+	}
+
+	void MpConnect::ClearMasterServerOverride() {
+		if (OverrideEndPoint)
+		{
+			getLogger().info("Stopped overriding master server");
+			delete OverrideEndPoint;
+			OverrideEndPoint = nullptr;
+		}
+	}
 #pragma endregion
 }

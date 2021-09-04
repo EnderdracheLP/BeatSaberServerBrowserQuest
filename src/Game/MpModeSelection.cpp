@@ -65,7 +65,7 @@ namespace ServerBrowser::Game {
 
 	void MpModeSelection::OpenCreateServerMenu() {
 		// TODO: Make sure any overrides are cleared when we're going to host
-		//MpConnect::ClearMasterServerOverride();
+		MpConnect::ClearMasterServerOverride();
 
 		// TODO: If we are initiating the server menu from our UI, assume the intent is to host a game
 		//Plugin.Config.LobbyAnnounceToggle = true;
@@ -94,21 +94,19 @@ namespace ServerBrowser::Game {
 
 		_flowCoordinator->joiningLobbyCancellationTokenSource = THROW_UNLESS(il2cpp_utils::New<CancellationTokenSource*>());
 
+		if (game->SupportsDirectConnect() && game->get_Endpoint().has_value()) {
+			getLogger().info("Attempting direct connection to endpoint: %s", game->get_Endpoint()->c_str());
+			GlobalModState::DirectConnectTarget = game->get_Endpoint();
+		}
+
 		SelectMultiplayerLobbyDestination* MpLobbyDest = THROW_UNLESS(il2cpp_utils::New<SelectMultiplayerLobbyDestination*>(il2cpp_utils::newcsstr(game->get_ServerCode())));
 		if (game->get_HostSecret().has_value())
 			MpLobbyDest->lobbySecret = il2cpp_utils::newcsstr(game->get_HostSecret().value());
 
-		//SelectMultiplayerLobbyDestination* Destination;
-  //      if (game->get_HostSecret().has_value())
-		//	Destination = CRASH_UNLESS(il2cpp_utils::New<SelectMultiplayerLobbyDestination*>(il2cpp_utils::newcsstr(game->get_HostSecret().value())));
-		//else if (ServerCode)
-		//	Destination = CRASH_UNLESS(il2cpp_utils::New<SelectMultiplayerLobbyDestination*>(ServerCode));
-
-
+		// NB: We call this even when direct connecting, as direct connections simply intercept the master response
+		// TODO Make direct connects better by avoiding the master server altogether :)
 		_mpLobbyConnectionController->CreateOrConnectToDestinationParty(
 			MpLobbyDest
-			//MpLobbyDest
-			//il2Cpp_utils::New(MpLobbyDestination(ServerCode, game->HostSecret))
 		);
 
 		Il2CppString* LVC_InitStr = il2cpp_utils::newcsstr(string_format("%s (%s)", game->get_GameName().c_str(), game->get_ServerCode().c_str()));
@@ -120,48 +118,6 @@ namespace ServerBrowser::Game {
 			HMUI::ViewController::AnimationType::In,
 			HMUI::ViewController::AnimationDirection::Vertical);
 	}
-
-	//void MpModeSelection::ConnectToHostedGame(HostedGameData game)
-	//{
-	//	//if (!game)
-	//	//	return;
-
-	//	MpModeSelection::WeInitiatedConnection = true;
-	//	MpModeSelection::LastConnectToHostedGame = game;
-	//	MpModeSelection::InjectQuickPlaySecret = nullptr;
-	//	MpModeSelection::InjectServerCode = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>(game->ServerCode);
-
-	//	if (game->IsQuickPlayServer() && !Il2CppString::IsNullOrEmpty(game->HostSecret))
-	//	{
-	//		// Join Quick Play server by secret
-	//		getLogger().info("Trying to join Quick Play game by secret (%s)...", to_utf8(csstrtostr(game->HostSecret)).c_str());
-
-	//		MpModeSelection::InjectQuickPlaySecret = game->HostSecret; // NB: JoinMatchmakingPatch will inject secret
-
-	//		BeatmapDifficultyMask difficultyMask = BeatmapDifficultyMask::All;
-	//		//if (game->ServerType == HostedGameData.ServerTypeVanillaQuickplay && game->Difficulty.value != 0) {
-	//			// Vanilla quick play is locked to a specific difficulty in the lobby
-	//			//difficultyMask = game->Difficulty;
-	//		// }
-
-	//		_mpLobbyConnectionController->ConnectToMatchmaking(difficultyMask, SongPackMask::get_all(), true);
-	//		_joiningLobbyViewController->Init(il2cpp_utils::newcsstr(string_format("Trying to join %s...", game->GameName.c_str())));
-
-	//		ReplaceTopViewController(_joiningLobbyViewController,
-	//			ViewController::AnimationType::In,
-	//			ViewController::AnimationDirection::Vertical);
-	//	}
-	//	else if (!game->ServerCode.empty())
-	//	{
-	//		// Join party by code
-	//		getLogger().info("Trying to join custom game by code (%s)...", game->ServerCode.c_str());
-
-	//		_mpLobbyConnectionController->CreateOrConnectToDestinationParty(il2cpp_utils::newcsstr(game->ServerCode));
-
-	//		_joiningLobbyViewController->Init(il2cpp_utils::newcsstr(string_format("%s (%s)", game->GameName.c_str(), game->ServerCode.c_str())));
-	//		ReplaceTopViewController(_joiningLobbyViewController, ViewController::AnimationType::In, ViewController::AnimationDirection::Vertical);
-	//	}
-	//}
 
 	void MpModeSelection::PresentConnectionFailedError(std::string errorTitle, std::string errorMessage, bool canRetry) {
 		CancelLobbyJoin();
@@ -187,7 +143,6 @@ namespace ServerBrowser::Game {
 			}
 		);
 
-		//auto* action = il2cpp_utils::MakeDelegate<System::Action_1<int>*>(classof(System::Action_1<int>*), std::function<void(int)>(ButtonCallback));
 		_simpleDialogPromptViewController->Init(errorTitleStr, errorMessageStr, backToBrowserStr, canRetry ? canRetryStr : nullptr, action);
 		ReplaceTopViewController(_simpleDialogPromptViewController, ViewController::AnimationType::In, ViewController::AnimationDirection::Vertical);
 	}

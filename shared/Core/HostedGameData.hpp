@@ -25,6 +25,7 @@ namespace ServerBrowser::Core {
         bool IsOnCustomMaster();
         bool IsDedicatedServer();
         bool IsBeatDedi();
+        bool SupportsDirectConnect();
         bool IsQuickPlayServer();
         bool CanJoin();
 #pragma endregion
@@ -45,6 +46,7 @@ namespace ServerBrowser::Core {
         int Id;
         std::string ServerCode;
         std::string GameName;
+        std::string OwnerId;
         std::string OwnerName;
         int PlayerCount;
         int PlayerLimit;
@@ -57,7 +59,7 @@ namespace ServerBrowser::Core {
         std::optional<std::string> SongAuthor;
         std::optional<int> Difficulty;
         std::string Platform;
-        std::string MasterServerHost;
+        std::optional<std::string> MasterServerHost;
         int MasterServerPort;
         std::optional<std::string> EndedAt;
         std::optional<semver::version> MpExVersion;
@@ -68,6 +70,7 @@ namespace ServerBrowser::Core {
         std::optional<std::string> ServerType;
         std::optional<std::string> HostSecret;
         std::optional<std::string> Endpoint;
+        std::optional<std::string> ManagerId;
 
     public:
         const std::optional<std::string> get_BeatsaverId() const { return BeatsaverId; }
@@ -76,6 +79,7 @@ namespace ServerBrowser::Core {
         const int& get_Id() const { return Id; }
         const std::string& get_ServerCode() const { return ServerCode; }
         const std::string& get_GameName() const { return GameName; }
+        const std::string& get_OwnerId() const { return OwnerId; }
         const std::string& get_OwnerName() const { return OwnerName; }
         const int& get_PlayerCount() const { return PlayerCount; }
         const int& get_PlayerLimit() const { return PlayerLimit; }
@@ -88,7 +92,7 @@ namespace ServerBrowser::Core {
         const std::optional<std::string> get_SongAuthor() const { return SongAuthor; }
         const std::optional<int> get_Difficulty() const { return Difficulty; }
         const std::string& get_Platform() const { return Platform; }
-        const std::string& get_MasterServerHost() const { return MasterServerHost; }
+        const std::optional<std::string> get_MasterServerHost() const { return MasterServerHost; }
         const int& get_MasterServerPort() const { return MasterServerPort; }
         const std::optional<std::string> get_EndedAt() const { return EndedAt; }
         const std::optional<semver::version> get_MpExVersion() const { return MpExVersion; }
@@ -99,6 +103,7 @@ namespace ServerBrowser::Core {
         const std::optional<std::string> get_ServerType() const { return ServerType; }
         const std::optional<std::string> get_HostSecret() const { return HostSecret; }
         const std::optional<std::string> get_Endpoint() const { return Endpoint; }
+        const std::optional<std::string> get_ManagerId() const { return ManagerId; }
 
         //void set_BeatsaverId(std::string value);
         //void set_CoverUrl(std::string value);

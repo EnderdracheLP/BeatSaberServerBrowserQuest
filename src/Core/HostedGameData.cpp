@@ -6,7 +6,7 @@ using GlobalNamespace::BeatmapDifficulty;
 namespace ServerBrowser::Core {
 #pragma region Helpers
     bool HostedGameData::IsOnCustomMaster() {
-        return !MasterServerHost.empty() && !MasterServerHost.ends_with(OFFICIAL_MASTER_SUFFIX);
+        return !MasterServerHost.has_value() && !MasterServerHost->ends_with(OFFICIAL_MASTER_SUFFIX);
     }
     bool HostedGameData::IsDedicatedServer() {
 		if (ServerType.has_value()) {
@@ -19,6 +19,9 @@ namespace ServerBrowser::Core {
 			return ServerType.value() == ServerTypeBeatDediCustom || ServerType.value() == ServerTypeBeatDediQuickplay;
 		}
 		else return false;
+	}
+	bool HostedGameData::SupportsDirectConnect() {
+		return IsBeatDedi();
 	}
     bool HostedGameData::IsQuickPlayServer() {
 		if (ServerType.has_value()) {
@@ -49,10 +52,10 @@ namespace ServerBrowser::Core {
 		std::string masterServerDescr;
 		std::string moddedDescr;
 
-		if (MasterServerHost.empty() || MasterServerHost == OFFICIAL_MASTER_OCULUS) {
+		if (MasterServerHost.has_value() || MasterServerHost.value() == OFFICIAL_MASTER_OCULUS) {
 			masterServerDescr = "Oculus";
 		}
-		else if (MasterServerHost.ends_with(OFFICIAL_MASTER_SUFFIX)) {
+		else if (MasterServerHost->ends_with(OFFICIAL_MASTER_SUFFIX)) {
 			masterServerDescr = "Official-unknown";
 		}
 		else {
@@ -139,6 +142,9 @@ SERIALIZE_STRING_METHOD(ServerBrowser::Core, HostedGameData,
 	SERIALIZE_VALUE(ServerCode, serverCode)
 	SERIALIZE_VALUE(GameName, gameName)
 	SERIALIZE_VALUE(OwnerName, ownerName)
+	if (!OwnerId.empty()) {
+		doc.AddMember("ownerId", OwnerId, alloc);
+	}
 	SERIALIZE_VALUE(PlayerCount, playerCount)
 	SERIALIZE_VALUE(PlayerLimit, playerLimit)
 	SERIALIZE_VALUE(IsModded, isModded)
@@ -150,7 +156,7 @@ SERIALIZE_STRING_METHOD(ServerBrowser::Core, HostedGameData,
 	SERIALIZE_VALUE_OPTIONAL(SongAuthor, songAuthor)
 	SERIALIZE_VALUE_OPTIONAL(Difficulty, difficulty)
 	SERIALIZE_VALUE(Platform, platform)
-	SERIALIZE_VALUE(MasterServerHost, masterServerHost)
+	SERIALIZE_VALUE_OPTIONAL(MasterServerHost, masterServerHost)
 	SERIALIZE_VALUE(MasterServerPort, masterServerPort)
 	SERIALIZE_VALUE_OPTIONAL(EndedAt, endedAt)
 	//SERIALIZE_VALUE_OPTIONAL(MpExVersion, mpExVersion)
@@ -167,6 +173,7 @@ SERIALIZE_STRING_METHOD(ServerBrowser::Core, HostedGameData,
 	SERIALIZE_VALUE_OPTIONAL(ServerType, serverType)
 	SERIALIZE_VALUE_OPTIONAL(HostSecret, hostSecret)
 	SERIALIZE_VALUE_OPTIONAL(Endpoint, endpoint)
+	SERIALIZE_VALUE_OPTIONAL(ManagerId, managerId)
 )
 #pragma endregion
 #pragma region Deserialize
@@ -177,6 +184,9 @@ SERIALIZE_STRING_METHOD(ServerBrowser::Core, HostedGameData,
 			DESERIALIZE_VALUE(Id, id, Int)
 			DESERIALIZE_VALUE(ServerCode, serverCode, String)
 			DESERIALIZE_VALUE(GameName, gameName, String)
+			if (jsonValue.HasMember("ownerId") && jsonValue["ownerId"].IsString()) {
+				OwnerId = jsonValue["ownerId"].GetString();
+			}
 			DESERIALIZE_VALUE(OwnerName, ownerName, String)
 			DESERIALIZE_VALUE(PlayerCount, playerCount, Int)
 			DESERIALIZE_VALUE(PlayerLimit, playerLimit, Int)
@@ -189,7 +199,7 @@ SERIALIZE_STRING_METHOD(ServerBrowser::Core, HostedGameData,
 			DESERIALIZE_VALUE_OPTIONAL(SongAuthor, songAuthor, String)
 			DESERIALIZE_VALUE_OPTIONAL(Difficulty, difficulty, Int)
 			DESERIALIZE_VALUE(Platform, platform, String)
-			DESERIALIZE_VALUE(MasterServerHost, masterServerHost, String)
+			DESERIALIZE_VALUE_OPTIONAL(MasterServerHost, masterServerHost, String)
 			DESERIALIZE_VALUE(MasterServerPort, masterServerPort, Int)
 			DESERIALIZE_VALUE_OPTIONAL(EndedAt, endedAt, String)
 			//DESERIALIZE_VALUE_OPTIONAL(MpExVersion, mpExVersion, String)

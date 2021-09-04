@@ -8,13 +8,11 @@ namespace ServerBrowser::Game {
         /// Instance of the game's MultiplayerSessionManager.
         /// </summary>
         static GlobalNamespace::MultiplayerSessionManager* SessionManager; /*{get; private set;}*/
-        static void set_SessionManager(GlobalNamespace::MultiplayerSessionManager* sessionManager);
 
         /// <summary>
         /// Indicates whether we are currently connected to a multiplayer session or not.
         /// </summary>
         static bool IsConnected; /*{get; private set;} = false;*/
-        static void set_IsConnected(bool isConnected);
 
         /// <summary>
         /// The most recent reason we were disconnected from a multiplayer session.

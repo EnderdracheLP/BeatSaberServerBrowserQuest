@@ -37,7 +37,7 @@ LOCAL_MODULE := codegen_0_13_0
 LOCAL_EXPORT_C_INCLUDES := extern/codegen
 LOCAL_SRC_FILES := extern/libcodegen_0_13_0.so
 include $(PREBUILT_SHARED_LIBRARY)
-# Creating prebuilt for dependency: questui - version: 0.10.2
+# Creating prebuilt for dependency: questui - version: 0.11.0
 include $(CLEAR_VARS)
 LOCAL_MODULE := questui
 LOCAL_EXPORT_C_INCLUDES := extern/questui
@@ -55,12 +55,6 @@ LOCAL_MODULE := curl
 LOCAL_EXPORT_C_INCLUDES := extern/libcurl
 LOCAL_SRC_FILES := extern/libcurl.a
 include $(PREBUILT_STATIC_LIBRARY)
-# Creating prebuilt for dependency: libcryptopp - version: 8.5.0
-include $(CLEAR_VARS)
-LOCAL_MODULE := cryptopp
-LOCAL_EXPORT_C_INCLUDES := extern/libcryptopp
-LOCAL_SRC_FILES := extern/libcryptopp.a
-include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE := ServerBrowser
@@ -73,7 +67,6 @@ LOCAL_SHARED_LIBRARIES += codegen_0_13_0
 LOCAL_SHARED_LIBRARIES += questui
 LOCAL_SHARED_LIBRARIES += custom-types
 LOCAL_STATIC_LIBRARIES += curl
-LOCAL_STATIC_LIBRARIES += cryptopp
 LOCAL_LDLIBS += -llog -lz
 LOCAL_CFLAGS += -I'extern/libil2cpp/il2cpp/libil2cpp' -DID='"ServerBrowser"' -DVERSION='"0.6.0"' -I'./shared' -I'./extern' -isystem'extern/codegen/include'
 LOCAL_CPPFLAGS += -std=c++2a

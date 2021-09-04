@@ -1,10 +1,17 @@
 {
   "ExpandedNodes": [
     "",
+    "\\extern",
     "\\include",
-    "\\include\\Core",
-    "\\shared",
-    "\\shared\\Core"
+    "\\include\\Game",
+    "\\libs",
+    "\\libs\\arm64-v8a",
+    "\\src",
+    "\\src\\Game",
+    "\\src\\UI",
+    "\\src\\UI\\Components",
+    "\\src\\Utils"
   ],
+  "SelectedNode": "\\copy.ps1",
   "PreviewInSolutionExplorer": false
 }

@@ -5,10 +5,11 @@
 #include "libcurl/shared/easy.h"
 
 #define TIMEOUT 10
-#define USER_AGENT std::string(ID "/" VERSION " (BeatSaber/1.16.4) (Oculus)").c_str()
+#define USER_AGENT std::string(ID "/" VERSION " (BeatSaber/" + GameVersion + ") (Oculus)").c_str()
 #define X_BSSB "X-BSSB: ✔"
 
 namespace WebUtils {
+    std::string GameVersion = "Unknown";
 
     //https://stackoverflow.com/a/55660581
     std::string query_encode(const std::string& s)

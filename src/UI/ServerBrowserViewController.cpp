@@ -115,7 +115,7 @@ namespace ServerBrowser::UI::ViewControllers {
 
     //[UIAction("refreshButtonClick")]
     */
-        void ServerBrowserViewController::RefreshButtonClick()
+    void ServerBrowserViewController::RefreshButtonClick()
     {
             SetInitialUiState();
             HostedGameBrowser::FullRefresh(/*_filters*/);

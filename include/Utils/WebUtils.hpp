@@ -4,6 +4,7 @@
 #include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
 
 namespace WebUtils {
+    extern std::string GameVersion;
 
     std::optional<rapidjson::Document> GetJSON(std::string url);
 
