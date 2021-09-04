@@ -449,6 +449,15 @@ namespace ServerBrowser::UI::ViewControllers {
             [this] {
                 CancelImageLoading();
             });
+        if (!BSSBMasterAPI::get_Exception().empty()) {
+            StatusText->set_text(il2cpp_utils::newcsstr("Failed to get server list"));
+            StatusText->set_color(Color::get_red());
+            if (loadingControl != nullptr)
+                QuestUI::MainThreadScheduler::Schedule(
+                    [this] {
+                        loadingControl->ShowText(il2cpp_utils::newcsstr(BSSBMasterAPI::get_Exception()), true);
+                    });
+        }
 
         if (!HostedGameBrowser::get_ServerMessage().empty())
         {
@@ -464,6 +473,11 @@ namespace ServerBrowser::UI::ViewControllers {
         {
             StatusText->set_text(il2cpp_utils::newcsstr("Failed to get server list"));
             StatusText->set_color(Color::get_red());
+            if (loadingControl != nullptr)
+                QuestUI::MainThreadScheduler::Schedule(
+                    [this] {
+                        loadingControl->ShowText(il2cpp_utils::newcsstr("Retry?"), true);
+                    });
         }
         else if (!HostedGameBrowser::get_AnyResultsOnPage())
         {

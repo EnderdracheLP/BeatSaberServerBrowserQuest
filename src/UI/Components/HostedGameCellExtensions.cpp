@@ -26,6 +26,7 @@ namespace ServerBrowser::UI::Components {
     void HostedGameCellExtensions::Configure(SelectableCell* cell, HostedGameCellData* cellInfo) {
         _cell = cell;
         _cellInfo = *cellInfo;
+        CoverImageSet = false;
 
         background = cell->get_transform()->Find(il2cpp_utils::newcsstr("Background"))->GetComponent<ImageView*>();
         coverImage = cell->get_transform()->Find(il2cpp_utils::newcsstr("CoverImage"))->GetComponent<ImageView*>();
@@ -95,6 +96,7 @@ namespace ServerBrowser::UI::Components {
     void HostedGameCellExtensions::RefreshContent(HostedGameCellData* cellInfo) {
         if (cellInfo) {
             _cellInfo = *cellInfo;
+            CoverImageSet = false;
         }
 
         FavoritesIcon->get_gameObject()->SetActive(false);
@@ -104,34 +106,39 @@ namespace ServerBrowser::UI::Components {
 
         auto game = _cellInfo.get_Game();
 
-        getLogger().debug("Running SetCoverArt in HostedGameCellExtensions");
-        getLogger().debug("LobbyState is: %d", game.get_LobbyState());
-        if (!game.get_LevelId().has_value() || game.get_LobbyState() != MultiplayerLobbyState::GameRunning) {
-            // No level info / we are in a lobby
-            getLogger().info("No level info, assuming they're in a lobby");
-            coverImage->set_sprite(Sprites::get_PortalUser());
-            return;
+        if (coverImage && !CoverImageSet) {
+            getLogger().debug("Running SetCoverArt in HostedGameCellExtensions");
+            getLogger().debug("LobbyState is: %d", game.get_LobbyState());
+            if (!game.get_LevelId().has_value() || game.get_LobbyState() != MultiplayerLobbyState::GameRunning) {
+                // No level info / we are in a lobby
+                getLogger().info("No level info, assuming they're in a lobby");
+                coverImage->set_sprite(Sprites::get_PortalUser());
+                CoverImageSet = true;
+                goto CoverFinished;
+            }
+            else {
+                BSSBMasterAPI::GetCoverImageAsync(game,
+                    [this](std::vector<uint8_t> coverArtBytes) {
+                        QuestUI::MainThreadScheduler::Schedule(
+                            [this, coverArtBytes] {
+                                std::vector<uint8_t> coverVector = coverArtBytes;
+                                auto coverArtSprite = QuestUI::BeatSaberUI::ArrayToSprite(il2cpp_utils::vectorToArray(coverVector));
+                                if (coverArtSprite) {
+                                    // Official level, or installed custom level found
+                                    coverImage->set_sprite(coverArtSprite);
+                                    CoverImageSet = true;
+                                }
+                                else {
+                                    getLogger().error("Failed to get level info");
+                                    // Failed to get level info, show beatsaver icon as placeholder
+                                    coverImage->set_sprite(Sprites::get_BeatSaverIcon());
+                                }
+                            });
+                    }
+                );
+            }
         }
-        else {
-            BSSBMasterAPI::GetCoverImageAsync(game,
-                [this](std::vector<uint8_t> coverArtBytes) {
-                    QuestUI::MainThreadScheduler::Schedule(
-                        [this, coverArtBytes] {
-                            std::vector<uint8_t> coverVector = coverArtBytes;
-                            auto coverArtSprite = QuestUI::BeatSaberUI::ArrayToSprite(il2cpp_utils::vectorToArray(coverVector));
-                            if (coverArtSprite) {
-                                // Official level, or installed custom level found
-                                coverImage->set_sprite(coverArtSprite);
-                            }
-                            else {
-                                getLogger().error("Failed to get level info");
-                                // Failed to get level info, show beatsaver icon as placeholder
-                                coverImage->set_sprite(Sprites::get_BeatSaverIcon());
-                            }
-                        });
-                }
-            );
-        }
+    CoverFinished:
 
         // Player count
         SongTime->set_text(il2cpp_utils::newcsstr(string_format("%d/%d", game.get_PlayerCount(), game.get_PlayerLimit())));

@@ -1,0 +1,8 @@
+
+
+DEFINE_TYPE(ServerBrowser::UI::Components, CreateServerExtensions);
+
+namespace ServerBrowser::UI::Components
+{
+    
+}

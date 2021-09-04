@@ -34,11 +34,6 @@
       "additionalData": {}
     },
     {
-      "id": "libcryptopp",
-      "versionRange": "*",
-      "additionalData": {}
-    },
-    {
       "id": "custom-types",
       "versionRange": "*",
       "additionalData": {}

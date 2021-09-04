@@ -1,12 +1,9 @@
 #include "main.hpp"
-//#include "UI/ServerBrowserFlowCoordinator.hpp"
-//#include "UI/NativeServerBrowser.hpp"
-//#include "UI/ServerBrowserViewController.hpp"
 #include "Core/HostedGameData.hpp"
-//#include "UI/Components/ListLoadingControl.hpp"
 #include "Core/GlobalModState.hpp"
 #include "Game/MpModeSelection.hpp"
 #include "Game/MpConnect.hpp"
+//#include "UI/Components/CreateServerExtensions.hpp"
 #include "Utils/ConnectionErrorText.hpp"
 #include "Utils/WebUtils.hpp"
 #include "UI/PluginUi.hpp"
@@ -270,8 +267,10 @@ QUICK_HOOK_GB(MultiplayerModeSelectionFlowCoordinator, HandleMultiplayerLobbyCon
 
 QUICK_HOOK_GB(CreateServerViewController, DidActivate, void, bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling) {
     getLogger().debug("CreateServerViewController_DidActivate");
-
     CreateServerViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
+    if (firstActivation) {
+        //self->get_gameObject()->AddComponent<ServerBrowser::UI::Components::CreateServerExtensions*>();
+    }
 }
 
 QUICK_HOOK_GB(MultiplayerModeSelectionFlowCoordinator, PresentConnectionErrorDialog, void, GlobalNamespace::MultiplayerLobbyConnectionController::LobbyConnectionType connectionType, GlobalNamespace::ConnectionFailedReason reason) {

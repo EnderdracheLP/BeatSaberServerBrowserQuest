@@ -6,7 +6,7 @@ using GlobalNamespace::BeatmapDifficulty;
 namespace ServerBrowser::Core {
 #pragma region Helpers
     bool HostedGameData::IsOnCustomMaster() {
-        return !MasterServerHost.has_value() && !MasterServerHost->ends_with(OFFICIAL_MASTER_SUFFIX);
+        return MasterServerHost.has_value() && !MasterServerHost->ends_with(OFFICIAL_MASTER_SUFFIX);
     }
     bool HostedGameData::IsDedicatedServer() {
 		if (ServerType.has_value()) {
@@ -52,7 +52,7 @@ namespace ServerBrowser::Core {
 		std::string masterServerDescr;
 		std::string moddedDescr;
 
-		if (MasterServerHost.has_value() || MasterServerHost.value() == OFFICIAL_MASTER_OCULUS) {
+		if (MasterServerHost.has_value() && MasterServerHost.value() == OFFICIAL_MASTER_OCULUS) {
 			masterServerDescr = "Oculus";
 		}
 		else if (MasterServerHost->ends_with(OFFICIAL_MASTER_SUFFIX)) {

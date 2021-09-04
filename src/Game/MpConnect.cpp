@@ -7,8 +7,7 @@ namespace ServerBrowser::Game {
 	void MpConnect::Join(HostedGameData game) {
 		// MQE Version check
 		if (game.get_MpExVersion().has_value()) {
-			//std::string ourMQE_Version = "Undefined";
-			std::string ourMQE_Version = "0.1.0";
+			std::string ourMQE_Version = "Undefined";
 
 			//semver::version checkRange2{ ourMQE_Version };
 			//checkRange2.minor++;
@@ -126,8 +125,8 @@ namespace ServerBrowser::Game {
 		if (hostName->EndsWith(il2cpp_utils::newcsstr(OFFICIAL_MASTER_SUFFIX)))
 		{
 			// This is the official / default master server (likely not using a server mod)
-			//_officialEndPoint = currentEndPoint;
-			//_usingModdedServer = false;
+			//officialEndPoint = currentEndPoint;
+			//usingModdedServer = false;
 
 			if (isFirstReport)
 			{
@@ -138,8 +137,8 @@ namespace ServerBrowser::Game {
 		}
 
 		// This is neither our override nor an official server, which means another mod is doing this
-		//_moddedEndPoint = currentEndPoint;
-		//_usingModdedServer = true;
+		//moddedEndPoint = currentEndPoint;
+		//usingModdedServer = true;
 
 		if (isFirstReport)
 		{
@@ -148,15 +147,19 @@ namespace ServerBrowser::Game {
 	}
 
 	void MpConnect::SetMasterServerOverride(std::string hostName, int port) {
+		if (!classof(MasterServerEndPoint*)->initialized) il2cpp_functions::Class_Init(classof(MasterServerEndPoint*)); // This is needed in order to initialize the Il2CppClass
 		SetMasterServerOverride(MasterServerEndPoint::New_ctor<il2cpp_utils::CreationType::Manual>(il2cpp_utils::newcsstr(hostName), port));
 	}
 
 	void MpConnect::SetMasterServerOverride(MasterServerEndPoint* overrideEndPoint) {
 		if (!OverrideEndPoint || !OverrideEndPoint->Equals(overrideEndPoint))
 		{
-			delete OverrideEndPoint;
+			gc_free_specific(OverrideEndPoint);
 			getLogger().info("Setting master server override now: %s", to_utf8(csstrtostr(overrideEndPoint->ToString())).c_str());
 			OverrideEndPoint = overrideEndPoint;
+		}
+		else {
+			gc_free_specific(overrideEndPoint);
 		}
 	}
 
@@ -164,7 +167,7 @@ namespace ServerBrowser::Game {
 		if (OverrideEndPoint)
 		{
 			getLogger().info("Stopped overriding master server");
-			delete OverrideEndPoint;
+			gc_free_specific(OverrideEndPoint);
 			OverrideEndPoint = nullptr;
 		}
 	}

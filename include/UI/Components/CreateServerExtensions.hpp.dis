@@ -1,0 +1,27 @@
+#include "custom-types/shared/macros.hpp"
+#include "UnityEngine/MonoBehaviour.hpp"
+#include "UnityEngine/Transform.hpp"
+#include "UnityEngine/UI/Toggle.hpp"
+
+#include "HMUI/InputFieldView.hpp"
+
+DECLARE_CLASS_CODEGEN(ServerBrowser::UI::Components, CreateServerExtensions, UnityEngine::MonoBehaviour,
+        DECLARE_INSTANCE_FIELD(UnityEngine::Transform*, wrapper);
+        DECLARE_INSTANCE_FIELD(UnityEngine::Transform*, formView);
+
+        DECLARE_INSTANCE_FIELD(UnityEngine::UI::Toggle*, addToBrowserSetting);
+        DECLARE_INSTANCE_FIELD(HMUI::InputFieldView*, serverNameSetting);
+
+        bool eventsEnabled = true;
+        bool firstEnable = true;
+
+        DECLARE_INSTANCE_METHOD(void, Awake);
+        DECLARE_INSTANCE_METHOD(void, OnEnable);
+        DECLARE_INSTANCE_METHOD(void, SyncValues);
+        DECLARE_INSTANCE_METHOD(void, OnDisable);
+
+#pragma region UI Helpers
+
+#pragma endregion
+
+)

@@ -45,6 +45,7 @@ DECLARE_CLASS_CODEGEN(ServerBrowser::UI::Components, HostedGameCellExtensions, U
     private:
     DECLARE_INSTANCE_METHOD(void, OnEnable);
     DECLARE_INSTANCE_METHOD(void, OnDisable);
+    bool CoverImageSet;
 
     //DECLARE_INSTANCE_METHOD(void, OnSelectionDidChange, HMUI::SelectableCell cell, HMUI::SelectableCell::TransitionType transition/*, object _*/);
     //DECLARE_INSTANCE_METHOD(void, OnHighlightDidChange, HMUI::SelectableCell cell, HMUI::SelectableCell::TransitionType transition);

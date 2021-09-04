@@ -1,17 +1,17 @@
-
 {
-    "_QPVersion": "0.1.1",
-    "name": "#{name}",
-    "id": "#{id}",
-    "author": "#{author}",
-    "version": "0.1.0",
-    "packageId": "com.beatgames.beatsaber",
-    "packageVersion": "1.14.0",
-    "description": "#{description}",
-    "modFiles": [
-        "lib#{id}.so"
-    ],
-    "libraryFiles": [
-        "libbeatsaber-hook_1_2_4.so"
-    ]
+  "_QPVersion": "0.1.1",
+  "name": "Server Browser",
+  "id": "ServerBrowser",
+  "author": "LookAtHippo#1213",
+  "porter": "EnderdracheLP#2305",
+  "version": "1.0.0",
+  "packageId": "com.beatgames.beatsaber",
+  "packageVersion": "1.17.0",
+  "description": "Lets you browse and join Multiplayer Servers right from within the headset",
+  "modFiles": [
+    "libServerBrowser.so"
+  ],
+  "libraryFiles": [
+    "libbeatsaber-hook_2_3_0.so"
+  ]
 }

@@ -8,7 +8,7 @@ namespace ServerBrowser::Core {
     class BSSBMasterAPI {
         static std::string exception;
     public:
-        const std::string get_Exception() const { return exception; }
+        static const std::string get_Exception() { return exception; }
         //static std::optional<BeatSaver::Page> SearchPaged(std::string query, int pageIndex, std::string sortOrder = "Relevance", std::string ME = "", std::string NE = "", std::string Chroma = "");
 
         static std::optional<ServerBrowser::Core::ServerBrowserResult> Browse(int offset/*, HostedGameFilters filters*/);

@@ -29,7 +29,7 @@ namespace ServerBrowser::UI::Components {
     void HostedGameCellData::UpdateUi() {
         text = Game.get_GameName();
 
-        if (Game.IsOnCustomMaster() && Game.get_MasterServerHost().has_value()) {
+        if (Game.IsOnCustomMaster()) {
             text += string_format(" <color=#59b0f4><size=3>(%s)</size></color>", Game.get_MasterServerHost()->c_str());
         }
 

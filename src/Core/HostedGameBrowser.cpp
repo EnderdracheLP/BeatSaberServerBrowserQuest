@@ -41,10 +41,10 @@ namespace ServerBrowser::Core {
                     }
 
                     lobbiesOnPage = nextLobbiesOnPage;
-
-                    // Fire update event for the UI
-                    if (OnUpdate) OnUpdate();
                 }
+
+                // Fire update event for the UI
+                if (OnUpdate) OnUpdate();
             });
     }
     bool HostedGameBrowser::get_ConnectionOk() {
