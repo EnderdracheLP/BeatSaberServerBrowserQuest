@@ -4,6 +4,7 @@ using GlobalNamespace::ConnectionFailedReason;
 namespace ServerBrowser::Utils {
     std::string ConnectionErrorText::Generate(GlobalNamespace::ConnectionFailedReason reason) {
         int reasonInt = reason.value;
+        //std::string reasonStr = to_utf8(csstrtostr(System::Enum::GetName(csTypeOf(GlobalNamespace::ConnectionFailedReason), System::Enum::ToObject(reason.value))));
         std::string msg = string_format("Error CFR-%d", reasonInt);
         
         switch (reason)

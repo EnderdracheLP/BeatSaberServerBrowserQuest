@@ -2,16 +2,15 @@
   "ExpandedNodes": [
     "",
     "\\extern",
-    "\\include",
-    "\\include\\Game",
-    "\\libs",
-    "\\libs\\arm64-v8a",
+    "\\extern\\codegen\\include",
+    "\\extern\\codegen\\include\\LiteNetLib",
+    "\\extern\\config-utils",
+    "\\extern\\config-utils\\shared",
     "\\src",
     "\\src\\Game",
     "\\src\\UI",
-    "\\src\\UI\\Components",
-    "\\src\\Utils"
+    "\\src\\UI\\Components"
   ],
-  "SelectedNode": "\\copy.ps1",
+  "SelectedNode": "\\src\\main.cpp",
   "PreviewInSolutionExplorer": false
 }

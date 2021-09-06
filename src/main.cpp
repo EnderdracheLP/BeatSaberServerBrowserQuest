@@ -1,9 +1,12 @@
 #include "main.hpp"
+#include "PluginConfig.hpp"
 #include "Core/HostedGameData.hpp"
 #include "Core/GlobalModState.hpp"
 #include "Game/MpModeSelection.hpp"
 #include "Game/MpConnect.hpp"
-//#include "UI/Components/CreateServerExtensions.hpp"
+#include "Game/MpSession.hpp"
+#include "Game/MpLocalPlayer.hpp"
+#include "UI/Components/CreateServerExtensions.hpp"
 #include "Utils/ConnectionErrorText.hpp"
 #include "Utils/WebUtils.hpp"
 #include "UI/PluginUi.hpp"
@@ -47,12 +50,18 @@
 #include "GlobalNamespace/GameServerBrowserViewController.hpp"
 #include "GlobalNamespace/MultiplayerLobbyConnectionController.hpp"
 #include "GlobalNamespace/ConnectionFailedReason.hpp"
-#include "GlobalNamespace/UserCertificateValidator.hpp"
 #include "GlobalNamespace/PacketEncryptionLayer.hpp"
 #include "GlobalNamespace/NetworkConfigSO.hpp"
 
+#include "GlobalNamespace/UserCertificateValidator.hpp"
+#include "GlobalNamespace/PlatformAuthenticationTokenProvider.hpp"
+#include "GlobalNamespace/AuthenticationToken.hpp"
+
 #include "System/Net/IPEndPoint.hpp"
 #include "System/Net/IPAddress.hpp"
+#include "System/Threading/Tasks/Task_1.hpp"
+
+#include "GlobalNamespace/BGNetDebug.hpp"
 using namespace GlobalNamespace;
 using namespace UnityEngine;
 using namespace ServerBrowser::UI;
@@ -64,6 +73,8 @@ using namespace ServerBrowser::Utils;
 #define QUICK_HOOK(namespace_, class_, methodname, retval, ...) MAKE_HOOK_MATCH(class_##_##methodname, &namespace_::class_::methodname, retval, namespace_::class_* self, __VA_ARGS__)
 
 static ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
+
+DEFINE_CONFIG(PluginConfig);
 
 // Loads the config from disk using our modInfo, then returns it for use
 Configuration& getConfig() {
@@ -221,9 +232,15 @@ QUICK_HOOK_GB(MultiplayerModeSelectionViewController, DidActivate, void, bool fi
     //getLogger().debug("MultiplayerModeSelectionViewController firstActivation");
     if (firstActivation) {
 #pragma region Setup
-        //MpSession::Setup();
+        // Bind multiplayer session events
+        MpSession::SetUp();
         MpModeSelection::SetUp();
+
+        // UI setup
         PluginUi::SetUp();
+
+        // Read local player info
+        MpLocalPlayer::SetUp();
 #pragma endregion
 
 #pragma region Button Setup
@@ -269,7 +286,7 @@ QUICK_HOOK_GB(CreateServerViewController, DidActivate, void, bool firstActivatio
     getLogger().debug("CreateServerViewController_DidActivate");
     CreateServerViewController_DidActivate(self, firstActivation, addedToHierarchy, screenSystemEnabling);
     if (firstActivation) {
-        //self->get_gameObject()->AddComponent<ServerBrowser::UI::Components::CreateServerExtensions*>();
+        self->get_gameObject()->AddComponent<ServerBrowser::UI::Components::CreateServerExtensions*>();
     }
 }
 
@@ -368,6 +385,32 @@ MAKE_HOOK_MATCH(NetworkConfigSO_get_masterServerEndPoint, &NetworkConfigSO::get_
     return result;
 }
 
+MAKE_HOOK_MATCH(BGNetDebug_Log, &GlobalNamespace::BGNetDebug::Log, void, Il2CppString* message) {
+    getLogger().WithContext("BGNetDebug::Log").debug("%s", to_utf8(csstrtostr(message)).c_str());
+    BGNetDebug_Log(message);
+}
+
+MAKE_HOOK_MATCH(BGNetDebug_LogError, &GlobalNamespace::BGNetDebug::LogError, void, Il2CppString* message) {
+    getLogger().WithContext("BGNetDebug::LogError").error("%s", to_utf8(csstrtostr(message)).c_str());
+    BGNetDebug_LogError(message);
+}
+
+MAKE_HOOK_MATCH(BGNetDebug_LogWarning, &GlobalNamespace::BGNetDebug::LogWarning, void, Il2CppString* message) {
+    getLogger().WithContext("BGNetDebug::LogWarning").warning("%s", to_utf8(csstrtostr(message)).c_str());
+    BGNetDebug_LogWarning(message);
+}
+
+MAKE_HOOK_MATCH(PlatformAuthenticationTokenProvider_GetAuthenticationToken, &PlatformAuthenticationTokenProvider::GetAuthenticationToken, System::Threading::Tasks::Task_1<GlobalNamespace::AuthenticationToken>*, PlatformAuthenticationTokenProvider* self)
+{
+    getLogger().debug("Returning custom authentication token!");
+    return System::Threading::Tasks::Task_1<AuthenticationToken>::New_ctor(AuthenticationToken(
+        AuthenticationToken::Platform::OculusQuest,
+        self->userId,
+        self->userName,
+        Array<uint8_t>::NewLength(0)
+    ));
+}
+
 // Called at the early stages of game loading
 extern "C" void setup(ModInfo& info) {
     info.id = ID;
@@ -381,6 +424,7 @@ extern "C" void setup(ModInfo& info) {
 // Called later on in the game loading - a good time to install function hooks
 extern "C" void load() {
     il2cpp_functions::Init();
+    getPluginConfig().Init(modInfo);
     custom_types::Register::AutoRegister();
     QuestUI::Init();
 
@@ -391,8 +435,18 @@ extern "C" void load() {
     INSTALL_HOOK(getLogger(), MultiplayerModeSelectionFlowCoordinator_HandleMultiplayerLobbyControllerDidFinish);
     INSTALL_HOOK(getLogger(), MultiplayerModeSelectionFlowCoordinator_PresentConnectionErrorDialog);
     INSTALL_HOOK(getLogger(), PacketEncryptionLayer_ProcessOutBoundPacketInternal);
-    INSTALL_HOOK(getLogger(), UserCertificateValidator_ValidateCertificateChainInternal);
+
     INSTALL_HOOK(getLogger(), NetworkConfigSO_get_masterServerEndPoint);
     INSTALL_HOOK(getLogger(), MasterServerConnectionManager_HandleConnectToServerSuccess);
+    auto ModList = Modloader::getMods();
+    if (ModList.find("BeatTogether") == ModList.end()) {
+        getLogger().info("BeatTogether not found, installing our own overrides");
+        INSTALL_HOOK(getLogger(), UserCertificateValidator_ValidateCertificateChainInternal);
+        INSTALL_HOOK(getLogger(), PlatformAuthenticationTokenProvider_GetAuthenticationToken);
+    }
+
+    INSTALL_HOOK(getLogger(), BGNetDebug_Log);
+    INSTALL_HOOK(getLogger(), BGNetDebug_LogError);
+    INSTALL_HOOK(getLogger(), BGNetDebug_LogWarning);
     getLogger().info("Installed all hooks!");
 }
