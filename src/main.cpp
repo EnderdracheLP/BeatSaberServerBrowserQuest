@@ -132,6 +132,11 @@ QUICK_HOOK_GB(MasterServerConnectionManager, HandleConnectToServerSuccess, void,
         isDedicatedServer ? "true" : "false",
         to_utf8(csstrtostr(managerId)).c_str());
 
+    getLogger().debug("Checking GlobalModState bools: WeInitiatedConnection: %s, LastConnectToHostedGame: %s, DirectConnectTarget: %s ", 
+        GlobalModState::WeInitiatedConnection ? "true" : "false", 
+        GlobalModState::LastConnectToHostedGame.has_value() ? "true" : "false", 
+        GlobalModState::DirectConnectTarget.has_value() ? "true" : "false");
+
     if (GlobalModState::WeInitiatedConnection && GlobalModState::LastConnectToHostedGame.has_value())
     {
         // Server Browser initiated this connection attempt

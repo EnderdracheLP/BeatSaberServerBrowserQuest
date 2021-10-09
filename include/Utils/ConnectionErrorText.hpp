@@ -5,6 +5,6 @@
 namespace ServerBrowser::Utils {
     class ConnectionErrorText {
     public:
-        static std::string Generate(GlobalNamespace::ConnectionFailedReason reason);
+        static const std::string Generate(GlobalNamespace::ConnectionFailedReason reason);
     };
 }

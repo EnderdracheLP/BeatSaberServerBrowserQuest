@@ -401,9 +401,9 @@ namespace ServerBrowser::UI::ViewControllers {
 
         // sometimes the non-primary buttons become disabled if the server browser
         //  isn't opened until after level selection, so let's ensure they're active
-        //RefreshButton->get_gameObject()->SetActive(true);
+        RefreshButton->get_gameObject()->SetActive(true);
         ////SearchButton->get_gameObject()->SetActive(true);
-        //CreateButton->get_gameObject()->SetActive(true);
+        CreateButton->get_gameObject()->SetActive(true);
 
         RefreshButton->set_interactable(false);
         //SearchButton->set_interactable(false);

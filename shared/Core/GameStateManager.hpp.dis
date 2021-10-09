@@ -1,0 +1,390 @@
+#include "HostedGameData.hpp"
+#include "AnnounceState.hpp"
+#include "PluginConfig.hpp"
+// TODO: Work on this, it's needed for announce'
+namespace ServerBrowser::Core {
+    class GameStateManager {
+        /// <summary>
+        /// A summary of the current multiplayer game state.
+        /// </summary>
+        //static MultiplayerActivity Activity;
+        //static MultiplayerActivity get_Activity() {
+        //    return Activity;
+        //}
+
+        /// <summary>
+        /// UI status text for the game state manager, as shown in the lobby panel.
+        /// </summary>
+        static std::string StatusText/* = "Hello world"*/;
+        static const std::string& get_StatusText() {
+            return StatusText;
+        }
+
+        /// <summary>
+        /// Indicates whether the game state manager errored, meaning no successful announce was made.
+        /// </summary>
+        static bool HasErrored/*{ get; private set; } = true*/;
+        static const bool& get_HasErrored() {
+            return HasErrored;
+        }
+
+        #pragma region Lifecycle
+        static void SetUp()
+        {
+            MpEvents::OnlineMenuOpened += OnOnlineMenuOpened;
+            MpEvents::OnlineMenuClosed += OnOnlineMenuClosed;
+            MpEvents::MasterServerChanged += OnMasterServerChanged;
+            MpEvents::ConnectionTypeChanged += OnConnectionTypeChanged;
+            MpEvents::ServerCodeChanged += OnServerCodeChanged;
+            MpEvents::LobbyStateChanged += OnLobbyStateChanged;
+            MpEvents::BeforeConnectToServer += OnBeforeConnectToServer;
+            MpEvents::SessionConnected += OnSessionConnected;
+            MpEvents::SessionDisconnected += OnSessionDisconnected;
+            MpEvents::PlayerConnected += OnPlayerConnected;
+            MpEvents::PlayerDisconnected += OnPlayerDisconnected;
+            MpEvents::StartingMultiplayerLevel += OnStartingMultiplayerLevel;
+        }
+
+        static void TearDown()
+        {
+            //MpEvents::OnlineMenuOpened -= OnOnlineMenuOpened;
+            //MpEvents::OnlineMenuClosed -= OnOnlineMenuClosed;
+            //MpEvents::MasterServerChanged -= OnMasterServerChanged;
+            //MpEvents::ConnectionTypeChanged += OnConnectionTypeChanged;
+            //MpEvents::ServerCodeChanged -= OnServerCodeChanged;
+            //MpEvents::LobbyStateChanged -= OnLobbyStateChanged;
+            //MpEvents::BeforeConnectToServer -= OnBeforeConnectToServer;
+            //MpEvents::SessionConnected -= OnSessionConnected;
+            //MpEvents::SessionDisconnected -= OnSessionDisconnected;
+            //MpEvents::PlayerConnected -= OnPlayerConnected;
+            //MpEvents::PlayerDisconnected -= OnPlayerDisconnected;
+            //MpEvents::StartingMultiplayerLevel -= OnStartingMultiplayerLevel;
+        }
+        #pragma endregion
+
+        #pragma region Events
+    private:
+        static void OnOnlineMenuOpened(Il2CppObject* sender, OnlineMenuOpenedEventArgs e)
+        {
+            Activity.InOnlineMenu = true;
+
+            HandleUpdate();
+        }
+        static void OnOnlineMenuClosed(Il2CppObject* sender, EventArgs e)
+        {
+            Activity.InOnlineMenu = false;
+
+            HandleUpdate();
+        }
+
+        static void OnMasterServerChanged(Il2CppObject* sender, MasterServerEndPoint endPoint)
+        {
+            Activity.MasterServer = endPoint;
+
+            HandleUpdate();
+        }
+
+        static void OnConnectionTypeChanged(Il2CppObject* sender, LobbyConnectionType connectionType)
+        {
+            if (Activity.ConnectionType == connectionType)
+                return;
+
+            Activity.ConnectionType = connectionType;
+
+            HandleUpdate();
+        }
+
+        static void OnLobbyStateChanged(Il2CppObject* sender, MultiplayerLobbyState lobbyState)
+        {
+            if (Activity.LobbyState == lobbyState)
+                return;
+
+            Activity.LobbyState = lobbyState;
+
+            if (Activity.LobbyState != MultiplayerLobbyState.None)
+                HandleUpdate();
+        }
+
+        static void OnServerCodeChanged(Il2CppObject* sender, string serverCode)
+        {
+            if (serverCode == Activity.ServerCode || String.IsNullOrEmpty(serverCode))
+                return;
+
+            Activity.ServerCode = serverCode;
+
+            HandleUpdate();
+        }
+
+        static void OnSessionConnected(Il2CppObject* sender, SessionConnectedEventArgs e)
+        {
+            Activity.SessionStartedAt = DateTime.Now;
+
+            if (e.MaxPlayers > 0)
+                Activity.MaxPlayerCount = e.MaxPlayers;
+
+            Activity.HostUserId = e.ConnectionOwner.userId;
+
+            if (Activity.Players == nullptr)
+                Activity.Players = new List<IConnectedPlayer>(e.MaxPlayers);
+            else
+                Activity.Players.Clear();
+
+            OnPlayerConnected(sender, e.LocalPlayer);
+            OnPlayerConnected(sender, e.ConnectionOwner);
+        }
+
+        static void OnSessionDisconnected(object sender, DisconnectedReason e)
+        {
+            Activity.ConnectionType = LobbyConnectionType.None;
+            Activity.LobbyState = MultiplayerLobbyState.None;
+            Activity.ServerCode = null;
+            Activity.HostUserId = null;
+            Activity.HostSecret = null;
+            Activity.IsDedicatedServer = false;
+            Activity.ServerConfiguration = null;
+            Activity.MaxPlayerCount = 0;
+            Activity.Players ? .Clear();
+            Activity.CurrentLevel = null;
+            Activity.CurrentDifficulty = null;
+            Activity.CurrentCharacteristic = null;
+            Activity.CurrentModifiers = null;
+            Activity.SessionStartedAt = null;
+
+            HandleUpdate();
+        }
+
+        static void OnPlayerConnected(Il2CppObject* sender, IConnectedPlayer player)
+        {
+            if (Activity.Players == null || Activity.Players.Any(p = > p.userId == player.userId))
+                return;
+
+            Activity.Players.Add(player);
+
+            HandleUpdate();
+        }
+
+        static void OnPlayerDisconnected(Il2CppObject* sender, IConnectedPlayer player)
+        {
+            if (Activity.Players == null)
+                return;
+
+            Activity.Players.Remove(player);
+
+            HandleUpdate();
+        }
+
+        static void OnBeforeConnectToServer(Il2CppObject* sender, ConnectToServerEventArgs e)
+        {
+            Activity.ServerCode = e.Code;
+            Activity.HostUserId = e.UserId;
+            Activity.HostSecret = e.Secret;
+            Activity.Endpoint = e.RemoteEndPoint;
+            Activity.IsDedicatedServer = e.IsDedicatedServer;
+            Activity.SelectionMask = e.SelectionMask;
+            Activity.ServerConfiguration = e.Configuration;
+            Activity.MaxPlayerCount = e.Configuration.maxPlayerCount;
+            Activity.ManagerId = e.ManagerId;
+
+            Activity.Players = new(Activity.MaxPlayerCount);
+
+            HandleUpdate();
+        }
+
+        static void OnStartingMultiplayerLevel(Il2CppObject* sender, StartingMultiplayerLevelEventArgs e)
+        {
+            Activity.CurrentLevel = e.BeatmapLevel;
+            Activity.CurrentDifficulty = e.Difficulty;
+            Activity.CurrentCharacteristic = e.Characteristic;
+            Activity.CurrentModifiers = e.Modifiers;
+
+            HandleUpdate();
+        }
+        #pragma endregion
+
+        #pragma region Update Action
+    public:
+        static void HandleUpdate(bool raiseEvent = true)
+        {
+            //Activity::Name = MpSession::GetHostGameName();
+
+            if (raiseEvent)
+                MpEvents::RaiseActivityUpdated(nullptr, Activity);
+
+            if (!CheckCanAnnounce())
+            {
+                // We are not able or allowed to announce right now
+                SetErrorState("Can't announce: you have to be the host, or be in a Quick Play game");
+                return;
+            }
+
+            if (!CheckToggleSwitch())
+            {
+                // The toggle switch is off, announce disabled
+                SetErrorState("Flip the switch to announce this game");
+                return;
+            }
+
+            // No objections, try announce now
+            try
+            {
+                auto lobbyAnnounce = GenerateAnnounce();
+
+                StatusText = "Announcing your game to the world...\r\n" + lobbyAnnounce.Describe();
+                HasErrored = false;
+
+                LobbyConfigPanel.UpdatePanelInstance();
+
+                // Send actual
+                DoAnnounce(lobbyAnnounce);
+            }
+            catch (const std::exception& e)
+            {
+                //Plugin.Log.Error($"[GameStateManager] Error in announce: {e}");
+                getLogger().error("[GameStateManager] Error in announce: %s", e.what());
+                SetErrorState("Error: could not send announce");
+            }
+        }
+
+        /// <summary>
+        /// Sets error state, removes any previous announces, and updates the UI.
+        /// </summary>
+        static void SetErrorState(std::string errorText, bool unAnnounce = true)
+        {
+            StatusText = il2cpp_utils::newcsstr(errorText);
+            HasErrored = true;
+
+            if (unAnnounce)
+                UnAnnounce();
+
+            LobbyConfigPanel->UpdatePanelInstance();
+        }
+
+        /// <summary>
+        /// Checks whether the local player can currently announce to the server browser.
+        /// </summary>
+        static bool CheckCanAnnounce()
+        {
+            if (Activity.ConnectionType is LobbyConnectionType.None or LobbyConnectionType.PartyClient)
+                // Not connected / not in a Quick Play game / not a host
+                return false;
+
+            if (Activity.ServerCode == nullptr || Activity.ConnectionOwner == nullptr)
+                // Need a server code and connection owner at minimum
+                return false;
+
+            // No objections
+            return true;
+        }
+
+        /// <summary>
+        /// Checks whether announces are enabled by the local player for the current lobby type.
+        /// </summary>
+        static bool CheckToggleSwitch()
+        {
+            if (Activity.IsQuickPlay)
+                return getPluginConfig().ShareQuickPlayGames.GetValue();
+                //return Plugin.Config.ShareQuickPlayGames;
+
+            return Plugin.Config.LobbyAnnounceToggle;
+        }
+
+        /// <summary>
+        /// Generates the announce payload for the master server API.
+        /// </summary>
+        static HostedGameData GenerateAnnounce() = > new()
+        {
+            ServerCode = Activity.ServerCode!,
+            GameName = MpSession.GetHostGameName(),
+            OwnerId = Activity.ConnectionOwner!.userId,
+            OwnerName = Activity.ConnectionOwner!.userName,
+            PlayerCount = Activity.CurrentPlayerCount,
+            PlayerLimit = Activity.MaxPlayerCount,
+            IsModded = Activity.IsModded,
+            LobbyState = Activity.LobbyState,
+            LevelId = Activity.CurrentLevel ? .levelID,
+            SongName = Activity.CurrentLevel ? .songName,
+            SongAuthor = Activity.CurrentLevel ? .songAuthorName,
+            Difficulty = Activity.DetermineLobbyDifficulty(),
+            Platform = MpLocalPlayer.PlatformId,
+            MasterServerHost = Activity.MasterServer.hostName,
+            MasterServerPort = Activity.MasterServer.port,
+            MpExVersion = ModCheck.MultiplayerExtensions.InstalledVersion,
+            ServerType = Activity.DetermineServerType(),
+            HostSecret = Activity.HostSecret,
+            Endpoint = Activity.Endpoint,
+            ManagerId = Activity.ManagerId,
+
+            Players = Activity.GetPlayersForAnnounce().ToList()
+        };
+        #pragma endregion
+
+        #pragma region Announce actions
+        static std::map<std::string, AnnounceState> announceStates;
+
+        /// <summary>
+        /// Sends a host announcement.
+        /// </summary>
+        static bool DoAnnounce(HostedGameData announce)
+        {
+            if (!announce.ServerCode)
+                return false;
+
+            // Get or initialize state
+            AnnounceState announceState;
+
+            if (!announceStates.contains(announce.ServerCode))
+            {
+                announceStates.emplace(announce.ServerCode, 
+                    {
+                        ServerCode = announce.ServerCode,
+                        OwnerId = announce.OwnerId,
+                        HostSecret = announce.HostSecret
+                    });
+            }
+
+            announceState = announceStates[announce.ServerCode];
+
+            // Try send announce
+            bool resultOk = false;
+
+            if (BSSBMasterAPI::Announce(announce))
+            {
+                announceState.DidAnnounce = true;
+                announceState.LastSuccess = DateTime.Now;
+
+                StatusText->set_text(il2cpp_utils::newcsstr(string_format("Players can now join from the browser!\r\n%s", to_utf8(csstrtostr(announce.Describe())).c_str())));
+                HasErrored = false;
+            }
+            else
+            {
+                announceState.DidFail = true;
+                announceState.LastFailure = DateTime.Now;
+
+                StatusText->set_text(il2cpp_utils::newcsstr("Could not announce to master server!"));
+                HasErrored = true;
+            }
+
+            LobbyConfigPanel->UpdatePanelInstance();
+            return resultOk;
+        }
+
+        /// <summary>
+        /// Ensures that any host announcements made by us previously are removed.
+        /// </summary>
+        static void UnAnnounce()
+        {
+            //for (int i = 0; i < _announceStates.Values.get_count(); i++) {
+            //    if (BSSBMasterAPI.UnAnnounce(state))
+            //}
+            
+            //foreach(var state in _announceStates.Values.ToArray())
+            //{
+            //    if (await BSSBMasterAPI.UnAnnounce(state))
+            //    {
+            //        _announceStates.Remove(state.ServerCode);
+            //    }
+            //}
+        }
+        #pragma endregion
+    };
+}

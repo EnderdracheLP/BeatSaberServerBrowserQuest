@@ -25,12 +25,14 @@ namespace ServerBrowser::Game {
 	//	static MasterServerEndPoint* _officialEndPoint;
 	//	static MasterServerEndPoint* _moddedEndPoint;
 	//	static bool _usingModdedServer;
-		static MasterServerEndPoint* OverrideEndPoint;
+	static SafePtr<MasterServerEndPoint> OverrideEndPoint;
+	//static std::pair<std::string, int> OverrideEndPoint;
 		//static bool ShouldDisableCertificateValidation;
 	public:
-		static MasterServerEndPoint* get_OverrideEndPoint();
+		static MasterServerEndPoint* const get_OverrideEndPoint();
 
-	static MasterServerEndPoint* LastUsedMasterServer;
+	static SafePtr<MasterServerEndPoint> LastUsedMasterServer;
+	//static std::pair<std::string, int> LastUsedMasterServer;
 	//	MasterServerEndPoint* get_LastUsedMasterServer();
 	//private:
 	//	void set_OverrideEndPoint(MasterServerEndPoint* NewOverrideEndPoint);

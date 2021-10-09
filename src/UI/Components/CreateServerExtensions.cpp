@@ -188,6 +188,7 @@ namespace ServerBrowser::UI::Components
     #pragma region UI Events
     void CreateServerExtensions::OnAddToBrowserChange(bool newValue)
     {
+        getPluginConfig().LobbyAnnounceToggle.SetValue(newValue);
         //Plugin.Config.LobbyAnnounceToggle = newValue;
 
         // Ensure the control is in sync

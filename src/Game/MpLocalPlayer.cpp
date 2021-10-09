@@ -27,7 +27,7 @@ namespace ServerBrowser::Game {
         }
     }
 
-    std::string MpLocalPlayer::get_PlatformId() {
+    const std::string MpLocalPlayer::get_PlatformId() {
         switch (get_Platform()) {
         case UserInfo::Platform::Oculus:
             return "oculus";

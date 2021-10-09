@@ -91,8 +91,8 @@ namespace ServerBrowser::Game {
         //    });
     }
     void MpSession::OnSessionDisconnected(GlobalNamespace::DisconnectedReason reason) {
-        std::string reasonStr = to_utf8(csstrtostr(System::Enum::GetName(csTypeOf(GlobalNamespace::DisconnectedReason), System::Enum::ToObject(csTypeOf(GlobalNamespace::DisconnectedReason), reason.value))));
-        getLogger().info("Multiplayer session is now disconnected (%s).", reasonStr.c_str());
+        //std::string reasonStr = to_utf8(csstrtostr(System::Enum::GetName(csTypeOf(GlobalNamespace::DisconnectedReason), System::Enum::ToObject(csTypeOf(GlobalNamespace::DisconnectedReason), reason.value))));
+        getLogger().info("Multiplayer session is now disconnected (%d).", reason.value /*reasonStr.c_str()*/);
 
         IsConnected = false;
         DisconnectedReason = reason;

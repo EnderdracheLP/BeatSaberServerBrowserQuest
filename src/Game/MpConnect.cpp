@@ -7,7 +7,9 @@ namespace ServerBrowser::Game {
 	void MpConnect::Join(HostedGameData game) {
 		// MQE Version check
 		if (game.get_MpExVersion().has_value()) {
-			std::string ourMQE_Version = "Undefined";
+			//std::string ourMQE_Version = "Undefined";
+			std::string ourMQE_Version = "0.6.1";
+
 
 			//semver::version checkRange2{ ourMQE_Version };
 			//checkRange2.minor++;
@@ -86,16 +88,21 @@ namespace ServerBrowser::Game {
 
 #pragma region Master Server Management
 
-	MasterServerEndPoint* MpConnect::OverrideEndPoint;
+	//std::pair<std::string, int> MpConnect::OverrideEndPoint;
 
-	MasterServerEndPoint* MpConnect::LastUsedMasterServer;
+	//std::pair<std::string, int> MpConnect::LastUsedMasterServer;
 
-	MasterServerEndPoint* MpConnect::get_OverrideEndPoint() {
-		return OverrideEndPoint;
+	SafePtr<MasterServerEndPoint> MpConnect::OverrideEndPoint;
+
+	SafePtr<MasterServerEndPoint> MpConnect::LastUsedMasterServer;
+
+	MasterServerEndPoint* const MpConnect::get_OverrideEndPoint() {
+		//return MasterServerEndPoint::New_ctor(il2cpp_utils::newcsstr(OverrideEndPoint.first), OverrideEndPoint.second)
+		return static_cast<MasterServerEndPoint*>(OverrideEndPoint);
 	}
 
 	//MasterServerEndPoint* MpConnect::get_LastUsedMasterServer() {
-
+	//	return MasterServerEndPoint::New_ctor(il2cpp_utils::newcsstr(LastUsedMasterServer.first), LastUsedMasterServer.second)
 	//}
 	//void MpConnect::set_OverrideEndPoint(MasterServerEndPoint* NewOverrideEndPoint) {
 
@@ -106,7 +113,7 @@ namespace ServerBrowser::Game {
 
 	bool MpConnect::get_ShouldDisableCertificateValidation() {
 		// We should disable certificate validation (X509CertificateUtilityPatch) if we are overriding to unofficial masters
-		return OverrideEndPoint != nullptr && !OverrideEndPoint->hostName->EndsWith(il2cpp_utils::newcsstr(OFFICIAL_MASTER_SUFFIX));
+		return OverrideEndPoint && !OverrideEndPoint->hostName->EndsWith(il2cpp_utils::newcsstr(OFFICIAL_MASTER_SUFFIX));
 	}
 
 	void MpConnect::ReportCurrentMasterServerValue(MasterServerEndPoint* currentEndPoint) {
@@ -114,7 +121,7 @@ namespace ServerBrowser::Game {
 
 		LastUsedMasterServer = currentEndPoint;
 
-		if (OverrideEndPoint && currentEndPoint->Equals(OverrideEndPoint))
+		if (OverrideEndPoint && currentEndPoint == static_cast<MasterServerEndPoint*>(OverrideEndPoint)/*currentEndPoint->Equals(OverrideEndPoint)*/)
 		{
 			// This is our own override, not useful information
 			return;
@@ -154,12 +161,12 @@ namespace ServerBrowser::Game {
 	void MpConnect::SetMasterServerOverride(MasterServerEndPoint* overrideEndPoint) {
 		if (!OverrideEndPoint || !OverrideEndPoint->Equals(overrideEndPoint))
 		{
-			gc_free_specific(OverrideEndPoint);
+			il2cpp_functions::GC_free(static_cast<MasterServerEndPoint*>(OverrideEndPoint));
 			getLogger().info("Setting master server override now: %s", to_utf8(csstrtostr(overrideEndPoint->ToString())).c_str());
 			OverrideEndPoint = overrideEndPoint;
 		}
 		else {
-			gc_free_specific(overrideEndPoint);
+			il2cpp_functions::GC_free(overrideEndPoint);
 		}
 	}
 
@@ -167,7 +174,7 @@ namespace ServerBrowser::Game {
 		if (OverrideEndPoint)
 		{
 			getLogger().info("Stopped overriding master server");
-			gc_free_specific(OverrideEndPoint);
+			il2cpp_functions::GC_free(static_cast<MasterServerEndPoint*>(OverrideEndPoint));
 			OverrideEndPoint = nullptr;
 		}
 	}

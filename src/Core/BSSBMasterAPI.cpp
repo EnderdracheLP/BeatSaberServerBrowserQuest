@@ -1,10 +1,12 @@
 #include "main.hpp"
 #include "Core/BSSBMasterAPI.hpp"
 //#include "Core/HostedGameFilters.hpp"
+#include "Game/MpLocalPlayer.hpp"
 
 #include "Utils/WebUtils.hpp"
 
 #include "Core/Exceptions.hpp"
+using ServerBrowser::Game::MpLocalPlayer;
 
 #define BASE_URL std::string("https://bssb.app/api/v1")
 #define FILE_DOWNLOAD_TIMEOUT 64
@@ -44,10 +46,11 @@ namespace ServerBrowser::Core {
 
     void BSSBMasterAPI::BrowseAsync(int offset, /*HostedGameFilters filters,*/ std::function<void(std::optional<ServerBrowser::Core::ServerBrowserResult>)> finished) {
         exception.clear();
-        std::string browsePath = BASE_URL + "/browse?platform=" + /*MpLocalPlayer::get_PlatformId()*/"oculus";
+        std::string browsePath = BASE_URL + "/browse?platform=" + MpLocalPlayer::get_PlatformId();
         if (offset > 0)browsePath += "&offset=" + std::to_string(offset);
         //if (filterFull > 0) browsePath += "&filterFull=" + /*std::to_string(filterFull)*/"0";
         //if (vanilla > 0) browsePath += "&vanilla=" + /*std::to_string(vanilla)*/"0";
+        //browsePath += "&vanilla=1";
         getLogger().debug("browsePath is: %s", browsePath.c_str());
         WebUtils::GetJSONAsync(browsePath,
             [finished](long httpCode, bool error, rapidjson::Document& document) {
@@ -98,7 +101,7 @@ namespace ServerBrowser::Core {
         if (coverURL.has_value()) {
             std::string URL = coverURL.value();
             URL.erase(remove(URL.begin(), URL.end(), '\\'), URL.end());
-            getLogger().debug("CoverURL is: %s", URL.c_str());
+            //getLogger().debug("CoverURL is: %s", URL.c_str());
             WebUtils::GetAsync(URL, FILE_DOWNLOAD_TIMEOUT,
                 [lobby, finished](long httpCode, std::string data) {
                     std::vector<uint8_t> bytes(data.begin(), data.end());

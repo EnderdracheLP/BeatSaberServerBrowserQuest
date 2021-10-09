@@ -2,9 +2,12 @@
 using GlobalNamespace::ConnectionFailedReason;
 
 namespace ServerBrowser::Utils {
-    std::string ConnectionErrorText::Generate(GlobalNamespace::ConnectionFailedReason reason) {
+    const std::string ConnectionErrorText::Generate(GlobalNamespace::ConnectionFailedReason reason) {
         int reasonInt = reason.value;
+        //std::string reasonStr = to_utf8(csstrtostr(reinterpret_cast<System::Enum*>(&reason)->ToString()));
+        //getLogger().debug("Reason: %s", reasonStr.c_str());
         //std::string reasonStr = to_utf8(csstrtostr(System::Enum::GetName(csTypeOf(GlobalNamespace::ConnectionFailedReason), System::Enum::ToObject(reason.value))));
+        //std::string msg = string_format("Error CFR-%d (%s)", reasonInt, reasonStr.c_str());
         std::string msg = string_format("Error CFR-%d", reasonInt);
         
         switch (reason)

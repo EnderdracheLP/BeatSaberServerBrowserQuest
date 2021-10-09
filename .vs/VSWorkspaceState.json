@@ -1,16 +1,16 @@
 {
   "ExpandedNodes": [
     "",
-    "\\extern",
-    "\\extern\\codegen\\include",
-    "\\extern\\codegen\\include\\LiteNetLib",
-    "\\extern\\config-utils",
-    "\\extern\\config-utils\\shared",
+    "\\include",
+    "\\include\\Utils",
+    "\\shared",
+    "\\shared\\Core",
+    "\\shared\\Game",
+    "\\shared\\Game\\Models",
     "\\src",
+    "\\src\\Core",
     "\\src\\Game",
-    "\\src\\UI",
-    "\\src\\UI\\Components"
+    "\\src\\Utils"
   ],
-  "SelectedNode": "\\src\\main.cpp",
   "PreviewInSolutionExplorer": false
 }

@@ -107,8 +107,8 @@ namespace ServerBrowser::UI::Components {
         auto game = _cellInfo.get_Game();
 
         if (coverImage && !CoverImageSet) {
-            getLogger().debug("Running SetCoverArt in HostedGameCellExtensions");
-            getLogger().debug("LobbyState is: %d", game.get_LobbyState());
+            //getLogger().debug("Running SetCoverArt in HostedGameCellExtensions");
+            //getLogger().debug("LobbyState is: %d", game.get_LobbyState());
             if (!game.get_LevelId().has_value() || game.get_LobbyState() != MultiplayerLobbyState::GameRunning) {
                 // No level info / we are in a lobby
                 getLogger().info("No level info, assuming they're in a lobby");

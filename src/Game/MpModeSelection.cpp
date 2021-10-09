@@ -88,9 +88,6 @@ namespace ServerBrowser::Game {
 			game->get_HostSecret()->c_str(),
 			game->get_ServerType()->c_str(),
 			game->get_Id());
-		//Plugin.Log.Info("--> Connecting to lobby destination now" +
-		//	$" (ServerCode={game->ServerCode}, HostSecret={game->HostSecret}," +
-		//	$" ServerType={game->ServerType}, ServerBrowserId={game->Id})");
 
 		_flowCoordinator->joiningLobbyCancellationTokenSource = THROW_UNLESS(il2cpp_utils::New<CancellationTokenSource*>());
 

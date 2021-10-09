@@ -162,6 +162,7 @@ SERIALIZE_STRING_METHOD(ServerBrowser::Core, HostedGameData,
 	//SERIALIZE_VALUE_OPTIONAL(MpExVersion, mpExVersion)
 	if (MpExVersion.has_value())
 		doc.AddMember("mpExVersion", MpExVersion->to_string(), alloc);
+	SERIALIZE_VALUE(ModName, modName)
 	rapidjson::Value modVer(rapidjson::kObjectType);
 	modVer.PushBack(ModVersion.major, alloc).PushBack(ModVersion.minor, alloc).PushBack(ModVersion.patch, alloc);
 	if (ModVersion.prerelease_number > 0) modVer.PushBack(ModVersion.prerelease_number, alloc);
@@ -206,6 +207,7 @@ SERIALIZE_STRING_METHOD(ServerBrowser::Core, HostedGameData,
 			if (jsonValue.HasMember("mpExVersion") && jsonValue["mpExVersion"].IsString()) {
 				MpExVersion = semver::from_string_noexcept(jsonValue["mpExVersion"].GetString());
 			}
+			DESERIALIZE_VALUE(ModName, modName, String)
 			if (jsonValue.HasMember("modVersion") && jsonValue["modVersion"].IsObject()) {
 				auto modVer = jsonValue["modVersion"].GetObject();
 				ModVersion.major = modVer["major"].GetInt();

@@ -1,3 +1,4 @@
+#pragma once
 #include "GlobalNamespace/LocalNetworkPlayerModel.hpp"
 #include "GlobalNamespace/UserInfo.hpp"
 
@@ -13,7 +14,7 @@ namespace ServerBrowser::Game {
 
         static GlobalNamespace::UserInfo::Platform get_Platform();
 
-        static std::string get_PlatformId();
+        static const std::string get_PlatformId();
 
         static void SetUp();
     };

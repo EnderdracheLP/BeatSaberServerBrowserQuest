@@ -95,6 +95,11 @@ if(jsonValue.HasMember(#jsonName) && jsonValue[#jsonName].Is##type()) { \
     name = std::nullopt; \
 }
 
+#define DESERIALIZE_VALUE_STRING(name, jsonName) \
+if(jsonValue.HasMember(#jsonName) && jsonValue[#jsonName].IsString()) { \
+    name = jsonValue[#jsonName].GetString(); \
+} else name.clear();
+
 #define DESERIALIZE_CLASS(name, jsonName) \
 if (!jsonValue.HasMember(#jsonName)) throw ServerBrowser::JsonException(ServerBrowser::Exceptions::NoMember, #jsonName); \
 if (!jsonValue[#jsonName].IsObject()) throw ServerBrowser::JsonException(ServerBrowser::Exceptions::WrongType, #jsonName ", Type expected was: JsonObject"); \
