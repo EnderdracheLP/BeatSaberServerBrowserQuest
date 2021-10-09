@@ -4,13 +4,15 @@
     "\\include",
     "\\include\\Utils",
     "\\shared",
-    "\\shared\\Core",
     "\\shared\\Game",
     "\\shared\\Game\\Models",
     "\\src",
+    "\\src\\Assets",
     "\\src\\Core",
     "\\src\\Game",
+    "\\src\\UI",
     "\\src\\Utils"
   ],
+  "SelectedNode": "\\src\\Core\\ServerBrowserResult.cpp",
   "PreviewInSolutionExplorer": false
 }

@@ -98,7 +98,9 @@ namespace ServerBrowser::Game {
 
 	MasterServerEndPoint* const MpConnect::get_OverrideEndPoint() {
 		//return MasterServerEndPoint::New_ctor(il2cpp_utils::newcsstr(OverrideEndPoint.first), OverrideEndPoint.second)
-		return static_cast<MasterServerEndPoint*>(OverrideEndPoint);
+		if (OverrideEndPoint)
+			return static_cast<MasterServerEndPoint*>(OverrideEndPoint);
+		else return nullptr;
 	}
 
 	//MasterServerEndPoint* MpConnect::get_LastUsedMasterServer() {
