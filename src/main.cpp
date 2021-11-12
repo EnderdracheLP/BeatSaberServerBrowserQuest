@@ -390,20 +390,20 @@ MAKE_HOOK_MATCH(NetworkConfigSO_get_masterServerEndPoint, &NetworkConfigSO::get_
     return result;
 }
 
-MAKE_HOOK_MATCH(BGNetDebug_Log, &GlobalNamespace::BGNetDebug::Log, void, Il2CppString* message) {
-    getLogger().WithContext("BGNetDebug::Log").debug("%s", to_utf8(csstrtostr(message)).c_str());
-    BGNetDebug_Log(message);
-}
-
-MAKE_HOOK_MATCH(BGNetDebug_LogError, &GlobalNamespace::BGNetDebug::LogError, void, Il2CppString* message) {
-    getLogger().WithContext("BGNetDebug::LogError").error("%s", to_utf8(csstrtostr(message)).c_str());
-    BGNetDebug_LogError(message);
-}
-
-MAKE_HOOK_MATCH(BGNetDebug_LogWarning, &GlobalNamespace::BGNetDebug::LogWarning, void, Il2CppString* message) {
-    getLogger().WithContext("BGNetDebug::LogWarning").warning("%s", to_utf8(csstrtostr(message)).c_str());
-    BGNetDebug_LogWarning(message);
-}
+//MAKE_HOOK_MATCH(BGNetDebug_Log, &GlobalNamespace::BGNetDebug::Log, void, Il2CppString* message) {
+//    getLogger().WithContext("BGNetDebug::Log").debug("%s", to_utf8(csstrtostr(message)).c_str());
+//    BGNetDebug_Log(message);
+//}
+//
+//MAKE_HOOK_MATCH(BGNetDebug_LogError, &GlobalNamespace::BGNetDebug::LogError, void, Il2CppString* message) {
+//    getLogger().WithContext("BGNetDebug::LogError").error("%s", to_utf8(csstrtostr(message)).c_str());
+//    BGNetDebug_LogError(message);
+//}
+//
+//MAKE_HOOK_MATCH(BGNetDebug_LogWarning, &GlobalNamespace::BGNetDebug::LogWarning, void, Il2CppString* message) {
+//    getLogger().WithContext("BGNetDebug::LogWarning").warning("%s", to_utf8(csstrtostr(message)).c_str());
+//    BGNetDebug_LogWarning(message);
+//}
 
 MAKE_HOOK_MATCH(PlatformAuthenticationTokenProvider_GetAuthenticationToken, &PlatformAuthenticationTokenProvider::GetAuthenticationToken, System::Threading::Tasks::Task_1<GlobalNamespace::AuthenticationToken>*, PlatformAuthenticationTokenProvider* self)
 {
@@ -436,7 +436,8 @@ extern "C" void load() {
     WebUtils::GameVersion = to_utf8(csstrtostr(UnityEngine::Application::get_version()));
     getLogger().info("Installing hooks...");
     INSTALL_HOOK(getLogger(), MultiplayerModeSelectionViewController_DidActivate);
-    INSTALL_HOOK(getLogger(), CreateServerViewController_DidActivate);
+    // TODO: Re-enable this hook once Lobby Announcing is done
+    //INSTALL_HOOK(getLogger(), CreateServerViewController_DidActivate);
     INSTALL_HOOK(getLogger(), MultiplayerModeSelectionFlowCoordinator_HandleMultiplayerLobbyControllerDidFinish);
     INSTALL_HOOK(getLogger(), MultiplayerModeSelectionFlowCoordinator_PresentConnectionErrorDialog);
     INSTALL_HOOK(getLogger(), PacketEncryptionLayer_ProcessOutBoundPacketInternal);
@@ -450,8 +451,8 @@ extern "C" void load() {
         INSTALL_HOOK(getLogger(), PlatformAuthenticationTokenProvider_GetAuthenticationToken);
     }
 
-    INSTALL_HOOK(getLogger(), BGNetDebug_Log);
-    INSTALL_HOOK(getLogger(), BGNetDebug_LogError);
-    INSTALL_HOOK(getLogger(), BGNetDebug_LogWarning);
+    //INSTALL_HOOK(getLogger(), BGNetDebug_Log);
+    //INSTALL_HOOK(getLogger(), BGNetDebug_LogError);
+    //INSTALL_HOOK(getLogger(), BGNetDebug_LogWarning);
     getLogger().info("Installed all hooks!");
 }

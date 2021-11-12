@@ -1,8 +1,6 @@
 {
   "ExpandedNodes": [
     "",
-    "\\include",
-    "\\include\\Utils",
     "\\shared",
     "\\shared\\Game",
     "\\shared\\Game\\Models",
@@ -13,6 +11,5 @@
     "\\src\\UI",
     "\\src\\Utils"
   ],
-  "SelectedNode": "\\src\\Core\\ServerBrowserResult.cpp",
   "PreviewInSolutionExplorer": false
 }
