@@ -5,10 +5,12 @@ using ServerBrowser::Game::MpModeSelection;
 namespace ServerBrowser::Game {
 
 	void MpConnect::Join(HostedGameData game) {
+		getLogger().debug("MpConnect::Join");
 		// MQE Version check
 		if (game.get_MpExVersion().has_value()) {
+			getLogger().debug("MpConnect::Join MpEx Check");
 			//std::string ourMQE_Version = "Undefined";
-			std::string ourMQE_Version = "0.6.1";
+			std::string ourMQE_Version = "0.6.2";
 
 
 			//semver::version checkRange2{ ourMQE_Version };
@@ -39,9 +41,10 @@ namespace ServerBrowser::Game {
 				return;
 			}
 		}
-
+		getLogger().debug("MpConnect::Join Passed MQE version check");
 		// Master server switching
 		if (!game.get_MasterServerHost().has_value() || game.get_MasterServerHost()->ends_with(OFFICIAL_MASTER_SUFFIX)) {
+			getLogger().debug("MpConnect::Join Official Server, this should never run");
 			// Game is hosted on the player platform's official master server
 			//if (_usingModdedServer || !_officialEndPoint) {
 			//	 If we normally use a modded server (e.g. because BeatTogether is installed), we need to now force-connect to our official server
@@ -78,10 +81,13 @@ namespace ServerBrowser::Game {
 		}
 		else
 		{
+			getLogger().debug("MpConnect::Join MasterServer is not offical, overrides will not work, hopefully this is BeatTogether Master");
 			// Game is hosted on a custom master server, we need to override
-			SetMasterServerOverride(game.get_MasterServerHost().value(), game.get_MasterServerPort() != 0 ? game.get_MasterServerPort() : DEFAULT_MASTER_PORT);
+			// We skip this for now as it's unlikely to see anything outside of BT to be used
+			//SetMasterServerOverride(game.get_MasterServerHost().value(), game.get_MasterServerPort() != 0 ? game.get_MasterServerPort() : DEFAULT_MASTER_PORT);
 		}
 
+		getLogger().debug("MpConnect::Join Trigger join");
 		// Trigger the actual join via server code
 		MpModeSelection::ConnectToHostedGame(game);
 	}
