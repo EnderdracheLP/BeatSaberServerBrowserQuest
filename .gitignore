@@ -49,3 +49,4 @@ Android.mk.backup
 qpm.shared.json
 /.vs/BeatSaberServerBrowserQuest/v16
 *.sqlite
+*.qmod

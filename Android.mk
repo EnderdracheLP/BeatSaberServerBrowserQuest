@@ -68,7 +68,7 @@ LOCAL_SHARED_LIBRARIES += custom-types
 LOCAL_SHARED_LIBRARIES += codegen
 LOCAL_STATIC_LIBRARIES += curl
 LOCAL_LDLIBS += -llog -lz
-LOCAL_CFLAGS += -I'extern/libil2cpp/il2cpp/libil2cpp' -DID='"ServerBrowserQuest"' -DVERSION='"0.1.0"' -I'./shared' -I'./extern' -isystem'extern/codegen/include'
+LOCAL_CFLAGS += -I'extern/libil2cpp/il2cpp/libil2cpp' -DID='"ServerBrowserQuest"' -DVERSION='"$(VERSION)"' -I'./shared' -I'./extern' -isystem'extern/codegen/include'
 LOCAL_CPPFLAGS += -std=c++2a
 LOCAL_C_INCLUDES += ./include ./src ./shared
 include $(BUILD_SHARED_LIBRARY)
