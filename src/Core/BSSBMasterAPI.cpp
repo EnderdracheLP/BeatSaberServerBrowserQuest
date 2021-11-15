@@ -59,10 +59,10 @@ namespace ServerBrowser::Core {
                 }
                 else {
                     try {
-                        rapidjson::StringBuffer buffer;
-                        rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-                        document.Accept(writer);
-                        writefile("/sdcard/ModData/ServerBrowser_Browse.json", buffer.GetString());
+                        //rapidjson::StringBuffer buffer;
+                        //rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+                        //document.Accept(writer);
+                        //writefile("/sdcard/ModData/ServerBrowser_Browse.json", buffer.GetString());
 
                         ServerBrowser::Core::ServerBrowserResult page;
                         page.Deserialize(document.GetObject());
