@@ -31,15 +31,4 @@ DECLARE_CLASS_CODEGEN(ServerBrowser::UI::ViewControllers, ServerBrowserViewContr
     DECLARE_INSTANCE_METHOD(void, SetInitialUiState);
     DECLARE_INSTANCE_METHOD(void, CancelImageLoading, bool reset = true);
     DECLARE_INSTANCE_METHOD(void, ClearSelection);
-
-    #if defined(BS__1_16) && defined(REGISTER_FUNCTION)
-    REGISTER_FUNCTION(
-    #elif defined(BS__1_13_2)
-    REGISTER_FUNCTION(ServerBrowserController,
-    #endif
-    #if defined(REGISTER_METHOD)
-        REGISTER_METHOD(DidActivate);
-        REGISTER_METHOD(DidDeactivate);
-    )
-#endif
 );

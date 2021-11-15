@@ -10,7 +10,7 @@ namespace ServerBrowser::Game {
 		if (game.get_MpExVersion().has_value()) {
 			getLogger().debug("MpConnect::Join MpEx Check");
 			//std::string ourMQE_Version = "Undefined";
-			std::string ourMQE_Version = "0.6.2";
+			std::string ourMQE_Version = (Modloader::getMods().find("multiquestensions") != Modloader::getMods().end()) ? "0.6.2" : "";
 
 
 			//semver::version checkRange2{ ourMQE_Version };
@@ -25,7 +25,7 @@ namespace ServerBrowser::Game {
 
 				std::string MQE_Error(string_format(
 					"MultiQuestensions/MultiplayerExtensions version difference detected!\r\n"
-					"Please ensure you and the host are both using the latest version.\r\n"
+					"Please ensure you and the host are both using a compatible version.\r\n"
 					"\r\n"
 					"Your version: %s\r\n"
 					"Their version: %s",
@@ -41,10 +41,9 @@ namespace ServerBrowser::Game {
 				return;
 			}
 		}
-		getLogger().debug("MpConnect::Join Passed MQE version check");
 		// Master server switching
 		if (!game.get_MasterServerHost().has_value() || game.get_MasterServerHost()->ends_with(OFFICIAL_MASTER_SUFFIX)) {
-			getLogger().debug("MpConnect::Join Official Server, this should never run");
+			getLogger().error("MpConnect::Join Official Server, this should never run!!!");
 			// Game is hosted on the player platform's official master server
 			//if (_usingModdedServer || !_officialEndPoint) {
 			//	 If we normally use a modded server (e.g. because BeatTogether is installed), we need to now force-connect to our official server
@@ -57,8 +56,6 @@ namespace ServerBrowser::Game {
 			//		SetMasterServerOverride(OFFICIAL_MASTER_OCULUS);
 			//		break;
 			//	case UserInfo.Platform.PS4:
-			//		// lmao
-			//		// Yeah lol, as if that would ever be used
 			//		SetMasterServerOverride(OFFICIAL_MASTER_PS4);
 			//		break;
 			//	case UserInfo.Platform.Test:
@@ -83,8 +80,7 @@ namespace ServerBrowser::Game {
 		{
 			getLogger().debug("MpConnect::Join MasterServer is not offical, overrides will not work, hopefully this is BeatTogether Master");
 			// Game is hosted on a custom master server, we need to override
-			// We skip this for now as it's unlikely to see anything outside of BT to be used
-			//SetMasterServerOverride(game.get_MasterServerHost().value(), game.get_MasterServerPort() != 0 ? game.get_MasterServerPort() : DEFAULT_MASTER_PORT);
+			SetMasterServerOverride(game.get_MasterServerHost().value(), game.get_MasterServerPort() != 0 ? game.get_MasterServerPort() : DEFAULT_MASTER_PORT);
 		}
 
 		getLogger().debug("MpConnect::Join Trigger join");
@@ -163,18 +159,19 @@ namespace ServerBrowser::Game {
 
 	void MpConnect::SetMasterServerOverride(std::string hostName, int port) {
 		if (!classof(MasterServerEndPoint*)->initialized) il2cpp_functions::Class_Init(classof(MasterServerEndPoint*)); // This is needed in order to initialize the Il2CppClass
-		SetMasterServerOverride(MasterServerEndPoint::New_ctor<il2cpp_utils::CreationType::Manual>(il2cpp_utils::newcsstr(hostName), port));
+		//SetMasterServerOverride(MasterServerEndPoint::New_ctor<il2cpp_utils::CreationType::Manual>(il2cpp_utils::newcsstr(hostName), port));
+		SetMasterServerOverride(MasterServerEndPoint::New_ctor(il2cpp_utils::newcsstr(hostName), port));
 	}
 
 	void MpConnect::SetMasterServerOverride(MasterServerEndPoint* overrideEndPoint) {
 		if (!OverrideEndPoint || !OverrideEndPoint->Equals(overrideEndPoint))
 		{
-			il2cpp_functions::GC_free(static_cast<MasterServerEndPoint*>(OverrideEndPoint));
+			//il2cpp_functions::GC_free(static_cast<MasterServerEndPoint*>(OverrideEndPoint));
 			getLogger().info("Setting master server override now: %s", to_utf8(csstrtostr(overrideEndPoint->ToString())).c_str());
 			OverrideEndPoint = overrideEndPoint;
 		}
 		else {
-			il2cpp_functions::GC_free(overrideEndPoint);
+			//il2cpp_functions::GC_free(overrideEndPoint);
 		}
 	}
 
@@ -182,7 +179,7 @@ namespace ServerBrowser::Game {
 		if (OverrideEndPoint)
 		{
 			getLogger().info("Stopped overriding master server");
-			il2cpp_functions::GC_free(static_cast<MasterServerEndPoint*>(OverrideEndPoint));
+			//il2cpp_functions::GC_free(static_cast<MasterServerEndPoint*>(OverrideEndPoint));
 			OverrideEndPoint = nullptr;
 		}
 	}

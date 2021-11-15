@@ -414,20 +414,20 @@ namespace ServerBrowser::UI::ViewControllers {
     }
 
     void ServerBrowserViewController::CancelImageLoading(bool reset) {
-        try {
-            if (_imageLoadCancellation != nullptr)
-            {
-                _imageLoadCancellation->Cancel();
-                _imageLoadCancellation->Dispose();
-            }
-        } catch (...) { }
+        // Not used here in the Quest port
+        //try {
+        //    if (_imageLoadCancellation)
+        //    {
+        //        _imageLoadCancellation->Cancel();
+        //        _imageLoadCancellation->Dispose();
+        //    }
+        //} catch (...) { }
 
-        _imageLoadCancellation = nullptr;
-
-        if (reset)
-        {
-            _imageLoadCancellation = THROW_UNLESS(il2cpp_utils::New<System::Threading::CancellationTokenSource*>());
-        }
+        //_imageLoadCancellation = nullptr;
+        //if (reset)
+        //{
+        //    _imageLoadCancellation = System::Threading::CancellationTokenSource::New_ctor()/*THROW_UNLESS(il2cpp_utils::New<System::Threading::CancellationTokenSource*>())*/;
+        //}
     }
 
     void ServerBrowserViewController::ClearSelection()
