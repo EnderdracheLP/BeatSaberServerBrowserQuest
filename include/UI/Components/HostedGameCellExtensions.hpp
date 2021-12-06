@@ -20,10 +20,7 @@ namespace ServerBrowser::UI::Components {
 }
 
 DECLARE_CLASS_CODEGEN(ServerBrowser::UI::Components, HostedGameCellExtensions, UnityEngine::MonoBehaviour,
-    bool enabled = false;
-
     DECLARE_INSTANCE_FIELD(HMUI::SelectableCell*, _cell);
-    HostedGameCellData _cellInfo;
 
     DECLARE_INSTANCE_FIELD(HMUI::ImageView*, background);
     DECLARE_INSTANCE_FIELD(HMUI::ImageView*, coverImage);
@@ -38,6 +35,9 @@ DECLARE_CLASS_CODEGEN(ServerBrowser::UI::Components, HostedGameCellExtensions, U
     DECLARE_INSTANCE_FIELD(HMUI::CurvedTextMeshPro*, SongTime);
     DECLARE_INSTANCE_FIELD(HMUI::CurvedTextMeshPro*, SongBpm);
     DECLARE_INSTANCE_FIELD(HMUI::ImageView*, BpmIcon);
+
+    bool enabled = false;
+    HostedGameCellData _cellInfo;
 
     public:
     void Configure(HMUI::SelectableCell* cell, HostedGameCellData* cellInfo);

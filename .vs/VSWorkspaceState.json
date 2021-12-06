@@ -1,16 +1,15 @@
 {
   "ExpandedNodes": [
     "",
-    "\\shared",
-    "\\shared\\Game",
-    "\\shared\\Game\\Models",
+    "\\include",
+    "\\include\\Game",
+    "\\include\\UI",
+    "\\include\\UI\\Components",
+    "\\include\\Utils",
+    "\\include\\Utils\\Sprites",
     "\\src",
-    "\\src\\Assets",
-    "\\src\\Core",
-    "\\src\\Game",
     "\\src\\UI",
-    "\\src\\Utils"
+    "\\src\\UI\\Components"
   ],
-  "SelectedNode": "\\log_unstripped.log",
   "PreviewInSolutionExplorer": false
 }

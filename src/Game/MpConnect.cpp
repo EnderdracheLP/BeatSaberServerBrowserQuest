@@ -125,7 +125,7 @@ namespace ServerBrowser::Game {
 
 		LastUsedMasterServer = currentEndPoint;
 
-		if (OverrideEndPoint && currentEndPoint == static_cast<MasterServerEndPoint*>(OverrideEndPoint)/*currentEndPoint->Equals(OverrideEndPoint)*/)
+		if (OverrideEndPoint && csstrtostr(currentEndPoint->ToString()) == csstrtostr(OverrideEndPoint->ToString())/*currentEndPoint->Equals(OverrideEndPoint)*/)
 		{
 			// This is our own override, not useful information
 			return;
@@ -164,7 +164,7 @@ namespace ServerBrowser::Game {
 	}
 
 	void MpConnect::SetMasterServerOverride(MasterServerEndPoint* overrideEndPoint) {
-		if (!OverrideEndPoint || !OverrideEndPoint->Equals(overrideEndPoint))
+		if (!OverrideEndPoint || !(csstrtostr(OverrideEndPoint->ToString()) == csstrtostr(overrideEndPoint->ToString())))
 		{
 			//il2cpp_functions::GC_free(static_cast<MasterServerEndPoint*>(OverrideEndPoint));
 			getLogger().info("Setting master server override now: %s", to_utf8(csstrtostr(overrideEndPoint->ToString())).c_str());

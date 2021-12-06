@@ -20,6 +20,8 @@ namespace ServerBrowser::UI::Components
 
         addToBrowserSetting = CreateToggle("Add to Server Browser", get_AddToBrowserValue(), [this](bool newValue) { OnAddToBrowserChange(newValue); });
         serverNameSetting = CreateTextInput("Server Name - " + Game::MpSession::GetDefaultHostGameName(), get_ServerNameValue(), [this](std::string_view newValue) { OnServerNameChange(newValue.data()); });
+
+        CreateExtraText();
     }
 
     void CreateServerExtensions::OnEnable()
@@ -170,6 +172,20 @@ namespace ServerBrowser::UI::Components
         //editIcon.transform.localScale = new Vector3(-1.0f, -1.0f, 1.0f);
 
         return stringSetting;
+    }
+
+    TMPro::TextMeshProUGUI* CreateServerExtensions::CreateExtraText(std::string initialText)
+    {
+        auto textTagObject = BeatSaberUI::CreateText(formView, initialText);
+
+        textTagObject->get_rectTransform()->set_offsetMin({ 0.0f, -30.0f });
+        textTagObject->get_rectTransform()->set_offsetMax({ 90.0f, -30.0f });
+        textTagObject->get_rectTransform()->set_sizeDelta({ 90.0f, 15.0f });
+        textTagObject->set_alignment(TMPro::TextAlignmentOptions::Center);
+        textTagObject->set_fontSize(4.0f);
+        textTagObject->set_extraPadding(true);
+
+        return textTagObject;
     }
 
     void CreateServerExtensions::ReApplyVerticalLayout(bool extraHeight)
