@@ -1,0 +1,19 @@
+﻿{
+  "configurations": [
+    {
+      "name": "arm64-v8a-Debug",
+      "generator": "Ninja",
+      "configurationType": "RelWithDebInfo",
+      "buildRoot": "${projectDir}\\build",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeExecutable": "C:\\Program Files\\CMake\\bin\\cmake.exe",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "cmakeToolchain": "%NdkPath%/build/cmake/android.toolchain.cmake",
+      "variables": [
+      ],
+      "intelliSenseMode": "android-clang-arm64"
+    }
+  ]
+}

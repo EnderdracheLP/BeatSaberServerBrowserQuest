@@ -1,36 +1,59 @@
 Param (
-[Parameter(HelpMessage="The version the mod should be compiled with")][string]$Version
+[Parameter(Mandatory=$false, HelpMessage="The version the mod should be compiled with")][Alias("ver")][string]$Version,
+[Parameter(Mandatory=$false, HelpMessage="Switch to create a clean compilation")][Alias("rebuild")][Switch]$clean,
+[Parameter(Mandatory=$false, HelpMessage="To create a release build")][Alias("publish")][Switch]$release,
+[Parameter(Mandatory=$false, HelpMessage="To create a github actions build, assumes specific Environment variables are set")][Alias("github-build")][Switch]$actions
 )
-Write-Host $Version
-$NDKPath = Get-Content $PSScriptRoot/ndkpath.txt -First 1
-if ($env:VERSION) {
-$Version = $env:VERSION
+$NDKPath = Get-Content $PSScriptRoot/ndkpath.txt
+$QPMpackage = "./qpm.json"
+$qpmjson = Get-Content $QPMpackage -Raw | ConvertFrom-Json
+$ModID = $qpmjson.info.id
+if (-not $Version) {
+    $VERSION = $qpmjson.info.version
+} else {
+    $VERSION = $Version
 }
-if (!($Version)) {
-$Version = "0.1.0"
+if ($release -ne $true -and -not $VERSION.Contains('-Dev')) {
+    $VERSION += "-Dev"
 }
-if ((Test-Path "./extern/beatsaber-hook/src/inline-hook/And64InlineHook.cpp", "./extern/beatsaber-hook/src/inline-hook/inlineHook.c", "./extern/beatsaber-hook/src/inline-hook/relocate.c") -contains $false) {
+
+if ($env:version -eq "") {
+    & qpm-rust package edit --version $VERSION
+}
+
+if ((Test-Path "./extern/includes/beatsaber-hook/src/inline-hook/And64InlineHook.cpp", "./extern/includes/beatsaber-hook/src/inline-hook/inlineHook.c", "./extern/includes/beatsaber-hook/src/inline-hook/relocate.c") -contains $false) {
     Write-Host "Critical: Missing inline-hook"
-    if (!(Test-Path "./extern/beatsaber-hook/src/inline-hook/And64InlineHook.cpp")) {
-        Write-Host "./extern/beatsaber-hook/src/inline-hook/And64InlineHook.cpp"
+    if (!(Test-Path "./extern/includes/beatsaber-hook/src/inline-hook/And64InlineHook.cpp")) {
+        Write-Host "./extern/includes/beatsaber-hook/src/inline-hook/And64InlineHook.cpp"
     }
-    if (!(Test-Path "./extern/beatsaber-hook/src/inline-hook/inlineHook.c")) {
-        Write-Host "./extern/beatsaber-hook/src/inline-hook/inlineHook.c"
+    if (!(Test-Path "./extern/includes/beatsaber-hook/src/inline-hook/inlineHook.c")) {
+        Write-Host "./extern/includes/beatsaber-hook/src/inline-hook/inlineHook.c"
     }
-        if (!(Test-Path "./extern/beatsaber-hook/inline-hook/src/relocate.c")) {
-        Write-Host "./extern/beatsaber-hook/src/inline-hook/relocate.c"
+        if (!(Test-Path "./extern/includes/beatsaber-hook/inline-hook/src/relocate.c")) {
+        Write-Host "./extern/includes/beatsaber-hook/src/inline-hook/relocate.c"
     }
-    Write-Host "Task Failed"
+    Write-Host "Task Failed, see output above"
     exit 1;
 }
+echo "Building mod $ModID version $VERSION"
 
-echo "Building ServerBrowserQuest Version: $Version"
-
-$buildScript = "$NDKPath/build/ndk-build"
-if (-not ($PSVersionTable.PSEdition -eq "Core")) {
-    $buildScript += ".cmd"
+if ($clean.IsPresent)
+{
+    if (Test-Path -Path "build")
+    {
+        remove-item build -R
+    }
 }
 
-& $buildScript NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./Android.mk NDK_APPLICATION_MK=./Application.mk VERSION=$Version
+if (($clean.IsPresent) -or (-not (Test-Path -Path "build")))
+{
+    $out = new-item -Path build -ItemType Directory
+}
 
-Exit $LASTEXITCODE
+cd build
+& cmake -G "Ninja" -DCMAKE_BUILD_TYPE="RelWithDebInfo" ../
+& cmake --build . -j 6
+$ExitCode = $LastExitCode
+cd ..
+exit $ExitCode
+echo Done

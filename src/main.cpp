@@ -113,13 +113,13 @@ std::vector<std::string> split(const std::string& str, char delim)
 /// This hook lets us determine the host's server secret.
 /// This can then be used to help connect to specific games without a code, e.g. in case of Quickplay games.
 /// </summary>
-QUICK_HOOK_GB(MasterServerConnectionManager, HandleConnectToServerSuccess, void, ::Il2CppString* userId, ::Il2CppString* userName, 
+QUICK_HOOK_GB(MasterServerConnectionManager, HandleConnectToServerSuccess, void, ::StringW userId, ::StringW userName, 
     System::Net::IPEndPoint* remoteEndPoint, 
-    ::Il2CppString* secret, ::Il2CppString* code, 
+    ::StringW secret, ::StringW code, 
     GlobalNamespace::BeatmapLevelSelectionMask selectionMask, 
     GlobalNamespace::GameplayServerConfiguration configuration, 
-    ::Array<uint8_t>* preMasterSecret, ::Array<uint8_t>* myRandom, ::Array<uint8_t>* remoteRandom, 
-    bool isConnectionOwner, bool isDedicatedServer, ::Il2CppString* managerId) {
+    ::ArrayW<uint8_t> preMasterSecret, ::ArrayW<uint8_t> myRandom, ::ArrayW<uint8_t> remoteRandom, 
+    bool isConnectionOwner, bool isDedicatedServer, ::StringW managerId) {
 
     getLogger().info("HandleConnectToServerSuccess(userId=%s, userName=%s, "
         " remoteEndPoint=%s, secret=%s, code=%s,"
@@ -146,22 +146,22 @@ QUICK_HOOK_GB(MasterServerConnectionManager, HandleConnectToServerSuccess, void,
             getLogger().warning("HandleConnectToServerSuccess: Forcing direct connection override"
                 " (DirectConnectTarget=%s)", GlobalModState::DirectConnectTarget.value().c_str());
 
-            userId = il2cpp_utils::newcsstr(GlobalModState::LastConnectToHostedGame->get_OwnerId());
-            userName = il2cpp_utils::newcsstr(GlobalModState::LastConnectToHostedGame->get_OwnerName());
+            userId = StringW(GlobalModState::LastConnectToHostedGame->get_OwnerId());
+            userName = StringW(GlobalModState::LastConnectToHostedGame->get_OwnerName());
             auto newEndpoint = split(GlobalModState::DirectConnectTarget.value(), ':');
             System::Net::IPAddress* address;
-            System::Net::IPAddress::TryParse(il2cpp_utils::newcsstr(newEndpoint[0]), ByRef(address));
+            System::Net::IPAddress::TryParse(StringW(newEndpoint[0]), byref(address));
             remoteEndPoint = System::Net::IPEndPoint::New_ctor(address, std::stoi(newEndpoint[1]));
-            secret = GlobalModState::LastConnectToHostedGame->get_HostSecret().has_value() ? il2cpp_utils::newcsstr(GlobalModState::LastConnectToHostedGame->get_HostSecret().value()) : nullptr;
-            code = il2cpp_utils::newcsstr(GlobalModState::LastConnectToHostedGame->get_ServerCode());
+            secret = GlobalModState::LastConnectToHostedGame->get_HostSecret().has_value() ? StringW(GlobalModState::LastConnectToHostedGame->get_HostSecret().value()) : nullptr;
+            code = StringW(GlobalModState::LastConnectToHostedGame->get_ServerCode());
             selectionMask = BeatmapLevelSelectionMask(BeatmapDifficultyMask::All,
                 GameplayModifierMask::All, SongPackMask::get_all());
             configuration = GameplayServerConfiguration(GlobalModState::LastConnectToHostedGame->get_PlayerLimit(),
                 DiscoveryPolicy::Public, InvitePolicy::AnyoneCanInvite, GameplayServerMode::Managed,
                 SongSelectionMode::OwnerPicks, GameplayServerControlSettings::All);
             managerId = GlobalModState::LastConnectToHostedGame->get_ManagerId().has_value() ?
-                il2cpp_utils::newcsstr(GlobalModState::LastConnectToHostedGame->get_ManagerId().value()) :
-                GlobalModState::LastConnectToHostedGame->get_OwnerId().empty() ? nullptr : il2cpp_utils::newcsstr(GlobalModState::LastConnectToHostedGame->get_OwnerId());
+                StringW(GlobalModState::LastConnectToHostedGame->get_ManagerId().value()) :
+                GlobalModState::LastConnectToHostedGame->get_OwnerId().empty() ? nullptr : StringW(GlobalModState::LastConnectToHostedGame->get_OwnerId());
 
             GlobalModState::ShouldDisableEncryption = true; // about to talk to game server, disable encryption
         }
@@ -233,7 +233,6 @@ QUICK_HOOK_GB(MultiplayerModeSelectionViewController, DidActivate, void, bool fi
         //getLogger().debug("Components values[%d] name: %s", i, to_utf8(csstrtostr(comp->values[i]->ToString())).c_str());
     }
 
-
     //getLogger().debug("MultiplayerModeSelectionViewController firstActivation");
     if (firstActivation) {
 #pragma region Setup
@@ -257,10 +256,13 @@ QUICK_HOOK_GB(MultiplayerModeSelectionViewController, DidActivate, void, bool fi
             transform->get_position().z
         ));
         transform->set_localScale({ 1.25f, 1.25f, 1.25f });
+        static ConstString btnString("Server Browser");
         btnGameBrowser->GetComponentInChildren<HMUI::CurvedTextMeshPro*>()
-            ->SetText(il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("Server Browser"));
+            ->SetText(btnString);
 #pragma endregion
     }
+
+    //WebUtils::PostJSONAsync("https://bssb.app/api/v1/announce", "{ \n\t\"Id\": null,\n\t\"ServerCode\": \"TEST5\",\n\t\"GameName\": \"Test ELP\",\n\t\"OwnerId\": \"ziuMSceapEuNN7wRGQXrZg\",\n\t\"OwnerName\": \"\",\n\t\"PlayerCount\": 1,\n\t\"PlayerLimit\": 2,\n\t\"IsModded\": true,\n\t\"LobbyState\": 1,\n\t\"LevelId\": null,\n\t\"SongName\": null,\n\t\"SongAuthor\": null,\n\t\"Difficulty\": null,\n\t\"Platform\": \"oculus\",\n\t\"MasterServerHost\": null,\n\t\"MasterServerPort\": 2328,\n\t\"CoverUrl\": null,\n\t\"Players\": [\n\t\t{\n\t\t\t\"SortIndex\": 0,\n\t\t\t\"UserId\": \"1CBzQzWUNIi3lpJCZdcWln\",\n\t\t\t\"UserName\": \"EnderdracheLP\",\n\t\t\t\"IsHost\": false,\n\t\t\t\"Latency\": 0\n\t\t},\n\t\t{\n\t\t\t\"SortIndex\": -1,\n\t\t\t\"UserId\": \"ziuMSceapEuNN7wRGQXrZg\",\n\t\t\t\"UserName\": \"\",\n\t\t\t\"IsHost\": true,\n\t\t\t\"Latency\": 0\n\t\t}\n\t],\n\t\"MpExVersion\": null,\n\t\"ServerType\": \"player_host\",\n\t\"HostSecret\": \"xiq6b+xv60+2b1TSrHr7Dw\",\n\t\"Endpoint\": \"199.195.250.55:30001\",\n\t\"ManagerId\": \"76561198076657570\"\n}");
 }
 
 //MAKE_HOOK_MATCH(MultiplayerModeSelectionViewController_HandleMenuButton, &MultiplayerModeSelectionViewController::HandleMenuButton, void, MultiplayerModeSelectionViewController* self, MultiplayerModeSelectionViewController::MenuButton menuButton) {

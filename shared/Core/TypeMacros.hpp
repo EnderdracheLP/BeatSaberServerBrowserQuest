@@ -44,7 +44,7 @@ void namespaze::name::Deserialize(const rapidjson::Value& jsonValue) { \
 }
 
 #define SERIALIZE_STRING_METHOD(namespaze, name, impl) \
-const std::string namespaze::name::SerializeToString() { \
+const std::string namespaze::name::ToJSON() { \
     rapidjson::Document doc; \
     auto& alloc = doc.GetAllocator(); \
     doc.SetObject(); \
@@ -66,7 +66,9 @@ doc.AddMember(#jsonName, name, alloc);
 //}
 
 #define SERIALIZE_VALUE_OPTIONAL(name, jsonName) \
-doc.AddMember(#jsonName, name.value(), alloc);
+if (name.has_value()) \
+doc.AddMember(#jsonName, name.value(), alloc); \
+else doc.AddMember(#jsonName, rapidjson::Value(rapidjson::kNullType), alloc);
 
 #define DESERIALIZE_CLASS_OPTIONAL(name, jsonName, type) \
 if(jsonValue.HasMember(#jsonName) && jsonValue[#jsonName].IsObject()) { \

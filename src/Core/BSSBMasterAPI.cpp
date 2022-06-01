@@ -83,6 +83,10 @@ namespace ServerBrowser::Core {
         );
     }
 
+    BSSBMasterAPI::Announce(HostedGameData announce) {
+
+    }
+
     //void DownloadBeatmapAsync(const BeatSaver::Beatmap& beatmap, std::function<void(bool)> finished, std::function<void(float)> progressUpdate) {
     //    WebUtils::GetAsync(beatmap.GetVersions().front().GetDownloadURL(), FILE_DOWNLOAD_TIMEOUT,
     //        [beatmap, finished](long httpCode, std::string data) {

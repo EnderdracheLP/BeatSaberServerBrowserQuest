@@ -5,16 +5,20 @@
 #include "semver/include/semver.hpp" // SemVer Submodule for version matching
 #include <optional>
 #include "TypeMacros.hpp"
+#include "Core/HostedGamePlayer.hpp"
 //#include "SemVer.hpp"
 
 namespace ServerBrowser::Core {
     class HostedGameData {
 #pragma region Consts
     private:
-        std::string ServerTypePlayerHost = "player_host";
+        std::string ServerTypeBeatTogetherDedicated = "beattogether_dedicated";
+        std::string ServerTypeBeatTogetherQuickplay = "beattogether_quickplay";
         std::string ServerTypeBeatDediCustom = "beatdedi_custom";
         std::string ServerTypeBeatDediQuickplay = "beatdedi_quickplay";
+        std::string ServerTypeVanillaDedicated = "vanilla_dedicated";
         std::string ServerTypeVanillaQuickplay = "vanilla_quickplay";
+        std::string ServerTypePlayerHost = "player_host";
     public:
         const std::string get_ServerTypePlayerHost() const { return ServerTypePlayerHost; }
         const std::string get_ServerTypeBeatDediCustom() const { return ServerTypeBeatDediCustom; }
@@ -41,7 +45,6 @@ namespace ServerBrowser::Core {
 
     private:
         std::optional<std::string> BeatsaverId;
-        std::optional<std::string> CoverUrl;
         std::optional<std::string> LevelName;
         int Id;
         std::string ServerCode;
@@ -61,6 +64,8 @@ namespace ServerBrowser::Core {
         std::string Platform;
         std::optional<std::string> MasterServerHost;
         int MasterServerPort;
+        std::optional<std::string> CoverUrl;
+        std::vector<HostedGamePlayer> Players;
         std::optional<std::string> EndedAt;
         std::optional<semver::version> MpExVersion;
         std::string ModName;
@@ -72,6 +77,7 @@ namespace ServerBrowser::Core {
         std::optional<std::string> HostSecret;
         std::optional<std::string> Endpoint;
         std::optional<std::string> ManagerId;
+        std::optional<std::string> Key;
 
     public:
         const std::optional<std::string> get_BeatsaverId() const { return BeatsaverId; }
@@ -135,7 +141,7 @@ namespace ServerBrowser::Core {
         //const std::optional<std::string> get_HostSecret() const { return HostSecret; }
         //const std::optional<std::string> get_Endpoint() const { return Endpoint; }
 
-        const std::string SerializeToString();
+        std::string ToJSON();
 #pragma endregion
     };
 }

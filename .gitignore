@@ -35,18 +35,24 @@
 !.vscode/c_cpp_properties.json
 !.vscode/tasks.json
 
+# CMake Stuff
+*.cmake
+
 # NDK stuff
 out/
 [Ll]ib/
 [Ll]ibs/
 [Oo]bj/
 [Oo]bjs/
+[Bb]uild/
 ndkpath.txt
 *.zip
 *.txt
+*.log
 extern/
 Android.mk.backup
 qpm.shared.json
 /.vs/BeatSaberServerBrowserQuest/v16
 *.sqlite
 *.qmod
+/.vs/BeatSaberServerBrowserQuest/v17

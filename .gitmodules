@@ -1,3 +1,3 @@
 [submodule "extern/semver"]
-	path = extern/semver
+	path = extern/includes/semver
 	url = https://github.com/Neargye/semver

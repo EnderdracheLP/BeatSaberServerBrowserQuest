@@ -35,7 +35,7 @@ namespace ServerBrowser::Core {
 #pragma endregion
 #pragma region Describe
 
-	Il2CppString* HostedGameData::Describe() {
+	StringW HostedGameData::Describe() {
 		std::string moddedDescr = IsModded ? "Modded" : "Vanilla";
 
 		if (IsQuickPlayServer()) {
@@ -45,10 +45,10 @@ namespace ServerBrowser::Core {
 		if (IsOnCustomMaster()) {
 			moddedDescr += ", Cross-play";
 		}
-		return il2cpp_utils::newcsstr(GameName + string_format(" (%d/%d, %s)", PlayerCount, PlayerLimit, moddedDescr.c_str()));
+		return StringW(GameName + string_format(" (%d/%d, %s)", PlayerCount, PlayerLimit, moddedDescr.c_str()));
 	}
 
-	Il2CppString* HostedGameData::DescribeType() {
+	StringW HostedGameData::DescribeType() {
 		std::string masterServerDescr;
 		std::string moddedDescr;
 
@@ -72,7 +72,7 @@ namespace ServerBrowser::Core {
 		else {
 			moddedDescr = "Vanilla";
 		}
-		return il2cpp_utils::newcsstr(string_format("%s, %s", masterServerDescr.c_str(), moddedDescr.c_str()));
+		return StringW(string_format("%s, %s", masterServerDescr.c_str(), moddedDescr.c_str()));
 	}
 
 	std::string HostedGameData::DescribeDifficulty(bool withColorTag) {
@@ -135,46 +135,62 @@ namespace ServerBrowser::Core {
 #pragma region JSON Serialization/Deserialization
 #pragma region Serialize
 SERIALIZE_STRING_METHOD(ServerBrowser::Core, HostedGameData,
-	SERIALIZE_VALUE_OPTIONAL(BeatsaverId, beatsaverId)
-	SERIALIZE_VALUE_OPTIONAL(CoverUrl, coverUrl)
-	SERIALIZE_VALUE_OPTIONAL(LevelName, levelName)
-	SERIALIZE_VALUE(Id, id)
-	SERIALIZE_VALUE(ServerCode, serverCode)
-	SERIALIZE_VALUE(GameName, gameName)
-	SERIALIZE_VALUE(OwnerName, ownerName)
+	//SERIALIZE_VALUE_OPTIONAL(BeatsaverId, beatsaverId)
+	//SERIALIZE_VALUE_OPTIONAL(CoverUrl, coverUrl)
+	//SERIALIZE_VALUE_OPTIONAL(LevelName, levelName)
+	SERIALIZE_VALUE(Id, Id)
+	SERIALIZE_VALUE(ServerCode, ServerCode)
+	SERIALIZE_VALUE(GameName, GameName)
+	//SERIALIZE_VALUE(OwnerName, OwnerName)
 	if (!OwnerId.empty()) {
 		doc.AddMember("ownerId", OwnerId, alloc);
 	}
 	SERIALIZE_VALUE(PlayerCount, playerCount)
 	SERIALIZE_VALUE(PlayerLimit, playerLimit)
 	SERIALIZE_VALUE(IsModded, isModded)
-	SERIALIZE_VALUE(FirstSeen, firstSeen)
-	SERIALIZE_VALUE(LastUpdate, lastUpdate)
-	SERIALIZE_VALUE(LobbyState, lobbyState)
-	SERIALIZE_VALUE_OPTIONAL(LevelId, levelId)
-	SERIALIZE_VALUE_OPTIONAL(SongName, songName)
-	SERIALIZE_VALUE_OPTIONAL(SongAuthor, songAuthor)
-	SERIALIZE_VALUE_OPTIONAL(Difficulty, difficulty)
-	SERIALIZE_VALUE(Platform, platform)
-	SERIALIZE_VALUE_OPTIONAL(MasterServerHost, masterServerHost)
-	SERIALIZE_VALUE(MasterServerPort, masterServerPort)
-	SERIALIZE_VALUE_OPTIONAL(EndedAt, endedAt)
+	//SERIALIZE_VALUE(FirstSeen, firstSeen)
+	//SERIALIZE_VALUE(LastUpdate, lastUpdate)
+	SERIALIZE_VALUE(LobbyState, LobbyState)
+	SERIALIZE_VALUE_OPTIONAL(LevelId, LevelId)
+	SERIALIZE_VALUE_OPTIONAL(SongName, SongName)
+	SERIALIZE_VALUE_OPTIONAL(SongAuthor, SongAuthor)
+	SERIALIZE_VALUE_OPTIONAL(Difficulty, Difficulty)
+	SERIALIZE_VALUE(Platform, Platform)
+	SERIALIZE_VALUE_OPTIONAL(MasterServerHost, MasterServerHost)
+	SERIALIZE_VALUE(MasterServerPort, MasterServerPort)
+	SERIALIZE_VALUE(CoverUrl, CoverUrl)
+	if (!Players.empty) {
+		rapidjson::Value players(rapidjson::kArrayType);
+		for (HostedGamePlayer player : Players) {
+			rapidjson::Value playerV(rapidjson::kObjectType);
+			playerV.AddMember("SortIndex", player.SortIndex, alloc);
+			playerV.AddMember("UserId", player.UserId, alloc);
+			playerV.AddMember("UserName", player.UserName, alloc);
+			playerV.AddMember("IsHost", player.IsHost, alloc);
+			playerV.AddMember("Latency", player.Latency, alloc);
+			players.PushBack(playerV, alloc);
+		}
+		doc.AddMember("Players", players, alloc);
+	}
+	else doc.AddMember("Players", rapidjson::Value(rapidjson::kNullType), alloc);
+	//SERIALIZE_VALUE_OPTIONAL(EndedAt, endedAt)
 	//SERIALIZE_VALUE_OPTIONAL(MpExVersion, mpExVersion)
 	if (MpExVersion.has_value())
-		doc.AddMember("mpExVersion", MpExVersion->to_string(), alloc);
-	SERIALIZE_VALUE(ModName, modName)
-	rapidjson::Value modVer(rapidjson::kObjectType);
-	modVer.PushBack(ModVersion.major, alloc).PushBack(ModVersion.minor, alloc).PushBack(ModVersion.patch, alloc);
-	if (ModVersion.prerelease_number > 0) modVer.PushBack(ModVersion.prerelease_number, alloc);
-	doc.AddMember("modVersion", modVer, alloc);
-	rapidjson::Value gameVer(rapidjson::kObjectType);
-	gameVer.PushBack(GameVersion.major, alloc).PushBack(GameVersion.minor, alloc).PushBack(GameVersion.patch, alloc);
-	if (GameVersion.prerelease_number > 0) gameVer.PushBack(GameVersion.prerelease_number, alloc);
-	doc.AddMember("gameVersion", gameVer, alloc);
-	SERIALIZE_VALUE_OPTIONAL(ServerType, serverType)
-	SERIALIZE_VALUE_OPTIONAL(HostSecret, hostSecret)
-	SERIALIZE_VALUE_OPTIONAL(Endpoint, endpoint)
-	SERIALIZE_VALUE_OPTIONAL(ManagerId, managerId)
+		doc.AddMember("MpExVersion", MpExVersion->to_string(), alloc);
+	else doc.AddMember("MpExVersion", rapidjson::Value(rapidjson::kNullType), alloc);
+	//SERIALIZE_VALUE(ModName, modName)
+	//rapidjson::Value modVer(rapidjson::kObjectType);
+	//modVer.PushBack(ModVersion.major, alloc).PushBack(ModVersion.minor, alloc).PushBack(ModVersion.patch, alloc);
+	//if (ModVersion.prerelease_number > 0) modVer.PushBack(ModVersion.prerelease_number, alloc);
+	//doc.AddMember("ModVersion", modVer, alloc);
+	//rapidjson::Value gameVer(rapidjson::kObjectType);
+	//gameVer.PushBack(GameVersion.major, alloc).PushBack(GameVersion.minor, alloc).PushBack(GameVersion.patch, alloc);
+	//if (GameVersion.prerelease_number > 0) gameVer.PushBack(GameVersion.prerelease_number, alloc);
+	//doc.AddMember("gameVersion", gameVer, alloc);
+	SERIALIZE_VALUE_OPTIONAL(ServerType, ServerType)
+	SERIALIZE_VALUE_OPTIONAL(HostSecret, HostSecret)
+	SERIALIZE_VALUE_OPTIONAL(Endpoint, Endpoint)
+	SERIALIZE_VALUE_OPTIONAL(ManagerId, ManagerId)
 )
 #pragma endregion
 #pragma region Deserialize
