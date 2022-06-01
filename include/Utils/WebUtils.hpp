@@ -18,8 +18,7 @@ namespace WebUtils {
 
     void GetJSONAsync(std::string url, std::function<void(long, bool, rapidjson::Document&)> finished);
 
-    void PostJSONAsync(std::string url, std::function<void(long, std::string)> finished);
+    void PostJSONAsync(std::string url, std::string data, std::function<void(long, std::string)> finished = nullptr);
 
-    void PostJSONAsync(std::string url, std::string data, long timeout, std::function<void(long, std::string)> finished);
-
+    void PostJSONAsync(std::string url, std::string data, long timeout, std::function<void(long, std::string)> finished = nullptr);
 }

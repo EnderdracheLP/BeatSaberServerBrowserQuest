@@ -227,6 +227,10 @@ namespace WebUtils {
         );
     }
 
+    void PostJSONAsync(std::string url, std::function<void(long, std::string)> finished) {
+        PostJSONAsync(url, "", TIMEOUT, finished);
+    }
+
     void PostJSONAsync(std::string url, std::string data, std::function<void(long, std::string)> finished) {
         PostJSONAsync(url, data, TIMEOUT, finished);
     }
@@ -241,7 +245,8 @@ namespace WebUtils {
                 struct curl_slist* headers = NULL;
                 headers = curl_slist_append(headers, "Accept: */*");
                 headers = curl_slist_append(headers, X_BSSB);
-                headers = curl_slist_append(headers, "Content-Type: application/json");
+                if (!data.empty())
+                    headers = curl_slist_append(headers, "Content-Type: application/json");
                 // Set headers
                 curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
@@ -261,18 +266,19 @@ namespace WebUtils {
                 curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
 
                 curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
-
-                curl_easy_setopt(curl, CURLOPT_POSTFIELDS, &data);
-
+                if (!data.empty())
+                    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str());
                 CURLcode res = curl_easy_perform(curl);
                 /* Check for errors */
                 if (res != CURLE_OK) {
                     getLogger().critical("curl_easy_perform() failed: %u: %s", res, curl_easy_strerror(res));
                 }
+                getLogger().debug("Response: '%s'", val.c_str());
                 curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
                 curl_easy_cleanup(curl);
                 //curl_mime_free(form);
-                finished(httpCode, val);
+                if (finished)
+                    finished(httpCode, val);
             }
         );
         t.detach();
