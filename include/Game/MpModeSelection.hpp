@@ -39,8 +39,8 @@ namespace ServerBrowser::Game {
 		static void PresentViewController(HMUI::ViewController* viewController, HMUI::ViewController::AnimationDirection animationDirection = HMUI::ViewController::AnimationDirection::Vertical, bool immediately = false, System::Action* finishedCallback = nullptr);
 		static void ReplaceTopViewController(HMUI::ViewController* viewController, HMUI::ViewController::AnimationType animationType = HMUI::ViewController::AnimationType::In, HMUI::ViewController::AnimationDirection animationDirection = HMUI::ViewController::AnimationDirection::Horizontal, System::Action* finishedCallback = nullptr);
 		static void DismissViewController(HMUI::ViewController* viewController, HMUI:: ViewController::AnimationDirection animationDirection = HMUI::ViewController::AnimationDirection::Horizontal, System::Action* finishedCallback = nullptr, bool immediately = false);
-		static void SetTitle(std::string title);
-		static void SetTitle(Il2CppString* title);
+		// static void SetTitle(std::string title);
+		static void SetTitle(StringW title);
 #pragma endregion
 
 		static void OpenCreateServerMenu();

@@ -1,6 +1,8 @@
 #include "Game/MpConnect.hpp"
 #include "Core/HostedGameData.hpp"
 
+#define RAPIDJSON_HAS_STDSTRING 1
+
 using GlobalNamespace::BeatmapDifficulty;
 
 namespace ServerBrowser::Core {
@@ -158,8 +160,8 @@ SERIALIZE_STRING_METHOD(ServerBrowser::Core, HostedGameData,
 	SERIALIZE_VALUE(Platform, Platform)
 	SERIALIZE_VALUE_OPTIONAL(MasterServerHost, MasterServerHost)
 	SERIALIZE_VALUE(MasterServerPort, MasterServerPort)
-	SERIALIZE_VALUE(CoverUrl, CoverUrl)
-	if (!Players.empty) {
+	SERIALIZE_VALUE_OPTIONAL(CoverUrl, CoverUrl)
+	if (!Players.empty()) {
 		rapidjson::Value players(rapidjson::kArrayType);
 		for (HostedGamePlayer player : Players) {
 			rapidjson::Value playerV(rapidjson::kObjectType);

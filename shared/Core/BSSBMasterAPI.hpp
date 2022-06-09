@@ -22,5 +22,7 @@ namespace ServerBrowser::Core {
         static void BrowseAsync(int offset, /*HostedGameFilters filters,*/ std::function<void(std::optional<ServerBrowser::Core::ServerBrowserResult>)> finished);
 
         static void GetCoverImageAsync(const ServerBrowser::Core::HostedGameData& lobby, std::function<void(std::vector<uint8_t>)> finished, std::function<void(float)> progressUpdate = nullptr);
+    
+        static void Announce(ServerBrowser::Core::HostedGameData announce);
     };
 }

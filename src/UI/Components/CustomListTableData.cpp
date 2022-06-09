@@ -80,7 +80,7 @@ namespace ServerBrowser::UI::Components
         if (!tableCell)
         {
             if (!songListTableCellInstance)
-                songListTableCellInstance = QuestUI::ArrayUtil::First(Resources::FindObjectsOfTypeAll<GlobalNamespace::LevelListTableCell*>(), [](auto x){ return to_utf8(csstrtostr(x->get_name())) == "LevelListTableCell"; });
+                songListTableCellInstance = Resources::FindObjectsOfTypeAll<GlobalNamespace::LevelListTableCell*>().First([](auto x){ return x->get_name() == "LevelListTableCell"; });
 
             tableCell = Instantiate(songListTableCellInstance);
         }
@@ -92,18 +92,36 @@ namespace ServerBrowser::UI::Components
         return tableCell;   
     }
 
-    GlobalNamespace::LevelPackTableCell* CustomListTableData::GetLevelPackTableCell()
+    QuestUI::QuestUIBoxTableCell* CustomListTableData::GetBoxTableCell()
     {
-        auto tableCell = reinterpret_cast<GlobalNamespace::LevelPackTableCell*>(tableView->DequeueReusableCellForIdentifier(reuseIdentifier));
+        auto tableCell = reinterpret_cast<QuestUI::QuestUIBoxTableCell*>(tableView->DequeueReusableCellForIdentifier(reuseIdentifier));
         if (!tableCell)
         {
             if (!levelPackTableCellInstance)
-                levelPackTableCellInstance = QuestUI::ArrayUtil::First(Resources::FindObjectsOfTypeAll<GlobalNamespace::LevelPackTableCell*>(), [](auto x){ return to_utf8(csstrtostr(x->get_name())) == "AnnotatedBeatmapLevelCollectionTableCell"; });
-            tableCell = Instantiate(levelPackTableCellInstance);
+                levelPackTableCellInstance = Resources::FindObjectsOfTypeAll<GlobalNamespace::LevelPackCell*>().First([](auto x){ return x->get_name() == "AnnotatedBeatmapLevelCollectionCell"; });
+            tableCell = InstantiateBoxTableCell(levelPackTableCellInstance);
         }
-
         tableCell->set_reuseIdentifier(reuseIdentifier);
         return tableCell;
+    }
+
+    QuestUI::QuestUIBoxTableCell* CustomListTableData::InstantiateBoxTableCell(GlobalNamespace::LevelPackCell* levelPackTableCell)
+    {
+        levelPackTableCell = Instantiate(levelPackTableCell);
+        ImageView* coverImage = levelPackTableCell->coverImage;
+        ImageView* selectionImage = levelPackTableCell->selectionImage;
+
+        auto transform = coverImage->get_transform();
+        for (int i = 0; i < transform->GetChildCount(); i++)
+        {
+            Object::Destroy(transform->GetChild(i)->get_gameObject());
+        }
+
+        GameObject* cellObject = levelPackTableCell->get_gameObject();
+        Object::Destroy(levelPackTableCell);
+        QuestUI::QuestUIBoxTableCell* boxTableCell = cellObject->AddComponent<QuestUI::QuestUIBoxTableCell*>();
+        boxTableCell->SetComponents(coverImage, selectionImage);
+        return boxTableCell;
     }
 
     GlobalNamespace::SimpleTextTableCell* CustomListTableData::GetSimpleTextTableCell()
@@ -112,7 +130,7 @@ namespace ServerBrowser::UI::Components
         if (!tableCell)
         {
             if (!simpleTextTableCellInstance)
-                simpleTextTableCellInstance = QuestUI::ArrayUtil::First(Resources::FindObjectsOfTypeAll<GlobalNamespace::SimpleTextTableCell*>(), [](auto x){ return to_utf8(csstrtostr(x->get_name())) == "SimpleTextTableCell"; });
+                simpleTextTableCellInstance = Resources::FindObjectsOfTypeAll<GlobalNamespace::SimpleTextTableCell*>().First([](auto x){ return x->get_name() == "SimpleTextTableCell"; });
             tableCell = Instantiate(simpleTextTableCellInstance);
         }
 
@@ -149,13 +167,14 @@ namespace ServerBrowser::UI::Components
                 return tableCell;
             }
             case ListStyle::Box: {
-                auto cell = GetLevelPackTableCell();
-                cell->set_showNewRibbon(false);
+                // cell->set_showNewRibbon(false);
                 auto& cellInfo = data[idx];
-                cell->infoText->set_text(cellInfo->get_combinedText());
-                auto packCoverImage = cell->coverImage;
+                auto cell = GetBoxTableCell();
+                // cell->infoText->set_text(cellInfo->get_combinedText());
+                // auto packCoverImage = cell->coverImage;
+                cell->SetData(cellInfo->get_icon());
 
-                packCoverImage->set_sprite(cellInfo->get_icon());
+                // packCoverImage->set_sprite(cellInfo->get_icon());
 
                 return cell;
             }
@@ -182,17 +201,17 @@ namespace ServerBrowser::UI::Components
         return data.size();
     }
 
-    Il2CppString* CustomListTableData::CustomCellInfo::get_text() 
+    StringW CustomListTableData::CustomCellInfo::get_text() 
     { 
         return il2cpp_utils::newcsstr(text); 
     }
 
-    Il2CppString* CustomListTableData::CustomCellInfo::get_subText() 
+    StringW CustomListTableData::CustomCellInfo::get_subText() 
     { 
         return il2cpp_utils::newcsstr(subText); 
     }
 
-    Il2CppString* CustomListTableData::CustomCellInfo::get_combinedText()
+    StringW CustomListTableData::CustomCellInfo::get_combinedText()
     {
         return il2cpp_utils::newcsstr(string_format("%s\n%s", text.c_str(), subText.c_str())); 
     }

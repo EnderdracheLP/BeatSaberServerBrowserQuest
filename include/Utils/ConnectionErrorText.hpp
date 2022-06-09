@@ -3,8 +3,7 @@
 #include <string>
 
 namespace ServerBrowser::Utils {
-    class ConnectionErrorText {
-    public:
-        static const std::string Generate(GlobalNamespace::ConnectionFailedReason reason);
+    struct ConnectionErrorText {
+        static StringW Generate(GlobalNamespace::ConnectionFailedReason reason);
     };
 }

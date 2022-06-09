@@ -6,7 +6,9 @@
     "id": "BeatSaberServerBrowserQuest",
     "version": "0.1.0",
     "url": null,
-    "additionalData": {}
+    "additionalData": {
+      "overrideSoName": "libServerBrowser.so"
+    }
   },
   "dependencies": [
     {
@@ -41,6 +43,16 @@
     {
       "id": "config-utils",
       "versionRange": "*",
+      "additionalData": {}
+    },
+    {
+      "id": "MultiplayerCore",
+      "versionRange": "^1.0.0",
+      "additionalData": {}
+    },
+    {
+      "id": "modloader",
+      "versionRange": "^1.2.3",
       "additionalData": {}
     }
   ],

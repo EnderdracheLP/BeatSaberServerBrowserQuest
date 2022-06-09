@@ -2,14 +2,14 @@
   "ExpandedNodes": [
     "",
     "\\include",
-    "\\include\\Game",
-    "\\include\\UI",
-    "\\include\\UI\\Components",
-    "\\include\\Utils",
-    "\\include\\Utils\\Sprites",
+    "\\include\\Assets",
+    "\\include\\Core",
+    "\\shared",
+    "\\shared\\Core",
+    "\\shared\\Game",
     "\\src",
-    "\\src\\UI",
-    "\\src\\UI\\Components"
+    "\\src\\Utils"
   ],
+  "SelectedNode": "\\BeatSaberServerBrowserQuest.sln",
   "PreviewInSolutionExplorer": false
 }

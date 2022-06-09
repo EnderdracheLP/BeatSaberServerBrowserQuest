@@ -53,15 +53,16 @@
 #include "GlobalNamespace/PacketEncryptionLayer.hpp"
 #include "GlobalNamespace/NetworkConfigSO.hpp"
 
-#include "GlobalNamespace/UserCertificateValidator.hpp"
+#include "GlobalNamespace/ClientCertificateValidator.hpp"
 #include "GlobalNamespace/PlatformAuthenticationTokenProvider.hpp"
 #include "GlobalNamespace/AuthenticationToken.hpp"
+#include "GlobalNamespace/DnsEndPoint.hpp"
 
 #include "System/Net/IPEndPoint.hpp"
 #include "System/Net/IPAddress.hpp"
 #include "System/Threading/Tasks/Task_1.hpp"
 
-#include "GlobalNamespace/BGNetDebug.hpp"
+// #include "BGNet/Logging/Debug.hpp"
 using namespace GlobalNamespace;
 using namespace UnityEngine;
 using namespace ServerBrowser::UI;
@@ -227,8 +228,8 @@ QUICK_HOOK_GB(MultiplayerModeSelectionViewController, DidActivate, void, bool fi
     btnGameBrowser->set_enabled(true);
     btnGameBrowser->get_gameObject()->SetActive(true);
 
-    Array<Component*>* comp = btnGameBrowser->GetComponents<Component*>();
-    for (int i = 0; i < comp->get_Length(); i++) {
+    ArrayW<Component*> comp = btnGameBrowser->GetComponents<Component*>();
+    for (int i = 0; i < comp.Length(); i++) {
         comp->values[i]->get_gameObject()->SetActive(true);
         //getLogger().debug("Components values[%d] name: %s", i, to_utf8(csstrtostr(comp->values[i]->ToString())).c_str());
     }
@@ -330,7 +331,9 @@ QUICK_HOOK_GB(MultiplayerModeSelectionFlowCoordinator, PresentConnectionErrorDia
     }
 }
 
-QUICK_HOOK_GB(PacketEncryptionLayer, ProcessOutBoundPacketInternal, bool, System::Net::IPEndPoint* remoteEndPoint, ByRef<::Array<uint8_t>*> data, ByRef<int> offset, ByRef<int> length, ByRef<bool> encrypted) {
+#include "System/Array.hpp"
+
+QUICK_HOOK_GB(PacketEncryptionLayer, ProcessOutBoundPacketInternal, bool, ::System::Net::IPEndPoint* remoteEndPoint, ByRef<::ArrayW<uint8_t>> data, ByRef<int> offset, ByRef<int> length, ByRef<bool> encrypted) {
     if (GlobalModState::ShouldDisableEncryption)
     {
         // Disabling; do not perform outbound encryption, disable unencrypted traffic filter
@@ -341,7 +344,7 @@ QUICK_HOOK_GB(PacketEncryptionLayer, ProcessOutBoundPacketInternal, bool, System
 
         if (offset.heldRef == 0)
         {
-            System::Array::Copy(data.heldRef, offset.heldRef, data.heldRef, offset.heldRef + 1, length.heldRef);
+            System::Array::Copy(reinterpret_cast<System::Array*>(static_cast<Il2CppArray*>(data.heldRef)), offset.heldRef, reinterpret_cast<System::Array*>(static_cast<Il2CppArray*>(data.heldRef)), offset.heldRef + 1, length.heldRef);
         }
         else
         {
@@ -362,7 +365,7 @@ QUICK_HOOK_GB(PacketEncryptionLayer, ProcessOutBoundPacketInternal, bool, System
     return PacketEncryptionLayer_ProcessOutBoundPacketInternal(self, remoteEndPoint, data, offset, length, encrypted);
 }
 
-QUICK_HOOK_GB(UserCertificateValidator, ValidateCertificateChainInternal, void, GlobalNamespace::MasterServerEndPoint* endPoint, System::Security::Cryptography::X509Certificates::X509Certificate2* certificate, ::Array<::Array<uint8_t>*>* certificateChain)
+QUICK_HOOK_GB(ClientCertificateValidator, ValidateCertificateChainInternal, void, GlobalNamespace::DnsEndPoint* endPoint, System::Security::Cryptography::X509Certificates::X509Certificate2* certificate, ::ArrayW<::ArrayW<uint8_t>> certificateChain)
 {
     // This mod disables certificate validation when it is overriding the master server to an unofficial one only.
     // If we are connecting to official games, we won't interfere.
@@ -372,11 +375,11 @@ QUICK_HOOK_GB(UserCertificateValidator, ValidateCertificateChainInternal, void, 
         getLogger().info("Bypassing user certificate validation");
     }
     else {
-        UserCertificateValidator_ValidateCertificateChainInternal(self, endPoint, certificate, certificateChain);
+        ClientCertificateValidator_ValidateCertificateChainInternal(self, endPoint, certificate, certificateChain);
     }
 }
 
-MAKE_HOOK_MATCH(NetworkConfigSO_get_masterServerEndPoint, &NetworkConfigSO::get_masterServerEndPoint, GlobalNamespace::MasterServerEndPoint*, NetworkConfigSO* self) {
+MAKE_HOOK_MATCH(NetworkConfigSO_get_masterServerEndPoint, &NetworkConfigSO::get_masterServerEndPoint, GlobalNamespace::DnsEndPoint*, NetworkConfigSO* self) {
     getLogger().debug("Running get_masterServerEndPoint");
     auto result = NetworkConfigSO_get_masterServerEndPoint(self);
     MpConnect::ReportCurrentMasterServerValue(result);
@@ -449,7 +452,7 @@ extern "C" void load() {
     auto ModList = Modloader::getMods();
     if (ModList.find("BeatTogether") == ModList.end()) {
         getLogger().info("BeatTogether not found, installing our own overrides");
-        INSTALL_HOOK(getLogger(), UserCertificateValidator_ValidateCertificateChainInternal);
+        INSTALL_HOOK(getLogger(), ClientCertificateValidator_ValidateCertificateChainInternal);
         INSTALL_HOOK(getLogger(), PlatformAuthenticationTokenProvider_GetAuthenticationToken);
     }
 

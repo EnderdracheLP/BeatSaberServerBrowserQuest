@@ -1,9 +1,10 @@
 #pragma once
 #include "main.hpp"
 #include "Core/HostedGameData.hpp"
-#include "GlobalNamespace/MasterServerEndPoint.hpp"
-using GlobalNamespace::MasterServerEndPoint;
-using ServerBrowser::Core::HostedGameData;
+#include "GlobalNamespace/DnsEndPoint.hpp"
+// #include "GlobalNamespace/MasterServerEndPoint.hpp"
+// using GlobalNamespace::MasterServerEndPoint;
+// using ServerBrowser::Core::HostedGameData;
 
 namespace ServerBrowser::Game {
 	class MpConnect
@@ -17,7 +18,7 @@ namespace ServerBrowser::Game {
 		
 		#define DEFAULT_MASTER_PORT 2328
 
-		static void Join(HostedGameData game);
+		static void Join(ServerBrowser::Core::HostedGameData game);
 		
 #pragma region Master Server Management
 	// TODO: Implement this possibly
@@ -25,13 +26,13 @@ namespace ServerBrowser::Game {
 	//	static MasterServerEndPoint* _officialEndPoint;
 	//	static MasterServerEndPoint* _moddedEndPoint;
 	//	static bool _usingModdedServer;
-	static SafePtr<MasterServerEndPoint> OverrideEndPoint;
+	static SafePtr<GlobalNamespace::DnsEndPoint> OverrideEndPoint;
 	//static std::pair<std::string, int> OverrideEndPoint;
 		//static bool ShouldDisableCertificateValidation;
 	public:
-		static MasterServerEndPoint* const get_OverrideEndPoint();
+		static GlobalNamespace::DnsEndPoint* const get_OverrideEndPoint();
 
-	static SafePtr<MasterServerEndPoint> LastUsedMasterServer;
+	static SafePtr<GlobalNamespace::DnsEndPoint> LastUsedMasterServer;
 	//static std::pair<std::string, int> LastUsedMasterServer;
 	//	MasterServerEndPoint* get_LastUsedMasterServer();
 	//private:
@@ -41,11 +42,11 @@ namespace ServerBrowser::Game {
 	//public:
 	static bool get_ShouldDisableCertificateValidation();
 
-	static void ReportCurrentMasterServerValue(MasterServerEndPoint* currentEndPoint);
+	static void ReportCurrentMasterServerValue(GlobalNamespace::DnsEndPoint* currentEndPoint);
 
 	static void SetMasterServerOverride(std::string hostName, int port = DEFAULT_MASTER_PORT);
 
-	static void SetMasterServerOverride(MasterServerEndPoint* overrideEndPoint);
+	static void SetMasterServerOverride(GlobalNamespace::DnsEndPoint* overrideEndPoint);
 
 	static void ClearMasterServerOverride();
 #pragma endregion

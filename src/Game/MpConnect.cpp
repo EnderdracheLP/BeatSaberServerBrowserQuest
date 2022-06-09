@@ -1,9 +1,10 @@
 #include "Game/MpConnect.hpp"
 #include "Game/MpModeSelection.hpp"
 using ServerBrowser::Game::MpModeSelection;
-
+using GlobalNamespace::DnsEndPoint;
+using namespace ServerBrowser::Core;
 namespace ServerBrowser::Game {
-
+// NOTE: If I ever use explicit free then I should use gc_free_specific instead of directly calling GC_free
 	void MpConnect::Join(HostedGameData game) {
 		getLogger().debug("MpConnect::Join");
 		// MQE Version check
@@ -94,14 +95,14 @@ namespace ServerBrowser::Game {
 
 	//std::pair<std::string, int> MpConnect::LastUsedMasterServer;
 
-	SafePtr<MasterServerEndPoint> MpConnect::OverrideEndPoint;
+	SafePtr<GlobalNamespace::DnsEndPoint> MpConnect::OverrideEndPoint;
 
-	SafePtr<MasterServerEndPoint> MpConnect::LastUsedMasterServer;
+	SafePtr<GlobalNamespace::DnsEndPoint> MpConnect::LastUsedMasterServer;
 
-	MasterServerEndPoint* const MpConnect::get_OverrideEndPoint() {
+	GlobalNamespace::DnsEndPoint* const MpConnect::get_OverrideEndPoint() {
 		//return MasterServerEndPoint::New_ctor(il2cpp_utils::newcsstr(OverrideEndPoint.first), OverrideEndPoint.second)
 		if (OverrideEndPoint)
-			return static_cast<MasterServerEndPoint*>(OverrideEndPoint);
+			return static_cast<GlobalNamespace::DnsEndPoint*>(OverrideEndPoint);
 		else return nullptr;
 	}
 
@@ -117,15 +118,15 @@ namespace ServerBrowser::Game {
 
 	bool MpConnect::get_ShouldDisableCertificateValidation() {
 		// We should disable certificate validation (X509CertificateUtilityPatch) if we are overriding to unofficial masters
-		return OverrideEndPoint && !OverrideEndPoint->hostName->EndsWith(il2cpp_utils::newcsstr(OFFICIAL_MASTER_SUFFIX));
+		return OverrideEndPoint && !OverrideEndPoint->hostName->EndsWith(OFFICIAL_MASTER_SUFFIX);
 	}
 
-	void MpConnect::ReportCurrentMasterServerValue(MasterServerEndPoint* currentEndPoint) {
+	void MpConnect::ReportCurrentMasterServerValue(GlobalNamespace::DnsEndPoint* currentEndPoint) {
 		bool isFirstReport = !LastUsedMasterServer;
 
 		LastUsedMasterServer = currentEndPoint;
 
-		if (OverrideEndPoint && csstrtostr(currentEndPoint->ToString()) == csstrtostr(OverrideEndPoint->ToString())/*currentEndPoint->Equals(OverrideEndPoint)*/)
+		if (OverrideEndPoint && static_cast<std::string>(currentEndPoint->ToString()) == static_cast<std::string>(OverrideEndPoint->ToString())/*currentEndPoint->Equals(OverrideEndPoint)*/)
 		{
 			// This is our own override, not useful information
 			return;
@@ -133,7 +134,7 @@ namespace ServerBrowser::Game {
 
 		auto hostName = currentEndPoint->hostName;
 
-		if (hostName->EndsWith(il2cpp_utils::newcsstr(OFFICIAL_MASTER_SUFFIX)))
+		if (hostName->EndsWith(OFFICIAL_MASTER_SUFFIX))
 		{
 			// This is the official / default master server (likely not using a server mod)
 			//officialEndPoint = currentEndPoint;
@@ -158,16 +159,16 @@ namespace ServerBrowser::Game {
 	}
 
 	void MpConnect::SetMasterServerOverride(std::string hostName, int port) {
-		if (!classof(MasterServerEndPoint*)->initialized) il2cpp_functions::Class_Init(classof(MasterServerEndPoint*)); // This is needed in order to initialize the Il2CppClass
+		if (!classof(DnsEndPoint*)->initialized) il2cpp_functions::Class_Init(classof(DnsEndPoint*)); // This is needed in order to initialize the Il2CppClass
 		//SetMasterServerOverride(MasterServerEndPoint::New_ctor<il2cpp_utils::CreationType::Manual>(il2cpp_utils::newcsstr(hostName), port));
-		SetMasterServerOverride(MasterServerEndPoint::New_ctor(il2cpp_utils::newcsstr(hostName), port));
+		SetMasterServerOverride(DnsEndPoint::New_ctor(hostName, port));
 	}
 
-	void MpConnect::SetMasterServerOverride(MasterServerEndPoint* overrideEndPoint) {
-		if (!OverrideEndPoint || !(csstrtostr(OverrideEndPoint->ToString()) == csstrtostr(overrideEndPoint->ToString())))
+	void MpConnect::SetMasterServerOverride(DnsEndPoint* overrideEndPoint) {
+		if (!OverrideEndPoint || !(static_cast<std::string>(OverrideEndPoint->ToString()) == static_cast<std::string>(overrideEndPoint->ToString())))
 		{
 			//il2cpp_functions::GC_free(static_cast<MasterServerEndPoint*>(OverrideEndPoint));
-			getLogger().info("Setting master server override now: %s", to_utf8(csstrtostr(overrideEndPoint->ToString())).c_str());
+			getLogger().info("Setting master server override now: %s", static_cast<std::string>(overrideEndPoint->ToString()).c_str());
 			OverrideEndPoint = overrideEndPoint;
 		}
 		else {

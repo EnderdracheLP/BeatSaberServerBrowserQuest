@@ -54,11 +54,11 @@ namespace ServerBrowser::Game {
 	void MpModeSelection::DismissViewController(ViewController* viewController, ViewController::AnimationDirection animationDirection, Action* finishedCallback, bool immediately) {
 		_flowCoordinator->DismissViewController(viewController, animationDirection, finishedCallback, immediately);
 	}
-	void MpModeSelection::SetTitle(std::string title) {
-		Il2CppString* titleStr = il2cpp_utils::newcsstr(title);
-		_flowCoordinator->SetTitle(titleStr, ViewController::AnimationType::In);
-	}
-	void MpModeSelection::SetTitle(Il2CppString* title) {
+	// void MpModeSelection::SetTitle(std::string title) {
+	// 	Il2CppString* titleStr = il2cpp_utils::newcsstr(title);
+	// 	_flowCoordinator->SetTitle(titleStr, ViewController::AnimationType::In);
+	// }
+	void MpModeSelection::SetTitle(StringW title) {
 		_flowCoordinator->SetTitle(title, ViewController::AnimationType::In);
 	}
 #pragma endregion

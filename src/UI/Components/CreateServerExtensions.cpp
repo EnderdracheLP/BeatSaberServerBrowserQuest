@@ -13,13 +13,15 @@ DEFINE_TYPE(ServerBrowser::UI::Components, CreateServerExtensions);
 namespace ServerBrowser::UI::Components
 {
     void CreateServerExtensions::Awake() {
-        wrapper = get_transform()->Find(il2cpp_utils::newcsstr("Wrapper"));
-        formView = wrapper->get_transform()->Find(il2cpp_utils::newcsstr("CreateServerFormView"));
+        static ConstString wrapperStr("wrapper");
+        static ConstString createServerFormView("CreateServerFormView");
+        wrapper = get_transform()->Find(wrapperStr);
+        formView = wrapper->get_transform()->Find(createServerFormView);
 
         //layout = BeatSaberUI::CreateVerticalLayoutGroup(formView);
 
         addToBrowserSetting = CreateToggle("Add to Server Browser", get_AddToBrowserValue(), [this](bool newValue) { OnAddToBrowserChange(newValue); });
-        serverNameSetting = CreateTextInput("Server Name - " + Game::MpSession::GetDefaultHostGameName(), get_ServerNameValue(), [this](std::string_view newValue) { OnServerNameChange(newValue.data()); });
+        serverNameSetting = CreateTextInput("Server Name - " + Game::MpSession::GetDefaultHostGameName(), get_ServerNameValue(), [this](StringW newValue) { OnServerNameChange(static_cast<std::string>(newValue)); });
 
         CreateExtraText();
     }
@@ -60,7 +62,7 @@ namespace ServerBrowser::UI::Components
     }
 
     #pragma region UI Helpers
-    UnityEngine::UI::Toggle* CreateServerExtensions::CreateToggle(std::string label, bool value, std::function<void(bool)> onChangeCallback, std::string hoverHint)
+    UnityEngine::UI::Toggle* CreateServerExtensions::CreateToggle(StringW label, bool value, std::function<void(bool)> onChangeCallback, StringW hoverHint)
     {
         // Base
         //auto toggleSetting = BeatSaberUI::CreateToggle(layout->get_transform(), label, value, onChangeCallback);
@@ -70,7 +72,7 @@ namespace ServerBrowser::UI::Components
 
         auto toggleSetting = BeatSaberUI::CreateToggle(formView, label, value, onChangeCallback);
         reinterpret_cast<RectTransform*>(toggleSetting->get_transform()->GetParent())->set_sizeDelta({ 90.0f, 7.0f });
-        if (!hoverHint.empty())
+        if (!Il2CppString::IsNullOrEmpty(hoverHint))
             BeatSaberUI::AddHoverHint(toggleSetting->get_gameObject(), hoverHint);
 
         return toggleSetting;
@@ -98,7 +100,7 @@ namespace ServerBrowser::UI::Components
         //return toggleSetting;
     }
 
-    HMUI::InputFieldView* CreateServerExtensions::CreateTextInput(std::string label, std::string value, std::function<void(std::string_view)> onChangeCallback)
+    HMUI::InputFieldView* CreateServerExtensions::CreateTextInput(StringW label, StringW value, std::function<void(StringW)> onChangeCallback)
     {
         // Base
         //auto stringSetting = BeatSaberUI::CreateStringSetting(layout->get_transform(), label, value, onChangeCallback);

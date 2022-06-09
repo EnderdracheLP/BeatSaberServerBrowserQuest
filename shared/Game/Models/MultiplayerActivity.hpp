@@ -1,5 +1,5 @@
 #include <string>
-#include "GlobalNamespace/MasterServerEndPoint.hpp"
+#include "GlobalNamespace/DnsEndPoint.hpp"
 #include "GlobalNamespace/MultiplayerLobbyConnectionController.hpp"
 #include "GlobalNamespace/MultiplayerLobbyState.hpp"
 #include "GlobalNamespace/BeatmapLevelSelectionMask.hpp"
@@ -16,7 +16,7 @@ namespace ServerBrowser::Game::Models {
         #pragma region Fields
         bool InOnlineMenu;
         std::string Name;
-        SafePtr<GlobalNamespace::MasterServerEndPoint> MasterServer;
+        SafePtr<GlobalNamespace::DnsEndPoint> MasterServer;
         GlobalNamespace::MultiplayerLobbyConnectionController::LobbyConnectionType ConnectionType;
         GlobalNamespace::MultiplayerLobbyState LobbyState;
         std::string ServerCode;

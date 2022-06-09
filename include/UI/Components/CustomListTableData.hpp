@@ -14,6 +14,8 @@
 #include "GlobalNamespace/AnnotatedBeatmapLevelCollectionCell.hpp"
 #include "GlobalNamespace/SimpleTextTableCell.hpp"
 
+#include "QuestUI/shared/CustomTypes/Components/List/QuestUIBoxTableCell.hpp"
+
 #include <vector>
 
 // this is what that used to be called, but this is more clear and understandable (Blame BSML) we just copy this
@@ -23,10 +25,10 @@ namespace GlobalNamespace {
 ___DECLARE_TYPE_WRAPPER_INHERITANCE(ServerBrowser::UI::Components, CustomListTableData, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, UnityEngine::MonoBehaviour, "QuestUI", { classof(HMUI::TableView::IDataSource*) }, 0, nullptr,
 
     DECLARE_INSTANCE_FIELD(GlobalNamespace::LevelListTableCell*, songListTableCellInstance);
-    DECLARE_INSTANCE_FIELD(GlobalNamespace::LevelPackTableCell*, levelPackTableCellInstance);
+    DECLARE_INSTANCE_FIELD(GlobalNamespace::LevelPackCell*, levelPackTableCellInstance);
     DECLARE_INSTANCE_FIELD(GlobalNamespace::SimpleTextTableCell*, simpleTextTableCellInstance);
 
-    DECLARE_INSTANCE_FIELD(Il2CppString*, reuseIdentifier);
+    DECLARE_INSTANCE_FIELD(StringW, reuseIdentifier);
     DECLARE_INSTANCE_FIELD(float, cellSize);
     DECLARE_INSTANCE_FIELD(HMUI::TableView*, tableView);
     DECLARE_INSTANCE_FIELD(bool, expandCell);
@@ -52,10 +54,10 @@ public:
 
         CustomCellInfo(std::string text = "", std::string subText = "", UnityEngine::Sprite* icon = nullptr) : text(text), subText(subText), icon(icon) {};
         CustomCellInfo(std::string text, UnityEngine::Sprite* icon) : text(text), subText(""), icon(icon) {};
-
-        Il2CppString* get_text();
-        Il2CppString* get_subText();
-        Il2CppString* get_combinedText();
+        
+        StringW get_text();
+        StringW get_subText();
+        StringW get_combinedText();
         UnityEngine::Sprite* get_icon();
     };
 
@@ -69,7 +71,8 @@ public:
         std::vector<CustomCellInfo*> data;
 
         GlobalNamespace::LevelListTableCell* GetTableCell();
-        GlobalNamespace::LevelPackTableCell* GetLevelPackTableCell();
+        QuestUI::QuestUIBoxTableCell* GetBoxTableCell();
+        QuestUI::QuestUIBoxTableCell* InstantiateBoxTableCell(GlobalNamespace::LevelPackCell* levelPackTableCell);
         GlobalNamespace::SimpleTextTableCell* GetSimpleTextTableCell();
 )
 

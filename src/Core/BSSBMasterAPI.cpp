@@ -83,7 +83,7 @@ namespace ServerBrowser::Core {
         );
     }
 
-    BSSBMasterAPI::Announce(HostedGameData announce) {
+    void BSSBMasterAPI::Announce(HostedGameData announce) {
 
     }
 

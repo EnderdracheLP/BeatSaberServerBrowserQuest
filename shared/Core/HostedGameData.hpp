@@ -35,8 +35,8 @@ namespace ServerBrowser::Core {
 #pragma endregion
 
 #pragma region Describe
-        Il2CppString* Describe();
-        Il2CppString* DescribeType();
+        StringW Describe();
+        StringW DescribeType();
         std::string DescribeDifficulty(bool withColorTag = false);
 #pragma endregion
 
@@ -141,7 +141,7 @@ namespace ServerBrowser::Core {
         //const std::optional<std::string> get_HostSecret() const { return HostSecret; }
         //const std::optional<std::string> get_Endpoint() const { return Endpoint; }
 
-        std::string ToJSON();
+        const std::string ToJSON();
 #pragma endregion
     };
 }
