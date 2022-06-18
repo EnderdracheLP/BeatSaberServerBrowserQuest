@@ -8,40 +8,40 @@ namespace ServerBrowser::Game {
 	void MpConnect::Join(HostedGameData game) {
 		getLogger().debug("MpConnect::Join");
 		// MQE Version check
-		if (game.get_MpExVersion().has_value()) {
-			getLogger().debug("MpConnect::Join MpEx Check");
-			//std::string ourMQE_Version = "Undefined";
-			std::string ourMQE_Version = (Modloader::getMods().find("multiquestensions") != Modloader::getMods().end()) ? "0.6.2" : "";
+		// if (game.get_MpExVersion().has_value()) {
+		// 	getLogger().debug("MpConnect::Join MpEx Check");
+		// 	//std::string ourMQE_Version = "Undefined";
+		// 	std::string ourMQE_Version = (Modloader::getMods().find("multiquestensions") != Modloader::getMods().end()) ? "0.6.2" : "";
 
 
-			//semver::version checkRange2{ ourMQE_Version };
-			//checkRange2.minor++;
-			//auto range = semver::range::detail::range(string_format(">=%s <%s", ourMQE_Version.c_str(), checkRange2.to_string().c_str()));
-			if (game.get_MpExVersion()->to_string() != ourMQE_Version/*range.satisfies(game.get_MpExVersion().value(), true)*/) {
-				std::string ourMQE_VersionStr = (!ourMQE_Version.empty() ? ourMQE_Version : "Not installed");
-				std::string theirMpExVersionStr = game.get_MpExVersion()->to_string();
+		// 	//semver::version checkRange2{ ourMQE_Version };
+		// 	//checkRange2.minor++;
+		// 	//auto range = semver::range::detail::range(string_format(">=%s <%s", ourMQE_Version.c_str(), checkRange2.to_string().c_str()));
+		// 	if (game.get_MpExVersion()->to_string() != ourMQE_Version/*range.satisfies(game.get_MpExVersion().value(), true)*/) {
+		// 		std::string ourMQE_VersionStr = (!ourMQE_Version.empty() ? ourMQE_Version : "Not installed");
+		// 		std::string theirMpExVersionStr = game.get_MpExVersion()->to_string();
 
-				getLogger().warning("Blocking game join because of MultiQuestensions/MultiplayerExtensions version mismatch ours: %s, theirs: %s", 
-					ourMQE_Version.c_str(), theirMpExVersionStr.c_str());
+		// 		getLogger().warning("Blocking game join because of MultiQuestensions/MultiplayerExtensions version mismatch ours: %s, theirs: %s", 
+		// 			ourMQE_Version.c_str(), theirMpExVersionStr.c_str());
 
-				std::string MQE_Error(string_format(
-					"MultiQuestensions/MultiplayerExtensions version difference detected!\r\n"
-					"Please ensure you and the host are both using a compatible version.\r\n"
-					"\r\n"
-					"Your version: %s\r\n"
-					"Their version: %s",
-					ourMQE_VersionStr.c_str(),
-					theirMpExVersionStr.c_str()
-				));
+		// 		std::string MQE_Error(string_format(
+		// 			"MultiQuestensions/MultiplayerExtensions version difference detected!\r\n"
+		// 			"Please ensure you and the host are both using a compatible version.\r\n"
+		// 			"\r\n"
+		// 			"Your version: %s\r\n"
+		// 			"Their version: %s",
+		// 			ourMQE_VersionStr.c_str(),
+		// 			theirMpExVersionStr.c_str()
+		// 		));
 				
-				MpModeSelection::PresentConnectionFailedError(
-					"Incompatible game",
-					MQE_Error,
-					false
-				);
-				return;
-			}
-		}
+		// 		MpModeSelection::PresentConnectionFailedError(
+		// 			"Incompatible game",
+		// 			MQE_Error,
+		// 			false
+		// 		);
+		// 		return;
+		// 	}
+		// }
 		// Master server switching
 		if (!game.get_MasterServerHost().has_value() || game.get_MasterServerHost()->ends_with(OFFICIAL_MASTER_SUFFIX)) {
 			getLogger().error("MpConnect::Join Official Server, this should never run!!!");
@@ -79,7 +79,7 @@ namespace ServerBrowser::Game {
 		}
 		else
 		{
-			getLogger().debug("MpConnect::Join MasterServer is not offical, overrides will not work, hopefully this is BeatTogether Master");
+			getLogger().debug("MpConnect::Join MasterServer is not offical");
 			// Game is hosted on a custom master server, we need to override
 			SetMasterServerOverride(game.get_MasterServerHost().value(), game.get_MasterServerPort() != 0 ? game.get_MasterServerPort() : DEFAULT_MASTER_PORT);
 		}
@@ -95,9 +95,9 @@ namespace ServerBrowser::Game {
 
 	//std::pair<std::string, int> MpConnect::LastUsedMasterServer;
 
-	SafePtr<GlobalNamespace::DnsEndPoint> MpConnect::OverrideEndPoint;
+	Core::DnsEndPointW MpConnect::OverrideEndPoint;
 
-	SafePtr<GlobalNamespace::DnsEndPoint> MpConnect::LastUsedMasterServer;
+	Core::DnsEndPointW MpConnect::LastUsedMasterServer;
 
 	GlobalNamespace::DnsEndPoint* const MpConnect::get_OverrideEndPoint() {
 		//return MasterServerEndPoint::New_ctor(il2cpp_utils::newcsstr(OverrideEndPoint.first), OverrideEndPoint.second)
@@ -118,21 +118,21 @@ namespace ServerBrowser::Game {
 
 	bool MpConnect::get_ShouldDisableCertificateValidation() {
 		// We should disable certificate validation (X509CertificateUtilityPatch) if we are overriding to unofficial masters
-		return OverrideEndPoint && !OverrideEndPoint->hostName->EndsWith(OFFICIAL_MASTER_SUFFIX);
+		return OverrideEndPoint && !OverrideEndPoint.hostName.ends_with(OFFICIAL_MASTER_SUFFIX);
 	}
 
-	void MpConnect::ReportCurrentMasterServerValue(GlobalNamespace::DnsEndPoint* currentEndPoint) {
+	void MpConnect::ReportCurrentMasterServerValue(Core::DnsEndPointW currentEndPoint) {
 		bool isFirstReport = !LastUsedMasterServer;
 
 		LastUsedMasterServer = currentEndPoint;
 
-		if (OverrideEndPoint && static_cast<std::string>(currentEndPoint->ToString()) == static_cast<std::string>(OverrideEndPoint->ToString())/*currentEndPoint->Equals(OverrideEndPoint)*/)
+		if (OverrideEndPoint && currentEndPoint == OverrideEndPoint/*currentEndPoint->Equals(OverrideEndPoint)*/)
 		{
 			// This is our own override, not useful information
 			return;
 		}
 
-		auto hostName = currentEndPoint->hostName;
+		auto hostName = currentEndPoint.hostName;
 
 		if (hostName->EndsWith(OFFICIAL_MASTER_SUFFIX))
 		{
@@ -158,14 +158,14 @@ namespace ServerBrowser::Game {
 		}
 	}
 
-	void MpConnect::SetMasterServerOverride(std::string hostName, int port) {
+	void MpConnect::SetMasterServerOverride(StringW hostName, int port) {
 		if (!classof(DnsEndPoint*)->initialized) il2cpp_functions::Class_Init(classof(DnsEndPoint*)); // This is needed in order to initialize the Il2CppClass
 		//SetMasterServerOverride(MasterServerEndPoint::New_ctor<il2cpp_utils::CreationType::Manual>(il2cpp_utils::newcsstr(hostName), port));
-		SetMasterServerOverride(DnsEndPoint::New_ctor(hostName, port));
+		SetMasterServerOverride(Core::DnsEndPointW(hostName, port));
 	}
 
-	void MpConnect::SetMasterServerOverride(DnsEndPoint* overrideEndPoint) {
-		if (!OverrideEndPoint || !(static_cast<std::string>(OverrideEndPoint->ToString()) == static_cast<std::string>(overrideEndPoint->ToString())))
+	void MpConnect::SetMasterServerOverride(Core::DnsEndPointW overrideEndPoint) {
+		if (!OverrideEndPoint || OverrideEndPoint != overrideEndPoint)
 		{
 			//il2cpp_functions::GC_free(static_cast<MasterServerEndPoint*>(OverrideEndPoint));
 			getLogger().info("Setting master server override now: %s", static_cast<std::string>(overrideEndPoint->ToString()).c_str());
@@ -181,7 +181,7 @@ namespace ServerBrowser::Game {
 		{
 			getLogger().info("Stopped overriding master server");
 			//il2cpp_functions::GC_free(static_cast<MasterServerEndPoint*>(OverrideEndPoint));
-			OverrideEndPoint = nullptr;
+			OverrideEndPoint.Clear();
 		}
 	}
 #pragma endregion

@@ -1,6 +1,7 @@
 #pragma once
 #include "main.hpp"
 #include "Core/HostedGameData.hpp"
+#include "Core/DnsEndPoint.hpp"
 #include "GlobalNamespace/DnsEndPoint.hpp"
 // #include "GlobalNamespace/MasterServerEndPoint.hpp"
 // using GlobalNamespace::MasterServerEndPoint;
@@ -26,13 +27,13 @@ namespace ServerBrowser::Game {
 	//	static MasterServerEndPoint* _officialEndPoint;
 	//	static MasterServerEndPoint* _moddedEndPoint;
 	//	static bool _usingModdedServer;
-	static SafePtr<GlobalNamespace::DnsEndPoint> OverrideEndPoint;
+	static Core::DnsEndPointW OverrideEndPoint;
 	//static std::pair<std::string, int> OverrideEndPoint;
 		//static bool ShouldDisableCertificateValidation;
 	public:
 		static GlobalNamespace::DnsEndPoint* const get_OverrideEndPoint();
 
-	static SafePtr<GlobalNamespace::DnsEndPoint> LastUsedMasterServer;
+	static Core::DnsEndPointW LastUsedMasterServer;
 	//static std::pair<std::string, int> LastUsedMasterServer;
 	//	MasterServerEndPoint* get_LastUsedMasterServer();
 	//private:
@@ -42,11 +43,11 @@ namespace ServerBrowser::Game {
 	//public:
 	static bool get_ShouldDisableCertificateValidation();
 
-	static void ReportCurrentMasterServerValue(GlobalNamespace::DnsEndPoint* currentEndPoint);
+	static void ReportCurrentMasterServerValue(Core::DnsEndPointW currentEndPoint);
 
-	static void SetMasterServerOverride(std::string hostName, int port = DEFAULT_MASTER_PORT);
+	static void SetMasterServerOverride(StringW hostName, int port = DEFAULT_MASTER_PORT);
 
-	static void SetMasterServerOverride(GlobalNamespace::DnsEndPoint* overrideEndPoint);
+	static void SetMasterServerOverride(Core::DnsEndPointW overrideEndPoint);
 
 	static void ClearMasterServerOverride();
 #pragma endregion

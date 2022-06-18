@@ -40,14 +40,15 @@ namespace ServerBrowser::Core {
 	StringW HostedGameData::Describe() {
 		std::string moddedDescr = IsModded ? "Modded" : "Vanilla";
 
-		if (IsQuickPlayServer()) {
-			moddedDescr += " Quick Play";
+		if (IsOnCustomMaster()) {
+			moddedDescr += ", Unofficial";
 		}
 
-		if (IsOnCustomMaster()) {
-			moddedDescr += ", Cross-play";
+		if (IsQuickPlayServer()) {
+			return StringW(string_format("Quick Play Lobby (%d/%d, %s)", PlayerCount, PlayerLimit, moddedDescr.c_str()));
+		} else {
+			return StringW(GameName + string_format(" (%d/%d, %s)", PlayerCount, PlayerLimit, moddedDescr.c_str()));
 		}
-		return StringW(GameName + string_format(" (%d/%d, %s)", PlayerCount, PlayerLimit, moddedDescr.c_str()));
 	}
 
 	StringW HostedGameData::DescribeType() {
@@ -57,11 +58,14 @@ namespace ServerBrowser::Core {
 		if (MasterServerHost.has_value() && MasterServerHost.value() == OFFICIAL_MASTER_OCULUS) {
 			masterServerDescr = "Oculus";
 		}
+		// else if (MasterServerHost.has_value() && MasterServerHost.value() == OFFICIAL_MASTER_STEAM) {
+		// 	masterServerDescr = "Steam";
+		// }
 		else if (MasterServerHost->ends_with(OFFICIAL_MASTER_SUFFIX)) {
 			masterServerDescr = "Official-unknown";
 		}
 		else {
-			masterServerDescr = "Cross-play";
+			masterServerDescr = "Unofficial";
 		}
 
 		if (IsModded) {
@@ -123,7 +127,7 @@ namespace ServerBrowser::Core {
 					colorHex = "#8f48db";
 					break;
 				default:
-					colorHex = "#FFFFFF";
+					colorHex = "#bcbdc2";
 					break;
 				}
 			text = string_format("<color=%s>%s</color>", colorHex.c_str(), text.c_str());
@@ -137,9 +141,9 @@ namespace ServerBrowser::Core {
 #pragma region JSON Serialization/Deserialization
 #pragma region Serialize
 SERIALIZE_STRING_METHOD(ServerBrowser::Core, HostedGameData,
-	//SERIALIZE_VALUE_OPTIONAL(BeatsaverId, beatsaverId)
-	//SERIALIZE_VALUE_OPTIONAL(CoverUrl, coverUrl)
-	//SERIALIZE_VALUE_OPTIONAL(LevelName, levelName)
+	SERIALIZE_VALUE_OPTIONAL(BeatsaverId, beatsaverId)
+	SERIALIZE_VALUE_OPTIONAL(CoverUrl, coverUrl)
+	SERIALIZE_VALUE_OPTIONAL(LevelName, levelName)
 	SERIALIZE_VALUE(Id, Id)
 	SERIALIZE_VALUE(ServerCode, ServerCode)
 	SERIALIZE_VALUE(GameName, GameName)
@@ -153,14 +157,15 @@ SERIALIZE_STRING_METHOD(ServerBrowser::Core, HostedGameData,
 	//SERIALIZE_VALUE(FirstSeen, firstSeen)
 	//SERIALIZE_VALUE(LastUpdate, lastUpdate)
 	SERIALIZE_VALUE(LobbyState, LobbyState)
-	SERIALIZE_VALUE_OPTIONAL(LevelId, LevelId)
-	SERIALIZE_VALUE_OPTIONAL(SongName, SongName)
-	SERIALIZE_VALUE_OPTIONAL(SongAuthor, SongAuthor)
+	// SERIALIZE_VALUE_OPTIONAL(LevelId, LevelId)
+	// SERIALIZE_VALUE_OPTIONAL(SongName, SongName)
+	// SERIALIZE_VALUE_OPTIONAL(SongAuthor, SongAuthor)
 	SERIALIZE_VALUE_OPTIONAL(Difficulty, Difficulty)
 	SERIALIZE_VALUE(Platform, Platform)
 	SERIALIZE_VALUE_OPTIONAL(MasterServerHost, MasterServerHost)
 	SERIALIZE_VALUE(MasterServerPort, MasterServerPort)
-	SERIALIZE_VALUE_OPTIONAL(CoverUrl, CoverUrl)
+	SERIALIZE_VALUE_OPTIONAL(MasterStatusUrl, MasterStatusUrl)
+	// SERIALIZE_VALUE_OPTIONAL(CoverUrl, CoverUrl)
 	if (!Players.empty()) {
 		rapidjson::Value players(rapidjson::kArrayType);
 		for (HostedGamePlayer player : Players) {
@@ -180,6 +185,9 @@ SERIALIZE_STRING_METHOD(ServerBrowser::Core, HostedGameData,
 	if (MpExVersion.has_value())
 		doc.AddMember("MpExVersion", MpExVersion->to_string(), alloc);
 	else doc.AddMember("MpExVersion", rapidjson::Value(rapidjson::kNullType), alloc);
+	if (MpCoreVersion.has_value())
+		doc.AddMember("MpCoreVersion", MpCoreVersion->to_string(), alloc);
+	else doc.AddMember("MpCoreVersion", rapidjson::Value(rapidjson::kNullType), alloc);
 	//SERIALIZE_VALUE(ModName, modName)
 	//rapidjson::Value modVer(rapidjson::kObjectType);
 	//modVer.PushBack(ModVersion.major, alloc).PushBack(ModVersion.minor, alloc).PushBack(ModVersion.patch, alloc);
@@ -213,17 +221,23 @@ SERIALIZE_STRING_METHOD(ServerBrowser::Core, HostedGameData,
 			DESERIALIZE_VALUE(FirstSeen, firstSeen, String)
 			DESERIALIZE_VALUE(LastUpdate, lastUpdate, String)
 			DESERIALIZE_VALUE(LobbyState, lobbyState, Int)
+
 			DESERIALIZE_VALUE_OPTIONAL(LevelId, levelId, String)
 			DESERIALIZE_VALUE_OPTIONAL(SongName, songName, String)
 			DESERIALIZE_VALUE_OPTIONAL(SongAuthor, songAuthor, String)
+			
 			DESERIALIZE_VALUE_OPTIONAL(Difficulty, difficulty, Int)
 			DESERIALIZE_VALUE(Platform, platform, String)
 			DESERIALIZE_VALUE_OPTIONAL(MasterServerHost, masterServerHost, String)
 			DESERIALIZE_VALUE(MasterServerPort, masterServerPort, Int)
+			DESERIALIZE_VALUE_OPTIONAL(MasterStatusUrl, masterStatusUrl, String)
 			DESERIALIZE_VALUE_OPTIONAL(EndedAt, endedAt, String)
 			//DESERIALIZE_VALUE_OPTIONAL(MpExVersion, mpExVersion, String)
 			if (jsonValue.HasMember("mpExVersion") && jsonValue["mpExVersion"].IsString()) {
 				MpExVersion = semver::from_string_noexcept(jsonValue["mpExVersion"].GetString());
+			}
+			if (jsonValue.HasMember("mpCoreVersion") && jsonValue["mpCoreVersion"].IsString()) {
+				MpCoreVersion = semver::from_string_noexcept(jsonValue["mpCoreVersion"].GetString());
 			}
 			DESERIALIZE_VALUE(ModName, modName, String)
 			if (jsonValue.HasMember("modVersion") && jsonValue["modVersion"].IsObject()) {
@@ -247,6 +261,11 @@ SERIALIZE_STRING_METHOD(ServerBrowser::Core, HostedGameData,
 			DESERIALIZE_VALUE_OPTIONAL(ServerType, serverType, String)
 			DESERIALIZE_VALUE_OPTIONAL(HostSecret, hostSecret, String)
 			DESERIALIZE_VALUE_OPTIONAL(Endpoint, endpoint, String)
+			// DESERIALIZE_VALUE_OPTIONAL(ManagerId, managerId, String)
+
+			// TODO: Deserialize level data
+
+
 	)
 #pragma endregion
 #pragma endregion

@@ -20,8 +20,8 @@ namespace ServerBrowser::Game {
 		//static ServerBrowser::Core::HostedGameData LastConnectToHostedGame;
 
 		// Remove the below for next update
-		static Il2CppString* InjectQuickPlaySecret;
-		static Il2CppString* InjectServerCode;
+		static StringW InjectQuickPlaySecret;
+		static StringW InjectServerCode;
 
 
 #pragma region Init
@@ -45,7 +45,7 @@ namespace ServerBrowser::Game {
 
 		static void OpenCreateServerMenu();
 		static void ConnectToHostedGame(std::optional<ServerBrowser::Core::HostedGameData> game);
-		static void PresentConnectionFailedError(std::string errorTitle = "Connection failed", std::string errorMessage = "", bool canRetry = true);
+		static void PresentConnectionFailedError(StringW errorTitle = "Connection failed", StringW errorMessage = "", bool canRetry = true);
 		// ^ set to static
 		static void CancelLobbyJoin(bool hideLoading = true);
 		static void MakeServerBrowserTopView();

@@ -2,6 +2,7 @@
 #include "Game/MpConnect.hpp"
 #include "Game/MpLocalPlayer.hpp"
 #include "PluginConfig.hpp"
+#include "MultiplayerCore/shared/Utilities.hpp"
 #include "UnityEngine/Resources.hpp"
 #include "GlobalNamespace/IConnectedPlayer.hpp"
 #include "System/Action_1.hpp"
@@ -27,6 +28,12 @@ namespace ServerBrowser::Game {
     }
 
     #pragma region Lifecycle
+
+    System::Action* onSessionJoinDelegate;
+    System::Action_1<GlobalNamespace::DisconnectedReason>* onSessionDisconnectDelegate;
+    System::Action_1<GlobalNamespace::IConnectedPlayer*>* onPlayerConnectDelegate;
+    System::Action_1<GlobalNamespace::IConnectedPlayer*>* onPlayerDisconnectDelegate;
+
     void MpSession::SetUp() 
     {
         /**
@@ -39,40 +46,48 @@ namespace ServerBrowser::Game {
             getLogger().critical("Unable to get MultiplayerSessionManager! Things are broken now.");
             return;
         }
+        onSessionJoinDelegate = il2cpp_utils::MakeDelegate<System::Action*>(classof(System::Action*), 
+                            static_cast<Il2CppObject*>(nullptr), OnSessionConnected);
+        SessionManager->add_connectedEvent(onSessionJoinDelegate);
 
-        SessionManager->add_connectedEvent(
-            il2cpp_utils::MakeDelegate<System::Action*>(classof(System::Action*), 
-                static_cast<Il2CppObject*>(nullptr), OnSessionConnected));
-        SessionManager->add_disconnectedEvent(
-            il2cpp_utils::MakeDelegate<System::Action_1<GlobalNamespace::DisconnectedReason>*>(
+        onSessionDisconnectDelegate = il2cpp_utils::MakeDelegate<System::Action_1<GlobalNamespace::DisconnectedReason>*>(
             classof(System::Action_1<GlobalNamespace::DisconnectedReason>*), 
-            static_cast<Il2CppObject*>(nullptr), OnSessionDisconnected));
-        SessionManager->add_playerConnectedEvent(
-            il2cpp_utils::MakeDelegate<System::Action_1<IConnectedPlayer*>*>(classof(System::Action_1<IConnectedPlayer*>*),
-            static_cast<Il2CppObject*>(nullptr), OnSessionPlayerConnected));
-        SessionManager->add_playerDisconnectedEvent(
-            il2cpp_utils::MakeDelegate<System::Action_1<IConnectedPlayer*>*>(classof(System::Action_1<IConnectedPlayer*>*), 
-                static_cast<Il2CppObject*>(nullptr), OnSessionPlayerDisconnected));
+            static_cast<Il2CppObject*>(nullptr), OnSessionDisconnected);
+        SessionManager->add_disconnectedEvent(onSessionDisconnectDelegate);
+
+        onPlayerConnectDelegate = il2cpp_utils::MakeDelegate<System::Action_1<IConnectedPlayer*>*>(
+            classof(System::Action_1<IConnectedPlayer*>*),
+            static_cast<Il2CppObject*>(nullptr), OnSessionPlayerConnected);
+        SessionManager->add_playerConnectedEvent(onPlayerConnectDelegate);
+
+        onPlayerDisconnectDelegate = il2cpp_utils::MakeDelegate<System::Action_1<IConnectedPlayer*>*>(
+            classof(System::Action_1<IConnectedPlayer*>*), 
+            static_cast<Il2CppObject*>(nullptr), OnSessionPlayerDisconnected);
+        SessionManager->add_playerDisconnectedEvent(onPlayerDisconnectDelegate);
     }
 
     void MpSession::TearDown()
     {
-        if (SessionManager != nullptr)
-        {
-            SessionManager->remove_connectedEvent(
-                il2cpp_utils::MakeDelegate<System::Action*>(classof(System::Action*),
-                    static_cast<Il2CppObject*>(nullptr), OnSessionConnected));
-            SessionManager->remove_disconnectedEvent(
-                il2cpp_utils::MakeDelegate<System::Action_1<GlobalNamespace::DisconnectedReason>*>(
-                    classof(System::Action_1<GlobalNamespace::DisconnectedReason>*),
-                    static_cast<Il2CppObject*>(nullptr), OnSessionDisconnected));
-            SessionManager->remove_playerConnectedEvent(
-                il2cpp_utils::MakeDelegate<System::Action_1<IConnectedPlayer*>*>(classof(System::Action_1<IConnectedPlayer*>*),
-                    static_cast<Il2CppObject*>(nullptr), OnSessionPlayerConnected));
-            SessionManager->remove_playerDisconnectedEvent(
-                il2cpp_utils::MakeDelegate<System::Action_1<IConnectedPlayer*>*>(classof(System::Action_1<IConnectedPlayer*>*),
-                    static_cast<Il2CppObject*>(nullptr), OnSessionPlayerDisconnected));
-        }
+        MultiplayerCore::Utilities::ClearDelegate(onSessionJoinDelegate);
+        MultiplayerCore::Utilities::ClearDelegate(onSessionDisconnectDelegate);
+        MultiplayerCore::Utilities::ClearDelegate(onPlayerConnectDelegate);
+        MultiplayerCore::Utilities::ClearDelegate(onPlayerDisconnectDelegate);
+        // if (SessionManager != nullptr)
+        // {
+            // SessionManager->remove_connectedEvent(
+            //     il2cpp_utils::MakeDelegate<System::Action*>(classof(System::Action*),
+            //         static_cast<Il2CppObject*>(nullptr), OnSessionConnected));
+            // SessionManager->remove_disconnectedEvent(
+            //     il2cpp_utils::MakeDelegate<System::Action_1<GlobalNamespace::DisconnectedReason>*>(
+            //         classof(System::Action_1<GlobalNamespace::DisconnectedReason>*),
+            //         static_cast<Il2CppObject*>(nullptr), OnSessionDisconnected));
+            // SessionManager->remove_playerConnectedEvent(
+            //     il2cpp_utils::MakeDelegate<System::Action_1<IConnectedPlayer*>*>(classof(System::Action_1<IConnectedPlayer*>*),
+            //         static_cast<Il2CppObject*>(nullptr), OnSessionPlayerConnected));
+            // SessionManager->remove_playerDisconnectedEvent(
+            //     il2cpp_utils::MakeDelegate<System::Action_1<IConnectedPlayer*>*>(classof(System::Action_1<IConnectedPlayer*>*),
+            //         static_cast<Il2CppObject*>(nullptr), OnSessionPlayerDisconnected));
+        // }
     }
     #pragma endregion
 

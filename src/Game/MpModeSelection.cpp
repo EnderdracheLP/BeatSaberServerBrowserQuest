@@ -1,11 +1,13 @@
 #include "Game/MpModeSelection.hpp"
 #include "Game/MpConnect.hpp"
 //#include "Game/MpLobbyDestination.hpp"
+#include "MultiplayerCore/shared/Utilities.hpp"
 #include "GlobalNamespace/SelectMultiplayerLobbyDestination.hpp"
 #include "UI/PluginUi.hpp"
 #include "UnityEngine/Resources.hpp"
 #include "UnityEngine/Object.hpp"
 #include "System/Action_1.hpp"
+#include "questui/shared/CustomTypes/Components/MainThreadScheduler.hpp"
 using namespace GlobalNamespace;
 using namespace HMUI;
 using namespace System;
@@ -19,8 +21,8 @@ namespace ServerBrowser::Game {
 	//bool MpModeSelection::WeAbortedJoin = false;
 	//HostedGameData MpModeSelection::LastConnectToHostedGame;
 	// Remove the below for next update
-	Il2CppString* MpModeSelection::InjectQuickPlaySecret = nullptr;
-	Il2CppString* MpModeSelection::InjectServerCode = nullptr;
+	StringW MpModeSelection::InjectQuickPlaySecret = nullptr;
+	StringW MpModeSelection::InjectServerCode = nullptr;
 
 
 	GlobalNamespace::MultiplayerModeSelectionFlowCoordinator* MpModeSelection::_flowCoordinator;
@@ -116,31 +118,41 @@ namespace ServerBrowser::Game {
 			HMUI::ViewController::AnimationDirection::Vertical);
 	}
 
-	void MpModeSelection::PresentConnectionFailedError(std::string errorTitle, std::string errorMessage, bool canRetry) {
+	void MpModeSelection::PresentConnectionFailedError(StringW errorTitle, StringW errorMessage, bool canRetry) {
 		CancelLobbyJoin();
-
+        static System::Action_1<int>* action;
 		//if (LastConnectToHostedGame == nullptr)
-		if (!GlobalModState::LastConnectToHostedGame.has_value())
+		if (!GlobalModState::LastConnectToHostedGame.has_value() || !GlobalModState::WeInitiatedConnection)
 			canRetry = false; // we don't have game info to retry with
-		Il2CppString* errorTitleStr = il2cpp_utils::newcsstr(errorTitle);
-		Il2CppString* errorMessageStr = il2cpp_utils::newcsstr(errorMessage);
-		Il2CppString* backToBrowserStr = il2cpp_utils::newcsstr("Back to browser");
-		Il2CppString* canRetryStr = il2cpp_utils::newcsstr("Retry connection");
-		auto* action = il2cpp_utils::MakeDelegate<System::Action_1<int>*>(classof(System::Action_1<int>*), (std::function<void(int)>)[](int btnId) {
+		// Il2CppString* errorTitleStr = il2cpp_utils::newcsstr(errorTitle);
+		// Il2CppString* errorMessageStr = il2cpp_utils::newcsstr(errorMessage);
+		static ConstString backToBrowserStr("Back to browser");
+		static ConstString canRetryStr("Retry connection");
+		action = il2cpp_utils::MakeDelegate<System::Action_1<int>*>(classof(System::Action_1<int>*), (std::function<void(int)>)[](int btnId) {
 				switch (btnId)
 				{
 				default:
-				case 0: // Back to browser
-					MpModeSelection::MakeServerBrowserTopView();
+				case 0: 
+					if (GlobalModState::WeInitiatedConnection)
+						// Back to browser
+						MpModeSelection::MakeServerBrowserTopView();
+					else
+						DismissViewController(_simpleDialogPromptViewController, ViewController::AnimationDirection::Vertical, nullptr, false);
 					break;
 				case 1: // Retry connection
 					MpModeSelection::ConnectToHostedGame(GlobalModState::LastConnectToHostedGame);
 					break;
 				}
+				if (action != nullptr) {
+					QuestUI::MainThreadScheduler::Schedule([]{
+						MultiplayerCore::Utilities::ClearDelegate(action);
+						action = nullptr;
+					});
+				}
 			}
 		);
 
-		_simpleDialogPromptViewController->Init(errorTitleStr, errorMessageStr, backToBrowserStr, canRetry ? canRetryStr : nullptr, action);
+		_simpleDialogPromptViewController->Init(errorTitle, errorMessage, backToBrowserStr, canRetry ? canRetryStr : nullptr, action);
 		ReplaceTopViewController(_simpleDialogPromptViewController, ViewController::AnimationType::In, ViewController::AnimationDirection::Vertical);
 	}
 	void MpModeSelection::CancelLobbyJoin(bool hideLoading) {

@@ -30,13 +30,13 @@ namespace ServerBrowser::Game {
     const std::string MpLocalPlayer::get_PlatformId() {
         switch (get_Platform()) {
         case UserInfo::Platform::Oculus:
-            return "oculus";
+            return "Oculus";
         case UserInfo::Platform::Steam:
-            return "steam";
+            return "Steam";
         case UserInfo::Platform::PS4:
-            return "ps4";
+            return "PS4";
         case UserInfo::Platform::Test:
-            return "test";
+            return "Test";
         default:
             return "unknown";
         }
@@ -50,18 +50,20 @@ namespace ServerBrowser::Game {
 
         //auto platformUserModel = localNetworkPlayerModel.GetField<IPlatformUserModel, LocalNetworkPlayerModel>("_platformUserModel");
         auto UserInfoTask = localNetworkPlayerModel->platformUserModel->GetUserInfo();
-
-        auto action = il2cpp_utils::MakeDelegate<System::Action_1<System::Threading::Tasks::Task*>*>(classof(System::Action_1<System::Threading::Tasks::Task*>*), (std::function<void(System::Threading::Tasks::Task_1<GlobalNamespace::UserInfo*>*)>)[&](System::Threading::Tasks::Task_1<GlobalNamespace::UserInfo*>* userInfoTask) {
+        static System::Action_1<System::Threading::Tasks::Task*>* action;
+        static bool gotPlayerInfo = false;
+        if (!gotPlayerInfo) action = il2cpp_utils::MakeDelegate<System::Action_1<System::Threading::Tasks::Task*>*>(classof(System::Action_1<System::Threading::Tasks::Task*>*), (std::function<void(System::Threading::Tasks::Task_1<GlobalNamespace::UserInfo*>*)>)[&](System::Threading::Tasks::Task_1<GlobalNamespace::UserInfo*>* userInfoTask) {
                 UserInfo = userInfoTask->get_Result();
                 if (UserInfo == nullptr)
                 {
                     getLogger().error("Failed to get local network player!");
                     return;
                 }
-            }
+        }
         );
-
-        reinterpret_cast<System::Threading::Tasks::Task*>(UserInfoTask)->ContinueWith(action);
+        if (action) { 
+            reinterpret_cast<System::Threading::Tasks::Task*>(UserInfoTask)->ContinueWith(action);
+        }
     }
 
     //void MpLocalPlayer::SetUserInfo(GlobalNamespace::UserInfo* userInfo) {

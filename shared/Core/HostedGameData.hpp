@@ -44,6 +44,12 @@ namespace ServerBrowser::Core {
         void Deserialize(const rapidjson::Value& jsonValue);
 
     private:
+        // TODO: Implement the level class for these and update code
+        std::optional<std::string> CoverUrl;
+        std::optional<std::string> LevelId;
+        std::optional<std::string> SongName;
+        std::optional<std::string> SongAuthor;
+
         std::optional<std::string> BeatsaverId;
         std::optional<std::string> LevelName;
         int Id;
@@ -57,17 +63,15 @@ namespace ServerBrowser::Core {
         std::string FirstSeen;
         std::string LastUpdate;
         int LobbyState;
-        std::optional<std::string> LevelId;
-        std::optional<std::string> SongName;
-        std::optional<std::string> SongAuthor;
         std::optional<int> Difficulty;
         std::string Platform;
         std::optional<std::string> MasterServerHost;
         int MasterServerPort;
-        std::optional<std::string> CoverUrl;
+        std::optional<std::string> MasterStatusUrl;
         std::vector<HostedGamePlayer> Players;
         std::optional<std::string> EndedAt;
         std::optional<semver::version> MpExVersion;
+        std::optional<semver::version> MpCoreVersion;
         std::string ModName;
         semver::version ModVersion;
         semver::version GameVersion;
@@ -80,8 +84,13 @@ namespace ServerBrowser::Core {
         std::optional<std::string> Key;
 
     public:
-        const std::optional<std::string> get_BeatsaverId() const { return BeatsaverId; }
+        // TODO: Implement the level class for these and update code
         const std::optional<std::string> get_CoverUrl() const { return CoverUrl; }
+        const std::optional<std::string> get_LevelId() const { return LevelId; }
+        const std::optional<std::string> get_SongName() const { return SongName; }
+        const std::optional<std::string> get_SongAuthor() const { return SongAuthor; }
+
+        const std::optional<std::string> get_BeatsaverId() const { return BeatsaverId; }
         const std::optional<std::string> get_LevelName() const { return LevelName; }
         const int& get_Id() const { return Id; }
         const std::string& get_ServerCode() const { return ServerCode; }
@@ -94,15 +103,14 @@ namespace ServerBrowser::Core {
         const std::string& get_FirstSeen() const { return FirstSeen; }
         const std::string& get_LastUpdate() const { return LastUpdate; }
         const int& get_LobbyState() const { return LobbyState; }
-        const std::optional<std::string> get_LevelId() const { return LevelId; }
-        const std::optional<std::string> get_SongName() const { return SongName; }
-        const std::optional<std::string> get_SongAuthor() const { return SongAuthor; }
         const std::optional<int> get_Difficulty() const { return Difficulty; }
         const std::string& get_Platform() const { return Platform; }
         const std::optional<std::string> get_MasterServerHost() const { return MasterServerHost; }
         const int& get_MasterServerPort() const { return MasterServerPort; }
+        const std::optional<std::string> get_MasterStatusUrl() const { return MasterStatusUrl; }
         const std::optional<std::string> get_EndedAt() const { return EndedAt; }
         const std::optional<semver::version> get_MpExVersion() const { return MpExVersion; }
+        const std::optional<semver::version> get_MpCoreVersion() const { return MpCoreVersion; }
         const std::string& get_ModName() const { return ModName; }
         const semver::version& get_ModVersion() const { return ModVersion; }
         const semver::version& get_GameVersion() const { return GameVersion; }
