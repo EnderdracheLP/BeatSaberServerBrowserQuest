@@ -360,7 +360,7 @@ QUICK_HOOK_GB(PacketEncryptionLayer, ProcessOutBoundPacketInternal, bool, System
     return PacketEncryptionLayer_ProcessOutBoundPacketInternal(self, remoteEndPoint, data, offset, length, encrypted);
 }
 
-QUICK_HOOK_GB(UserCertificateValidator, ValidateCertificateChainInternal, void, GlobalNamespace::MasterServerEndPoint* endPoint, System::Security::Cryptography::X509Certificates::X509Certificate2* certificate, ::Array<::Array<uint8_t>*>* certificateChain)
+QUICK_HOOK_GB(UserCertificateValidator, ValidateCertificateChainInternal, void, GlobalNamespace::DnsEndPoint* endPoint, System::Security::Cryptography::X509Certificates::X509Certificate2* certificate, ::Array<::Array<uint8_t>*>* certificateChain)
 {
     // This mod disables certificate validation when it is overriding the master server to an unofficial one only.
     // If we are connecting to official games, we won't interfere.
