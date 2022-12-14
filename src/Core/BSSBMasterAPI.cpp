@@ -46,6 +46,7 @@ namespace ServerBrowser::Core {
 
     void BSSBMasterAPI::BrowseAsync(int offset, /*HostedGameFilters filters,*/ std::function<void(std::optional<ServerBrowser::Core::ServerBrowserResult>)> finished) {
         exception.clear();
+        // std::string browsePath = "https://httpbin.org/anything?platform=" + MpLocalPlayer::get_PlatformId();
         std::string browsePath = BASE_URL + "/browse?platform=" + MpLocalPlayer::get_PlatformId();
         if (offset > 0)browsePath += "&offset=" + std::to_string(offset);
         //if (filterFull > 0) browsePath += "&filterFull=" + /*std::to_string(filterFull)*/"0";
@@ -55,14 +56,16 @@ namespace ServerBrowser::Core {
         WebUtils::GetJSONAsync(browsePath,
             [finished](long httpCode, bool error, rapidjson::Document& document) {
                 if (error) {
+                    getLogger().error("Error returned %ld", httpCode);
                     finished(std::nullopt);
                 }
                 else {
                     try {
-                        //rapidjson::StringBuffer buffer;
-                        //rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-                        //document.Accept(writer);
-                        //writefile("/sdcard/ModData/ServerBrowser_Browse.json", buffer.GetString());
+                        // rapidjson::StringBuffer buffer;
+                        // rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+                        // document.Accept(writer);
+                        // writefile("/sdcard/ModData/ServerBrowser_Browse.json", buffer.GetString());
+                        // getLogger().debug("%s", buffer.GetString());
 
                         ServerBrowser::Core::ServerBrowserResult page;
                         page.Deserialize(document.GetObject());
