@@ -72,7 +72,7 @@ namespace ServerBrowser::Core {
 			moddedDescr = "Modded";
 
 			if (MpExVersion.has_value()) {
-				moddedDescr += " " + MpExVersion->to_string();
+				moddedDescr += " " + MpExVersion.value();
 			}
 		}
 		else {
@@ -182,12 +182,14 @@ SERIALIZE_STRING_METHOD(ServerBrowser::Core, HostedGameData,
 	else doc.AddMember("Players", rapidjson::Value(rapidjson::kNullType), alloc);
 	//SERIALIZE_VALUE_OPTIONAL(EndedAt, endedAt)
 	//SERIALIZE_VALUE_OPTIONAL(MpExVersion, mpExVersion)
-	if (MpExVersion.has_value())
-		doc.AddMember("MpExVersion", MpExVersion->to_string(), alloc);
-	else doc.AddMember("MpExVersion", rapidjson::Value(rapidjson::kNullType), alloc);
-	if (MpCoreVersion.has_value())
-		doc.AddMember("MpCoreVersion", MpCoreVersion->to_string(), alloc);
-	else doc.AddMember("MpCoreVersion", rapidjson::Value(rapidjson::kNullType), alloc);
+	SERIALIZE_VALUE_OPTIONAL(MpExVersion, mpExVersion)
+	SERIALIZE_VALUE_OPTIONAL(MpCoreVersion, mpCoreVersion)
+	// if (MpExVersion.has_value())
+	// 	doc.AddMember("MpExVersion", MpExVersion->to_string(), alloc);
+	// else doc.AddMember("MpExVersion", rapidjson::Value(rapidjson::kNullType), alloc);
+	// if (MpCoreVersion.has_value())
+	// 	doc.AddMember("MpCoreVersion", MpCoreVersion->to_string(), alloc);
+	// else doc.AddMember("MpCoreVersion", rapidjson::Value(rapidjson::kNullType), alloc);
 	//SERIALIZE_VALUE(ModName, modName)
 	//rapidjson::Value modVer(rapidjson::kObjectType);
 	//modVer.PushBack(ModVersion.major, alloc).PushBack(ModVersion.minor, alloc).PushBack(ModVersion.patch, alloc);
@@ -232,29 +234,36 @@ SERIALIZE_STRING_METHOD(ServerBrowser::Core, HostedGameData,
 			DESERIALIZE_VALUE(MasterServerPort, masterServerPort, Int)
 			DESERIALIZE_VALUE_OPTIONAL(MasterStatusUrl, masterStatusUrl, String)
 			DESERIALIZE_VALUE_OPTIONAL(EndedAt, endedAt, String)
-			//DESERIALIZE_VALUE_OPTIONAL(MpExVersion, mpExVersion, String)
-			if (jsonValue.HasMember("mpExVersion") && jsonValue["mpExVersion"].IsString()) {
-				MpExVersion = semver::from_string_noexcept(jsonValue["mpExVersion"].GetString());
-			}
-			if (jsonValue.HasMember("mpCoreVersion") && jsonValue["mpCoreVersion"].IsString()) {
-				MpCoreVersion = semver::from_string_noexcept(jsonValue["mpCoreVersion"].GetString());
-			}
+			DESERIALIZE_VALUE_OPTIONAL(MpExVersion, mpExVersion, String)
+			DESERIALIZE_VALUE_OPTIONAL(MpCoreVersion, mpCoreVersion, String)
+			// if (jsonValue.HasMember("mpExVersion") && jsonValue["mpExVersion"].IsString()) {
+			// 	MpExVersion = semver::from_string_noexcept(jsonValue["mpExVersion"].GetString());
+			// }
+			// if (jsonValue.HasMember("mpCoreVersion") && jsonValue["mpCoreVersion"].IsString()) {
+			// 	MpCoreVersion = semver::from_string_noexcept(jsonValue["mpCoreVersion"].GetString());
+			// }
 			DESERIALIZE_VALUE(ModName, modName, String)
 			if (jsonValue.HasMember("modVersion") && jsonValue["modVersion"].IsObject()) {
 				auto modVer = jsonValue["modVersion"].GetObject();
-				ModVersion.major = modVer["major"].GetInt();
-				ModVersion.minor = modVer["minor"].GetInt();
-				ModVersion.patch = modVer["build"].GetInt();
+				ModVersion = string_format("%d.%d.%d", modVer["major"].GetInt(), modVer["minor"].GetInt(), modVer["build"].GetInt());
 				if (modVer.HasMember("revision") && modVer["revision"].IsInt())
-					ModVersion.prerelease_number = modVer["revision"].GetInt();
+					ModVersion += string_format("-%d", modVer["revision"].GetInt());
+				// ModVersion.major = modVer["major"].GetInt();
+				// ModVersion.minor = modVer["minor"].GetInt();
+				// ModVersion.patch = modVer["build"].GetInt();
+				// if (modVer.HasMember("revision") && modVer["revision"].IsInt())
+				// 	ModVersion.prerelease_number = modVer["revision"].GetInt();
 			}
 			if (jsonValue.HasMember("gameVersion") && jsonValue["gameVersion"].IsObject()) {
 				auto gameVer = jsonValue["gameVersion"].GetObject();
-				GameVersion.major = gameVer["major"].GetInt();
-				GameVersion.minor = gameVer["minor"].GetInt();
-				GameVersion.patch = gameVer["build"].GetInt();
+				GameVersion = string_format("%d.%d.%d", gameVer["major"].GetInt(), gameVer["minor"].GetInt(), gameVer["build"].GetInt());
 				if (gameVer.HasMember("revision") && gameVer["revision"].IsInt())
-					GameVersion.prerelease_number = gameVer["revision"].GetInt();
+					GameVersion += string_format("-%d", gameVer["revision"].GetInt());
+				// GameVersion.major = gameVer["major"].GetInt();
+				// GameVersion.minor = gameVer["minor"].GetInt();
+				// GameVersion.patch = gameVer["build"].GetInt();
+				// if (gameVer.HasMember("revision") && gameVer["revision"].IsInt())
+				// 	GameVersion.prerelease_number = gameVer["revision"].GetInt();
 			}
 			//DESERIALIZE_CLASS(ModVersion, modVersion)
 			//DESERIALIZE_CLASS(GameVersion, gameVersion)

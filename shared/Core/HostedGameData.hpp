@@ -2,7 +2,8 @@
 #include "main.hpp"
 #include "GlobalNamespace/MultiplayerLobbyState.hpp"
 #include "GlobalNamespace/BeatmapDifficulty.hpp"
-#include "semver/include/semver.hpp" // SemVer Submodule for version matching
+#include "cpp-semver/shared/cpp-semver.hpp"
+// #include "semver/include/semver.hpp" // SemVer Submodule for version matching
 #include <optional>
 #include "TypeMacros.hpp"
 #include "Core/HostedGamePlayer.hpp"
@@ -70,11 +71,11 @@ namespace ServerBrowser::Core {
         std::optional<std::string> MasterStatusUrl;
         std::vector<HostedGamePlayer> Players;
         std::optional<std::string> EndedAt;
-        std::optional<semver::version> MpExVersion;
-        std::optional<semver::version> MpCoreVersion;
+        std::optional<std::string> MpExVersion;
+        std::optional<std::string> MpCoreVersion;
         std::string ModName;
-        semver::version ModVersion;
-        semver::version GameVersion;
+        std::string ModVersion;
+        std::string GameVersion;
         //SemVer ModVersion;
         //SemVer GameVersion;
         std::optional<std::string> ServerType;
@@ -109,11 +110,11 @@ namespace ServerBrowser::Core {
         const int& get_MasterServerPort() const { return MasterServerPort; }
         const std::optional<std::string> get_MasterStatusUrl() const { return MasterStatusUrl; }
         const std::optional<std::string> get_EndedAt() const { return EndedAt; }
-        const std::optional<semver::version> get_MpExVersion() const { return MpExVersion; }
-        const std::optional<semver::version> get_MpCoreVersion() const { return MpCoreVersion; }
+        const std::optional<std::string> get_MpExVersion() const { return MpExVersion; }
+        const std::optional<std::string> get_MpCoreVersion() const { return MpCoreVersion; }
         const std::string& get_ModName() const { return ModName; }
-        const semver::version& get_ModVersion() const { return ModVersion; }
-        const semver::version& get_GameVersion() const { return GameVersion; }
+        const std::string& get_ModVersion() const { return ModVersion; }
+        const std::string& get_GameVersion() const { return GameVersion; }
         //const SemVer& get_ModVersion() const { return ModVersion; }
         //const SemVer& get_GameVersion() const { return GameVersion; }
         const std::optional<std::string> get_ServerType() const { return ServerType; }
