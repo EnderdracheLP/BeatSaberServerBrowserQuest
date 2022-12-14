@@ -1,5 +1,5 @@
 Param(
-    [Parameter(Mandatory=$false, HelpMessage="The name the output qmod file should have")][String] $qmodname="MultiplayerCore",
+    [Parameter(Mandatory=$false, HelpMessage="The name the output qmod file should have")][String] $qmodname="ServerBrowser",
 
     [Parameter(Mandatory=$false, HelpMessage="Switch to create a clean compilation")]
     [Alias("rebuild")]
@@ -86,6 +86,8 @@ foreach ($lib in $modJson.libraryFiles)
     }
     $filelist += $path
 }
+
+$qmodName += "_v" + $modJson.version;
 
 $zip = $qmodName + ".zip"
 $qmod = $qmodName + ".qmod"
