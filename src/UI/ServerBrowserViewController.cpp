@@ -346,7 +346,7 @@ namespace ServerBrowser::UI::ViewControllers {
                 ////_loadingControl = ListLoadingControl::Create(GameList->get_gameObject->get_transform);
                 //_loadingControl = ListLoadingControl::Create(this->get_gameObject()->get_transform());
                 if (loadingControl) {
-                    loadingControl->didPressRefreshButtonEvent = il2cpp_utils::MakeDelegate<System::Action*>(classof(System::Action*), 
+                    loadingControl->didPressRefreshButtonEvent = custom_types::MakeDelegate<System::Action*>(classof(System::Action*), 
                         (std::function<void()>)[this] {
                             RefreshButtonClick();
                         }

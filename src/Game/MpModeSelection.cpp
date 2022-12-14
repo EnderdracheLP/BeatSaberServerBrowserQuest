@@ -1,7 +1,7 @@
 #include "Game/MpModeSelection.hpp"
 #include "Game/MpConnect.hpp"
 //#include "Game/MpLobbyDestination.hpp"
-#include "MultiplayerCore/shared/Utilities.hpp"
+#include "multiplayer-core/shared/Utilities.hpp"
 #include "GlobalNamespace/SelectMultiplayerLobbyDestination.hpp"
 #include "UI/PluginUi.hpp"
 #include "UnityEngine/Resources.hpp"
@@ -128,7 +128,7 @@ namespace ServerBrowser::Game {
 		// Il2CppString* errorMessageStr = il2cpp_utils::newcsstr(errorMessage);
 		static ConstString backToBrowserStr("Back to browser");
 		static ConstString canRetryStr("Retry connection");
-		action = il2cpp_utils::MakeDelegate<System::Action_1<int>*>(classof(System::Action_1<int>*), (std::function<void(int)>)[](int btnId) {
+		action = custom_types::MakeDelegate<System::Action_1<int>*>(classof(System::Action_1<int>*), (std::function<void(int)>)[](int btnId) {
 				switch (btnId)
 				{
 				default:

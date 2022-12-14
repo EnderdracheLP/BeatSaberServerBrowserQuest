@@ -52,7 +52,7 @@ namespace ServerBrowser::Game {
         auto UserInfoTask = localNetworkPlayerModel->platformUserModel->GetUserInfo();
         static System::Action_1<System::Threading::Tasks::Task*>* action;
         static bool gotPlayerInfo = false;
-        if (!gotPlayerInfo) action = il2cpp_utils::MakeDelegate<System::Action_1<System::Threading::Tasks::Task*>*>(classof(System::Action_1<System::Threading::Tasks::Task*>*), (std::function<void(System::Threading::Tasks::Task_1<GlobalNamespace::UserInfo*>*)>)[&](System::Threading::Tasks::Task_1<GlobalNamespace::UserInfo*>* userInfoTask) {
+        if (!gotPlayerInfo) action = custom_types::MakeDelegate<System::Action_1<System::Threading::Tasks::Task*>*>(classof(System::Action_1<System::Threading::Tasks::Task*>*), (std::function<void(System::Threading::Tasks::Task_1<GlobalNamespace::UserInfo*>*)>)[&](System::Threading::Tasks::Task_1<GlobalNamespace::UserInfo*>* userInfoTask) {
                 UserInfo = userInfoTask->get_Result();
                 if (UserInfo == nullptr)
                 {

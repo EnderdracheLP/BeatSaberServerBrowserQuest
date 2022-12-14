@@ -13,7 +13,6 @@
 #include "UnityEngine/UI/ScrollRect.hpp"
 #include "UnityEngine/UI/RectMask2D.hpp"
 #include "VRUIControls/VRGraphicRaycaster.hpp"
-#include "System/Action_2.hpp"
 #include "HMUI/Touchable.hpp"
 #include "HMUI/EventSystemListener.hpp"
 #include "HMUI/ScrollView.hpp"
@@ -23,6 +22,9 @@
 #include "questui/shared/ArrayUtil.hpp"
 #include "questui/shared/CustomTypes/Components/List/QuestUITableView.hpp"
 #include "questui/shared/BeatSaberUI.hpp"
+
+#include "custom-types/shared/delegate.hpp"
+
 //using namespace QuestUI;
 using UnityEngine::UI::ScrollRect;
 using VRUIControls::VRGraphicRaycaster;
@@ -49,6 +51,8 @@ namespace ServerBrowser::UI::Components
     
     void CustomListTableData::dtor()
     {
+        if (tableView) tableView->remove_didSelectCellWithIdxEvent(didSelectCellWithIdxEvent);
+        // MultiplayerCore::Utilities::ClearDelegate(didSelectCellWithIdxEvent);
         Finalize();
     }
 
@@ -296,13 +300,13 @@ namespace ServerBrowser::UI::Components
 
         container->SetParent(parent, false);
 
-        static auto QuestUIList_cs = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("QuestUIList");
+        static ConstString QuestUIList_cs("QuestUIList");
         auto gameObject = GameObject::New_ctor(QuestUIList_cs);
         gameObject->get_transform()->SetParent(container, false);
         gameObject->SetActive(false);
 
-        static auto DropdownTableView_cs = il2cpp_utils::newcsstr<il2cpp_utils::CreationType::Manual>("DropdownTableView");
-        auto canvasTemplate = QuestUI::ArrayUtil::First(Resources::FindObjectsOfTypeAll<Canvas*>(), [&](auto x) { return x->get_name()->Equals(DropdownTableView_cs); });
+        static ConstString DropdownTableView_cs("DropdownTableView");
+        auto canvasTemplate = QuestUI::ArrayUtil::First(Resources::FindObjectsOfTypeAll<Canvas*>(), [&](auto x) { return static_cast<std::string>(x->get_name()) == static_cast<std::string>(DropdownTableView_cs); });
 
         gameObject->AddComponent<ScrollRect*>();
         auto canvas = gameObject->AddComponent<Canvas*>();
@@ -363,8 +367,8 @@ namespace ServerBrowser::UI::Components
             std::function<void(HMUI::TableView*, int)> fun = [onCellWithIdxClicked](HMUI::TableView*, int idx) {
                 onCellWithIdxClicked(idx);
             };
-            auto delegate = il2cpp_utils::MakeDelegate<DelegateType*>(classof(DelegateType*), fun);
-            tableView->add_didSelectCellWithIdxEvent(delegate);
+            tableData->didSelectCellWithIdxEvent = custom_types::MakeDelegate<DelegateType*>(fun);
+            tableView->add_didSelectCellWithIdxEvent(tableData->didSelectCellWithIdxEvent);
         }
 
         tableView->get_gameObject()->SetActive(true);

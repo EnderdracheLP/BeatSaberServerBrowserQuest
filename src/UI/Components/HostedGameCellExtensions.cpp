@@ -32,7 +32,7 @@ namespace ServerBrowser::UI::Components {
         coverImage = cell->get_transform()->Find(il2cpp_utils::newcsstr("CoverImage"))->GetComponent<ImageView*>();
 
         std::function<void(HMUI::SelectableCell*, HMUI::SelectableCell::TransitionType, ::Il2CppObject*)> fun = [this](SelectableCell* cell, SelectableCell::TransitionType transition, Il2CppObject* obj) { RefreshContent(); };
-        OnSelectionDidChange = il2cpp_utils::MakeDelegate<System::Action_3<HMUI::SelectableCell*, HMUI::SelectableCell::TransitionType, ::Il2CppObject*>*>(classof(System::Action_3<HMUI::SelectableCell*, HMUI::SelectableCell::TransitionType, ::Il2CppObject*>*), fun);
+        OnSelectionDidChange = custom_types::MakeDelegate<System::Action_3<HMUI::SelectableCell*, HMUI::SelectableCell::TransitionType, ::Il2CppObject*>*>(classof(System::Action_3<HMUI::SelectableCell*, HMUI::SelectableCell::TransitionType, ::Il2CppObject*>*), fun);
 
         //OnSelectionDidChange = il2cpp_utils::MakeDelegate<System::Action_3<SelectableCell*, SelectableCell::TransitionType, Il2CppObject*>*>(
         //    classof(System::Action_3<SelectableCell*, SelectableCell::TransitionType, Il2CppObject*>*),

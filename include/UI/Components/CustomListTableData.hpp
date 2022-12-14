@@ -14,6 +14,8 @@
 #include "GlobalNamespace/AnnotatedBeatmapLevelCollectionCell.hpp"
 #include "GlobalNamespace/SimpleTextTableCell.hpp"
 
+#include "System/Action_2.hpp"
+
 #include "QuestUI/shared/CustomTypes/Components/List/QuestUIBoxTableCell.hpp"
 
 #include <vector>
@@ -21,6 +23,9 @@
 // this is what that used to be called, but this is more clear and understandable (Blame BSML) we just copy this
 namespace GlobalNamespace {
     using LevelPackCell = AnnotatedBeatmapLevelCollectionCell;
+}
+namespace System {
+        using DelegateType = System::Action_2<HMUI::TableView*, int>;
 }
 ___DECLARE_TYPE_WRAPPER_INHERITANCE(ServerBrowser::UI::Components, CustomListTableData, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, UnityEngine::MonoBehaviour, "QuestUI", { classof(HMUI::TableView::IDataSource*) }, 0, nullptr,
 
@@ -32,6 +37,8 @@ ___DECLARE_TYPE_WRAPPER_INHERITANCE(ServerBrowser::UI::Components, CustomListTab
     DECLARE_INSTANCE_FIELD(float, cellSize);
     DECLARE_INSTANCE_FIELD(HMUI::TableView*, tableView);
     DECLARE_INSTANCE_FIELD(bool, expandCell);
+
+    DECLARE_INSTANCE_FIELD(System::DelegateType*, didSelectCellWithIdxEvent);
     
     DECLARE_CTOR(ctor);
     DECLARE_DTOR(dtor);
