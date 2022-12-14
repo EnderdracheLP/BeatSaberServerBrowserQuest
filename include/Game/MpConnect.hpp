@@ -1,7 +1,7 @@
 #pragma once
 #include "main.hpp"
 #include "Core/HostedGameData.hpp"
-#include "Core/DnsEndPoint.hpp"
+#include "Core/DnsEndPointW.hpp"
 #include "GlobalNamespace/DnsEndPoint.hpp"
 // #include "GlobalNamespace/MasterServerEndPoint.hpp"
 // using GlobalNamespace::MasterServerEndPoint;

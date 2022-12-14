@@ -2,7 +2,7 @@
 #include "Game/MpConnect.hpp"
 #include "Game/MpLocalPlayer.hpp"
 #include "PluginConfig.hpp"
-#include "MultiplayerCore/shared/Utilities.hpp"
+#include "multiplayer-core/shared/Utilities.hpp"
 #include "UnityEngine/Resources.hpp"
 #include "GlobalNamespace/IConnectedPlayer.hpp"
 #include "System/Action_1.hpp"
