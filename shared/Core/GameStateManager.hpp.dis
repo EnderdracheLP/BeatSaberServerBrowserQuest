@@ -77,7 +77,7 @@ namespace ServerBrowser::Core {
             HandleUpdate();
         }
 
-        static void OnMasterServerChanged(Il2CppObject* sender, MasterServerEndPoint endPoint)
+        static void OnMasterServerChanged(Il2CppObject* sender, DnsEndPoint endPoint)
         {
             Activity.MasterServer = endPoint;
 

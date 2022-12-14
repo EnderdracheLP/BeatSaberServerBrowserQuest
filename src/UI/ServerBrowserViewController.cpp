@@ -296,7 +296,7 @@ namespace ServerBrowser::UI::ViewControllers {
 #pragma endregion
 
             UnityEngine::UI::HorizontalLayoutGroup* statusLayout = QuestUI::BeatSaberUI::CreateHorizontalLayoutGroup(MainContentRoot->get_transform());
-            statusLayout->get_gameObject()->AddComponent<Backgroundable*>()->ApplyBackground(il2cpp_utils::createcsstr("round-rect-panel"));
+            statusLayout->get_gameObject()->AddComponent<Backgroundable*>()->ApplyBackground(il2cpp_utils::newcsstr("round-rect-panel"));
             statusLayout->get_rectTransform()->set_anchorMin({ 0, 1 });
             statusLayout->set_padding(UnityEngine::RectOffset::New_ctor(5, 5, 0, 0));
             RectTransform* statusLayoutTransform = statusLayout->GetComponent<RectTransform*>();
@@ -370,7 +370,7 @@ namespace ServerBrowser::UI::ViewControllers {
 
     void ServerBrowserViewController::DidDeactivate(bool removedFromHierarchy, bool systemScreenDisabling) {
 
-        ServerBrowser::Game::MpModeSelection::SetTitle(Polyglot::Localization::Get(il2cpp_utils::newcsstr("LABEL_MULTIPLAYER_MODE_SELECTION")));
+        ServerBrowser::Game::MpModeSelection::SetTitleIl2String(Polyglot::Localization::Get(il2cpp_utils::newcsstr("LABEL_MULTIPLAYER_MODE_SELECTION")));
         getLogger().debug("ServerBrowserViewController::DidDeactivate");
         CancelImageLoading(false);
     }

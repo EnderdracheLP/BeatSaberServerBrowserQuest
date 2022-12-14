@@ -8,7 +8,7 @@
 using ServerBrowser::Game::MpLocalPlayer;
 
 #define TIMEOUT 10
-#define USER_AGENT std::string(ID "/" VERSION " (BeatSaber/" + GameVersion + ") (" + MpLocalPlayer::get_PlatformId() + ")").c_str()
+#define USER_AGENT std::string(MOD_ID "/" VERSION " (BeatSaber/" + GameVersion + ") (" + MpLocalPlayer::get_PlatformId() + ")").c_str()
 #define X_BSSB "X-BSSB: ✔"
 
 namespace WebUtils {
