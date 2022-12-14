@@ -113,8 +113,8 @@ namespace WebUtils {
         // Init curl
         auto* curl = curl_easy_init();
         struct curl_slist *headers = NULL;
-        headers = curl_slist_append(headers, "Accept: */*");
         headers = curl_slist_append(headers, X_BSSB);
+        headers = curl_slist_append(headers, "Accept: */*");
         // Set headers
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers); 
 
@@ -222,6 +222,11 @@ namespace WebUtils {
             [finished] (long httpCode, std::string data) { 
                 rapidjson::Document document;
                 document.Parse(data);
+                if (document.HasParseError() || !document.IsObject()) {
+                    getLogger().error("Failed to parse JSON Content: %s", data.c_str());
+                    getLogger().debug("%s", USER_AGENT);
+                    getLogger().debug("%s", X_BSSB);
+                }
                 finished(httpCode, document.HasParseError() || !document.IsObject(), document);
             }
         );
