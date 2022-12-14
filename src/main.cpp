@@ -308,27 +308,30 @@ QUICK_HOOK_GB(MultiplayerModeSelectionFlowCoordinator, PresentConnectionErrorDia
             MpModeSelection::PresentConnectionFailedError("Connection failed", "The selected server instance is no longer available.");
             return;
         }
-
-        if (reason == ConnectionFailedReason::ConnectionCanceled) {
-            // ...and if it's just a self-cancel, return to the browser immediately.
+//         return;
+    }
+    if (reason == ConnectionFailedReason::ConnectionCanceled) {
+        // if it's just a self-cancel and we initiated the connection, return to the browser immediately.
+        if (GlobalModState::WeInitiatedConnection) {
             MpModeSelection::CancelLobbyJoin();
             MpModeSelection::MakeServerBrowserTopView();
+            return;
         }
-        else
-        {
-            MpModeSelection::PresentConnectionFailedError
-            (
-                "Connection failed",
-                ConnectionErrorText::Generate(reason),
-                reason != ConnectionFailedReason::InvalidPassword
-                && reason != ConnectionFailedReason::VersionMismatch
-            );
-        }
-        return;
-    }
-    else {
         MultiplayerModeSelectionFlowCoordinator_PresentConnectionErrorDialog(self, connectionType, reason);
     }
+    else
+    {
+        MpModeSelection::PresentConnectionFailedError
+        (
+            "Connection failed",
+            ConnectionErrorText::Generate(reason),
+            reason != ConnectionFailedReason::InvalidPassword
+            && reason != ConnectionFailedReason::VersionMismatch
+        );
+    }
+//     else {
+//         MultiplayerModeSelectionFlowCoordinator_PresentConnectionErrorDialog(self, connectionType, reason);
+//     }
 }
 
 #include "System/Array.hpp"
@@ -421,6 +424,13 @@ MAKE_HOOK_MATCH(PlatformAuthenticationTokenProvider_GetAuthenticationToken, &Pla
     ));
 }
 
+// This might not get called
+MAKE_HOOK_FIND_VERBOSE(UnityEngine_Application_Quit, il2cpp_utils::FindMethodUnsafe("UnityEngine", "Application", "Quit", 1), void, int exitCode) {
+    getLogger().debug("Application Quitting");
+    MpSession::TearDown();
+    UnityEngine_Application_Quit(exitCode);
+}
+
 // Called at the early stages of game loading
 extern "C" void setup(ModInfo& info) {
     info.id = ID;
@@ -449,6 +459,7 @@ extern "C" void load() {
 
     INSTALL_HOOK(getLogger(), NetworkConfigSO_get_masterServerEndPoint);
     INSTALL_HOOK(getLogger(), MasterServerConnectionManager_HandleConnectToServerSuccess);
+    INSTALL_HOOK(getLogger(), UnityEngine_Application_Quit);
     auto ModList = Modloader::getMods();
     if (ModList.find("BeatTogether") == ModList.end()) {
         getLogger().info("BeatTogether not found, installing our own overrides");
