@@ -29,11 +29,4 @@ DECLARE_CONFIG(PluginConfig,
     /// </summary>
     CONFIG_VALUE(JoinNotificationsEnabled, bool, "JoinNotificationsEnabled", true);
     //public bool JoinNotificationsEnabled{ get; set; } = true;
-
-    CONFIG_INIT_FUNCTION(
-        CONFIG_INIT_VALUE(LobbyAnnounceToggle);
-        CONFIG_INIT_VALUE(ShareQuickPlayGames);
-        CONFIG_INIT_VALUE(CustomGameName);
-        CONFIG_INIT_VALUE(JoinNotificationsEnabled);
-    )
 )
