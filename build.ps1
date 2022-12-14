@@ -1,36 +1,31 @@
-Param (
-[Parameter(HelpMessage="The version the mod should be compiled with")][string]$Version
+Param(
+    [Parameter(Mandatory=$false)]
+    [Switch] $clean,
+
+    [Parameter(Mandatory=$false)]
+    [Switch] $help
 )
-Write-Host $Version
-$NDKPath = Get-Content $PSScriptRoot/ndkpath.txt -First 1
-if ($env:VERSION) {
-$Version = $env:VERSION
+
+if ($help -eq $true) {
+    Write-Output "`"Build`" - Copiles your mod into a `".so`" or a `".a`" library"
+    Write-Output "`n-- Arguments --`n"
+
+    Write-Output "-Clean `t`t Deletes the `"build`" folder, so that the entire library is rebuilt"
+
+    exit
 }
-if (!($Version)) {
-$Version = "0.1.0"
-}
-if ((Test-Path "./extern/beatsaber-hook/src/inline-hook/And64InlineHook.cpp", "./extern/beatsaber-hook/src/inline-hook/inlineHook.c", "./extern/beatsaber-hook/src/inline-hook/relocate.c") -contains $false) {
-    Write-Host "Critical: Missing inline-hook"
-    if (!(Test-Path "./extern/beatsaber-hook/src/inline-hook/And64InlineHook.cpp")) {
-        Write-Host "./extern/beatsaber-hook/src/inline-hook/And64InlineHook.cpp"
+
+# if user specified clean, remove all build files
+if ($clean.IsPresent) {
+    if (Test-Path -Path "build") {
+        remove-item build -R
     }
-    if (!(Test-Path "./extern/beatsaber-hook/src/inline-hook/inlineHook.c")) {
-        Write-Host "./extern/beatsaber-hook/src/inline-hook/inlineHook.c"
-    }
-        if (!(Test-Path "./extern/beatsaber-hook/inline-hook/src/relocate.c")) {
-        Write-Host "./extern/beatsaber-hook/src/inline-hook/relocate.c"
-    }
-    Write-Host "Task Failed"
-    exit 1;
 }
 
-echo "Building ServerBrowserQuest Version: $Version"
 
-$buildScript = "$NDKPath/build/ndk-build"
-if (-not ($PSVersionTable.PSEdition -eq "Core")) {
-    $buildScript += ".cmd"
-}
+if (($clean.IsPresent) -or (-not (Test-Path -Path "build"))) {
+    new-item -Path build -ItemType Directory
+} 
 
-& $buildScript NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./Android.mk NDK_APPLICATION_MK=./Application.mk VERSION=$Version
-
-Exit $LASTEXITCODE
+& cmake -G "Ninja" -DCMAKE_BUILD_TYPE="RelWithDebInfo" -B build
+& cmake --build ./build
