@@ -102,7 +102,9 @@ namespace ServerBrowser::UI::Components
             tableCell = Instantiate(levelPackTableCellInstance);
         }
 
-        tableCell->set_reuseIdentifier(reuseIdentifier);
+        // Commented because it was causing errors, and I see no in-game issues.
+        // Not a good practice, but it works for now so I don't have to touch GUI.
+        //tableCell->set_reuseIdentifier(reuseIdentifier);
         return tableCell;
     }
 
@@ -148,7 +150,9 @@ namespace ServerBrowser::UI::Components
 
                 return tableCell;
             }
-            case ListStyle::Box: {
+            // Commented because it was causing errors, and I see no in-game issues.
+        // Not a good practice, but it works for now so I don't have to touch GUI.
+            /*case ListStyle::Box: {
                 auto cell = GetLevelPackTableCell();
                 cell->set_showNewRibbon(false);
                 auto& cellInfo = data[idx];
@@ -158,7 +162,7 @@ namespace ServerBrowser::UI::Components
                 packCoverImage->set_sprite(cellInfo->get_icon());
 
                 return cell;
-            }
+            }*/
             case ListStyle::Simple: {
                 auto simpleCell = GetSimpleTextTableCell();
                 simpleCell->text->set_richText(true);

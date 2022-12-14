@@ -19,7 +19,7 @@ namespace ServerBrowser::UI::Components
         //layout = BeatSaberUI::CreateVerticalLayoutGroup(formView);
 
         addToBrowserSetting = CreateToggle("Add to Server Browser", get_AddToBrowserValue(), [this](bool newValue) { OnAddToBrowserChange(newValue); });
-        serverNameSetting = CreateTextInput("Server Name - " + Game::MpSession::GetDefaultHostGameName(), get_ServerNameValue(), [this](std::string_view newValue) { OnServerNameChange(newValue.data()); });
+        serverNameSetting = CreateTextInput("Server Name - " + Game::MpSession::GetDefaultHostGameName(), get_ServerNameValue(), [this](StringW newValue) { OnServerNameChange(newValue); });
 
         CreateExtraText();
     }
@@ -98,7 +98,7 @@ namespace ServerBrowser::UI::Components
         //return toggleSetting;
     }
 
-    HMUI::InputFieldView* CreateServerExtensions::CreateTextInput(std::string label, std::string value, std::function<void(std::string_view)> onChangeCallback)
+    HMUI::InputFieldView* CreateServerExtensions::CreateTextInput(std::string label, std::string value, std::function<void(StringW)> onChangeCallback)
     {
         // Base
         //auto stringSetting = BeatSaberUI::CreateStringSetting(layout->get_transform(), label, value, onChangeCallback);

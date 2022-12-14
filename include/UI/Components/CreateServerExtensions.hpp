@@ -25,7 +25,7 @@ DECLARE_CLASS_CODEGEN(ServerBrowser::UI::Components, CreateServerExtensions, Uni
         DECLARE_INSTANCE_METHOD(void, ReApplyVerticalLayout, bool extraHeight);
 
         UnityEngine::UI::Toggle* CreateToggle(std::string label, bool value, std::function<void(bool)> onChangeCallback, std::string hoverHint = "");
-        HMUI::InputFieldView* CreateTextInput(std::string label, std::string value, std::function<void(std::string_view)> onChangeCallback);
+        HMUI::InputFieldView* CreateTextInput(std::string label, std::string value, std::function<void(StringW)> onChangeCallback);
         TMPro::TextMeshProUGUI* CreateExtraText(std::string initialText = "");
 
         bool eventsEnabled = true;

@@ -11,14 +11,14 @@
 #include "HMUI/SelectableCell.hpp"
 
 #include "GlobalNamespace/LevelListTableCell.hpp"
-#include "GlobalNamespace/AnnotatedBeatmapLevelCollectionTableCell.hpp"
+#include "GlobalNamespace/AnnotatedBeatmapLevelCollectionCell.hpp"
 #include "GlobalNamespace/SimpleTextTableCell.hpp"
 
 #include <vector>
 
 // this is what that used to be called, but this is more clear and understandable (Blame BSML) we just copy this
 namespace GlobalNamespace {
-    using LevelPackTableCell = AnnotatedBeatmapLevelCollectionTableCell;
+    using LevelPackTableCell = AnnotatedBeatmapLevelCollectionCell;
 }
 ___DECLARE_TYPE_WRAPPER_INHERITANCE(ServerBrowser::UI::Components, CustomListTableData, Il2CppTypeEnum::IL2CPP_TYPE_CLASS, UnityEngine::MonoBehaviour, "QuestUI", { classof(HMUI::TableView::IDataSource*) }, 0, nullptr,
 

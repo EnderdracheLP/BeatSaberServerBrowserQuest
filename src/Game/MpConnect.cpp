@@ -6,6 +6,7 @@ namespace ServerBrowser::Game {
 
 	void MpConnect::Join(HostedGameData game) {
 		getLogger().debug("MpConnect::Join");
+		/* MQE hasn't been updated in awhile, but this my be useful in the future
 		// MQE Version check
 		if (game.get_MpExVersion().has_value()) {
 			getLogger().debug("MpConnect::Join MpEx Check");
@@ -16,7 +17,7 @@ namespace ServerBrowser::Game {
 			//semver::version checkRange2{ ourMQE_Version };
 			//checkRange2.minor++;
 			//auto range = semver::range::detail::range(string_format(">=%s <%s", ourMQE_Version.c_str(), checkRange2.to_string().c_str()));
-			if (game.get_MpExVersion()->to_string() != ourMQE_Version/*range.satisfies(game.get_MpExVersion().value(), true)*/) {
+			if (game.get_MpExVersion()->to_string() != ourMQE_Version/*range.satisfies(game.get_MpExVersion().value(), true)*//*) {
 				std::string ourMQE_VersionStr = (!ourMQE_Version.empty() ? ourMQE_Version : "Not installed");
 				std::string theirMpExVersionStr = game.get_MpExVersion()->to_string();
 
@@ -40,7 +41,7 @@ namespace ServerBrowser::Game {
 				);
 				return;
 			}
-		}
+		}*/
 		// Master server switching
 		if (!game.get_MasterServerHost().has_value() || game.get_MasterServerHost()->ends_with(OFFICIAL_MASTER_SUFFIX)) {
 			getLogger().error("MpConnect::Join Official Server, this should never run!!!");
@@ -94,24 +95,24 @@ namespace ServerBrowser::Game {
 
 	//std::pair<std::string, int> MpConnect::LastUsedMasterServer;
 
-	SafePtr<MasterServerEndPoint> MpConnect::OverrideEndPoint;
+	SafePtr<DnsEndPoint> MpConnect::OverrideEndPoint;
 
-	SafePtr<MasterServerEndPoint> MpConnect::LastUsedMasterServer;
+	SafePtr<DnsEndPoint> MpConnect::LastUsedMasterServer;
 
-	MasterServerEndPoint* const MpConnect::get_OverrideEndPoint() {
-		//return MasterServerEndPoint::New_ctor(il2cpp_utils::newcsstr(OverrideEndPoint.first), OverrideEndPoint.second)
+	DnsEndPoint* const MpConnect::get_OverrideEndPoint() {
+		//return DnsEndPoint::New_ctor(il2cpp_utils::newcsstr(OverrideEndPoint.first), OverrideEndPoint.second)
 		if (OverrideEndPoint)
-			return static_cast<MasterServerEndPoint*>(OverrideEndPoint);
+			return static_cast<DnsEndPoint*>(OverrideEndPoint);
 		else return nullptr;
 	}
 
-	//MasterServerEndPoint* MpConnect::get_LastUsedMasterServer() {
-	//	return MasterServerEndPoint::New_ctor(il2cpp_utils::newcsstr(LastUsedMasterServer.first), LastUsedMasterServer.second)
+	//DnsEndPoint* MpConnect::get_LastUsedMasterServer() {
+	//	return DnsEndPoint::New_ctor(il2cpp_utils::newcsstr(LastUsedMasterServer.first), LastUsedMasterServer.second)
 	//}
-	//void MpConnect::set_OverrideEndPoint(MasterServerEndPoint* NewOverrideEndPoint) {
+	//void MpConnect::set_OverrideEndPoint(DnsEndPoint* NewOverrideEndPoint) {
 
 	//}
-	//void MpConnect::set_LastUsedMasterServer(MasterServerEndPoint* LastUsedEndPoint) {
+	//void MpConnect::set_LastUsedMasterServer(DnsEndPoint* LastUsedEndPoint) {
 
 	//}
 
@@ -120,7 +121,7 @@ namespace ServerBrowser::Game {
 		return OverrideEndPoint && !OverrideEndPoint->hostName->EndsWith(il2cpp_utils::newcsstr(OFFICIAL_MASTER_SUFFIX));
 	}
 
-	void MpConnect::ReportCurrentMasterServerValue(MasterServerEndPoint* currentEndPoint) {
+	void MpConnect::ReportCurrentMasterServerValue(DnsEndPoint* currentEndPoint) {
 		bool isFirstReport = !LastUsedMasterServer;
 
 		LastUsedMasterServer = currentEndPoint;
@@ -158,15 +159,15 @@ namespace ServerBrowser::Game {
 	}
 
 	void MpConnect::SetMasterServerOverride(std::string hostName, int port) {
-		if (!classof(MasterServerEndPoint*)->initialized) il2cpp_functions::Class_Init(classof(MasterServerEndPoint*)); // This is needed in order to initialize the Il2CppClass
-		//SetMasterServerOverride(MasterServerEndPoint::New_ctor<il2cpp_utils::CreationType::Manual>(il2cpp_utils::newcsstr(hostName), port));
-		SetMasterServerOverride(MasterServerEndPoint::New_ctor(il2cpp_utils::newcsstr(hostName), port));
+		if (!classof(DnsEndPoint*)->initialized) il2cpp_functions::Class_Init(classof(DnsEndPoint*)); // This is needed in order to initialize the Il2CppClass
+		//SetMasterServerOverride(DnsEndPoint::New_ctor<il2cpp_utils::CreationType::Manual>(il2cpp_utils::newcsstr(hostName), port));
+		SetMasterServerOverride(DnsEndPoint::New_ctor(il2cpp_utils::newcsstr(hostName), port));
 	}
 
-	void MpConnect::SetMasterServerOverride(MasterServerEndPoint* overrideEndPoint) {
+	void MpConnect::SetMasterServerOverride(DnsEndPoint* overrideEndPoint) {
 		if (!OverrideEndPoint || !(csstrtostr(OverrideEndPoint->ToString()) == csstrtostr(overrideEndPoint->ToString())))
 		{
-			//il2cpp_functions::GC_free(static_cast<MasterServerEndPoint*>(OverrideEndPoint));
+			//il2cpp_functions::GC_free(static_cast<DnsEndPoint*>(OverrideEndPoint));
 			getLogger().info("Setting master server override now: %s", to_utf8(csstrtostr(overrideEndPoint->ToString())).c_str());
 			OverrideEndPoint = overrideEndPoint;
 		}
@@ -179,7 +180,7 @@ namespace ServerBrowser::Game {
 		if (OverrideEndPoint)
 		{
 			getLogger().info("Stopped overriding master server");
-			//il2cpp_functions::GC_free(static_cast<MasterServerEndPoint*>(OverrideEndPoint));
+			//il2cpp_functions::GC_free(static_cast<DnsEndPoint*>(OverrideEndPoint));
 			OverrideEndPoint = nullptr;
 		}
 	}

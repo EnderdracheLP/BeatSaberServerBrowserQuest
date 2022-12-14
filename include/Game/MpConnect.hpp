@@ -1,8 +1,8 @@
 #pragma once
 #include "main.hpp"
 #include "Core/HostedGameData.hpp"
-#include "GlobalNamespace/MasterServerEndPoint.hpp"
-using GlobalNamespace::MasterServerEndPoint;
+#include "GlobalNamespace/DnsEndPoint.hpp"
+using GlobalNamespace::DnsEndPoint;
 using ServerBrowser::Core::HostedGameData;
 
 namespace ServerBrowser::Game {
@@ -22,30 +22,30 @@ namespace ServerBrowser::Game {
 #pragma region Master Server Management
 	// TODO: Implement this possibly
 	private:
-	//	static MasterServerEndPoint* _officialEndPoint;
-	//	static MasterServerEndPoint* _moddedEndPoint;
+	//	static DnsEndPoint* _officialEndPoint;
+	//	static DnsEndPoint* _moddedEndPoint;
 	//	static bool _usingModdedServer;
-	static SafePtr<MasterServerEndPoint> OverrideEndPoint;
+	static SafePtr<DnsEndPoint> OverrideEndPoint;
 	//static std::pair<std::string, int> OverrideEndPoint;
 		//static bool ShouldDisableCertificateValidation;
 	public:
-		static MasterServerEndPoint* const get_OverrideEndPoint();
+		static DnsEndPoint* const get_OverrideEndPoint();
 
-	static SafePtr<MasterServerEndPoint> LastUsedMasterServer;
+	static SafePtr<DnsEndPoint> LastUsedMasterServer;
 	//static std::pair<std::string, int> LastUsedMasterServer;
-	//	MasterServerEndPoint* get_LastUsedMasterServer();
+	//	DnsEndPoint* get_LastUsedMasterServer();
 	//private:
-	//	void set_OverrideEndPoint(MasterServerEndPoint* NewOverrideEndPoint);
-	//	void set_LastUsedMasterServer(MasterServerEndPoint* LastUsedEndPoint);
+	//	void set_OverrideEndPoint(DnsEndPoint* NewOverrideEndPoint);
+	//	void set_LastUsedMasterServer(DnsEndPoint* LastUsedEndPoint);
 
 	//public:
 	static bool get_ShouldDisableCertificateValidation();
 
-	static void ReportCurrentMasterServerValue(MasterServerEndPoint* currentEndPoint);
+	static void ReportCurrentMasterServerValue(DnsEndPoint* currentEndPoint);
 
 	static void SetMasterServerOverride(std::string hostName, int port = DEFAULT_MASTER_PORT);
 
-	static void SetMasterServerOverride(MasterServerEndPoint* overrideEndPoint);
+	static void SetMasterServerOverride(DnsEndPoint* overrideEndPoint);
 
 	static void ClearMasterServerOverride();
 #pragma endregion

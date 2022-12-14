@@ -58,7 +58,7 @@ namespace ServerBrowser::Game {
 		Il2CppString* titleStr = il2cpp_utils::newcsstr(title);
 		_flowCoordinator->SetTitle(titleStr, ViewController::AnimationType::In);
 	}
-	void MpModeSelection::SetTitle(Il2CppString* title) {
+	void MpModeSelection::SetTitleIl2String(Il2CppString* title) {
 		_flowCoordinator->SetTitle(title, ViewController::AnimationType::In);
 	}
 #pragma endregion
