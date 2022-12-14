@@ -53,7 +53,7 @@
 #include "GlobalNamespace/PacketEncryptionLayer.hpp"
 #include "GlobalNamespace/NetworkConfigSO.hpp"
 
-#include "GlobalNamespace/UserCertificateValidator.hpp"
+#include "GlobalNamespace/ClientCertificateValidator.hpp"
 #include "GlobalNamespace/PlatformAuthenticationTokenProvider.hpp"
 #include "GlobalNamespace/AuthenticationToken.hpp"
 
@@ -61,7 +61,7 @@
 #include "System/Net/IPAddress.hpp"
 #include "System/Threading/Tasks/Task_1.hpp"
 
-#include "GlobalNamespace/BGNetDebug.hpp"
+//#include "GlobalNamespace/BGNetDebug.hpp"
 using namespace GlobalNamespace;
 using namespace UnityEngine;
 using namespace ServerBrowser::UI;
@@ -73,8 +73,6 @@ using namespace ServerBrowser::Utils;
 #define QUICK_HOOK(namespace_, class_, methodname, retval, ...) MAKE_HOOK_MATCH(class_##_##methodname, &namespace_::class_::methodname, retval, namespace_::class_* self, __VA_ARGS__)
 
 static ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
-
-DEFINE_CONFIG(PluginConfig);
 
 // Loads the config from disk using our modInfo, then returns it for use
 Configuration& getConfig() {
@@ -113,13 +111,13 @@ std::vector<std::string> split(const std::string& str, char delim)
 /// This hook lets us determine the host's server secret.
 /// This can then be used to help connect to specific games without a code, e.g. in case of Quickplay games.
 /// </summary>
-QUICK_HOOK_GB(MasterServerConnectionManager, HandleConnectToServerSuccess, void, ::Il2CppString* userId, ::Il2CppString* userName, 
+QUICK_HOOK_GB(MasterServerConnectionManager, HandleConnectToServerSuccess, void, StringW userId, StringW userName, 
     System::Net::IPEndPoint* remoteEndPoint, 
-    ::Il2CppString* secret, ::Il2CppString* code, 
+    StringW secret, StringW code, 
     GlobalNamespace::BeatmapLevelSelectionMask selectionMask, 
     GlobalNamespace::GameplayServerConfiguration configuration, 
-    ::Array<uint8_t>* preMasterSecret, ::Array<uint8_t>* myRandom, ::Array<uint8_t>* remoteRandom, 
-    bool isConnectionOwner, bool isDedicatedServer, ::Il2CppString* managerId) {
+    ::ArrayW<uint8_t> preMasterSecret, ::ArrayW<uint8_t> myRandom, ::ArrayW<uint8_t> remoteRandom, 
+    bool isConnectionOwner, bool isDedicatedServer, StringW managerId) {
 
     getLogger().info("HandleConnectToServerSuccess(userId=%s, userName=%s, "
         " remoteEndPoint=%s, secret=%s, code=%s,"
@@ -227,8 +225,8 @@ QUICK_HOOK_GB(MultiplayerModeSelectionViewController, DidActivate, void, bool fi
     btnGameBrowser->set_enabled(true);
     btnGameBrowser->get_gameObject()->SetActive(true);
 
-    Array<Component*>* comp = btnGameBrowser->GetComponents<Component*>();
-    for (int i = 0; i < comp->get_Length(); i++) {
+    ArrayW<Component*> comp = btnGameBrowser->GetComponents<Component*>();
+    for (int i = 0; i < comp->Length(); i++) {
         comp->values[i]->get_gameObject()->SetActive(true);
         //getLogger().debug("Components values[%d] name: %s", i, to_utf8(csstrtostr(comp->values[i]->ToString())).c_str());
     }
@@ -328,7 +326,7 @@ QUICK_HOOK_GB(MultiplayerModeSelectionFlowCoordinator, PresentConnectionErrorDia
     }
 }
 
-QUICK_HOOK_GB(PacketEncryptionLayer, ProcessOutBoundPacketInternal, bool, System::Net::IPEndPoint* remoteEndPoint, ByRef<::Array<uint8_t>*> data, ByRef<int> offset, ByRef<int> length, ByRef<bool> encrypted) {
+QUICK_HOOK_GB(PacketEncryptionLayer, ProcessOutBoundPacketInternal, bool, System::Net::IPEndPoint* remoteEndPoint, ByRef<::ArrayW<uint8_t>> data, ByRef<int> offset, ByRef<int> length, ByRef<bool> encrypted) {
     if (GlobalModState::ShouldDisableEncryption)
     {
         // Disabling; do not perform outbound encryption, disable unencrypted traffic filter
@@ -339,7 +337,7 @@ QUICK_HOOK_GB(PacketEncryptionLayer, ProcessOutBoundPacketInternal, bool, System
 
         if (offset.heldRef == 0)
         {
-            System::Array::Copy(data.heldRef, offset.heldRef, data.heldRef, offset.heldRef + 1, length.heldRef);
+            //System::Array::Copy(data.heldRef, offset.heldRef, data.heldRef, offset.heldRef + 1, length.heldRef);
         }
         else
         {
@@ -360,7 +358,7 @@ QUICK_HOOK_GB(PacketEncryptionLayer, ProcessOutBoundPacketInternal, bool, System
     return PacketEncryptionLayer_ProcessOutBoundPacketInternal(self, remoteEndPoint, data, offset, length, encrypted);
 }
 
-QUICK_HOOK_GB(UserCertificateValidator, ValidateCertificateChainInternal, void, GlobalNamespace::DnsEndPoint* endPoint, System::Security::Cryptography::X509Certificates::X509Certificate2* certificate, ::Array<::Array<uint8_t>*>* certificateChain)
+QUICK_HOOK_GB(ClientCertificateValidator, ValidateCertificateChainInternal, void, GlobalNamespace::DnsEndPoint* endPoint, System::Security::Cryptography::X509Certificates::X509Certificate2* certificate, ::ArrayW<::ArrayW<uint8_t>> certificateChain)
 {
     // This mod disables certificate validation when it is overriding the master server to an unofficial one only.
     // If we are connecting to official games, we won't interfere.
@@ -370,11 +368,11 @@ QUICK_HOOK_GB(UserCertificateValidator, ValidateCertificateChainInternal, void, 
         getLogger().info("Bypassing user certificate validation");
     }
     else {
-        UserCertificateValidator_ValidateCertificateChainInternal(self, endPoint, certificate, certificateChain);
+        ClientCertificateValidator_ValidateCertificateChainInternal(self, endPoint, certificate, certificateChain);
     }
 }
 
-MAKE_HOOK_MATCH(NetworkConfigSO_get_masterServerEndPoint, &NetworkConfigSO::get_masterServerEndPoint, GlobalNamespace::MasterServerEndPoint*, NetworkConfigSO* self) {
+MAKE_HOOK_MATCH(NetworkConfigSO_get_masterServerEndPoint, &NetworkConfigSO::get_masterServerEndPoint, GlobalNamespace::DnsEndPoint*, NetworkConfigSO* self) {
     getLogger().debug("Running get_masterServerEndPoint");
     auto result = NetworkConfigSO_get_masterServerEndPoint(self);
     MpConnect::ReportCurrentMasterServerValue(result);
@@ -418,11 +416,10 @@ MAKE_HOOK_MATCH(PlatformAuthenticationTokenProvider_GetAuthenticationToken, &Pla
 
 // Called at the early stages of game loading
 extern "C" void setup(ModInfo& info) {
-    info.id = ID;
+    info.id = MOD_ID;
     info.version = VERSION;
     modInfo = info;
-	
-    getConfig().Load(); // Load the config file
+
     getLogger().info("Completed setup!");
 }
 
@@ -437,7 +434,7 @@ extern "C" void load() {
     getLogger().info("Installing hooks...");
     INSTALL_HOOK(getLogger(), MultiplayerModeSelectionViewController_DidActivate);
     // TODO: Re-enable this hook once Lobby Announcing is done
-    //INSTALL_HOOK(getLogger(), CreateServerViewController_DidActivate);
+    INSTALL_HOOK(getLogger(), CreateServerViewController_DidActivate);
     INSTALL_HOOK(getLogger(), MultiplayerModeSelectionFlowCoordinator_HandleMultiplayerLobbyControllerDidFinish);
     INSTALL_HOOK(getLogger(), MultiplayerModeSelectionFlowCoordinator_PresentConnectionErrorDialog);
     INSTALL_HOOK(getLogger(), PacketEncryptionLayer_ProcessOutBoundPacketInternal);
@@ -447,7 +444,7 @@ extern "C" void load() {
     auto ModList = Modloader::getMods();
     if (ModList.find("BeatTogether") == ModList.end()) {
         getLogger().info("BeatTogether not found, installing our own overrides");
-        INSTALL_HOOK(getLogger(), UserCertificateValidator_ValidateCertificateChainInternal);
+        INSTALL_HOOK(getLogger(), ClientCertificateValidator_ValidateCertificateChainInternal);
         INSTALL_HOOK(getLogger(), PlatformAuthenticationTokenProvider_GetAuthenticationToken);
     }
 
