@@ -14,7 +14,6 @@ namespace ServerBrowser::Models {
         VALUE(std::string, CoverArtUrl);
 
 
-        __declspec(property(get = get_ListDescription)) std::string ListDescription;
         std::string get_ListDescription() {
                 if (SongName.empty())
                     return "Unknown";
@@ -28,5 +27,6 @@ namespace ServerBrowser::Models {
                 text += SongName;
                 return text;
         }
+        __declspec(property(get = get_ListDescription)) std::string ListDescription;
     };
 }
