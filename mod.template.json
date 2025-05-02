@@ -1,0 +1,16 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Lauriethefish/QuestPatcher.QMod/main/QuestPatcher.QMod/Resources/qmod.schema.json",
+  "_QPVersion": "0.1.1",
+  "name": "${mod_name}",
+  "id": "${mod_id}",
+  "author": "EnderdracheLP, LookAtHippo",
+  "version": "0.1.0",
+  "packageId": "com.beatgames.beatsaber",
+  "packageVersion": "1.35.0_8016709773",
+  "description": "A mod for Beat Saber that adds a Server Browser to Online, making it easy to join multiplayer games.",
+  "dependencies": [],
+  "modFiles": ["${binary}"],
+
+  "libraryFiles": [],
+  "fileCopies": []
+}
